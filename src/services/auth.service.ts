@@ -1,4 +1,4 @@
-import { apiClient } from '~/api/client';
+import { apiClient, refreshClient } from '~/api/client';
 
 interface AuthResponse {
   accessToken: string;
@@ -16,5 +16,12 @@ export const authService = {
   },
   logout: async (refreshToken: string): Promise<void> => {
     await apiClient.post('/Auth/logout', { refreshToken });
+  },
+  refresh: async (refreshToken: string): Promise<AuthResponse> => {
+    const { data } = await refreshClient.post<AuthResponse>('/Auth/refresh', {
+      refreshToken,
+    });
+
+    return data;
   },
 };

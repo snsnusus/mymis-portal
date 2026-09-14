@@ -5,8 +5,8 @@ import {
   Outlet,
   type RouteObject,
 } from 'react-router-dom';
-import ProtectedRoute from './protected-route';
-import { loadable } from '~/utils';
+import { ProtectedRoute } from '~/routes/protected-route';
+import { loadable } from '~/utils/loadable';
 
 const App = loadable(() => import('~/App'));
 const Login = loadable(() => import('~/pages/login'));

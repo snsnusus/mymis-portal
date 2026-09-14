@@ -5,8 +5,11 @@ import {
   useContext,
   useState,
   type PropsWithChildren,
+  useEffect,
+  useRef,
 } from 'react';
 import { authService } from '~/services/auth.service';
+import { isTokenExpired } from '~/utils/token.util';
 
 interface AuthUser {
   id: string;
@@ -26,6 +29,7 @@ interface DecodedToken {
 interface AuthContextType {
   user: AuthUser | null;
   isAuthenticated: boolean;
+  isInitializing: boolean;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
 }
@@ -43,17 +47,59 @@ const decodeUser = (accessToken: string): AuthUser => {
   };
 };
 
-export const AuthProvider = ({ children }: PropsWithChildren): ReactElement => {
-  const [user, setUser] = useState<AuthUser | null>(() => {
-    const savedAccessToken = localStorage.getItem('access_token');
-    if (!savedAccessToken) return null;
+const clearStoredTokens = (): void => {
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+};
 
-    try {
-      return decodeUser(savedAccessToken);
-    } catch {
-      return null;
-    }
-  });
+export const AuthProvider = ({ children }: PropsWithChildren): ReactElement => {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  const hasInitialized = useRef(false);
+
+  useEffect(() => {
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
+
+    const initializeAuth = async (): Promise<void> => {
+      const savedAccessToken = localStorage.getItem('access_token');
+      const savedRefreshToken = localStorage.getItem('refresh_token');
+
+      if (!savedAccessToken || !savedRefreshToken) {
+        setIsInitializing(false);
+        return;
+      }
+
+      if (!isTokenExpired(savedAccessToken)) {
+        try {
+          setUser(decodeUser(savedAccessToken));
+        } catch {
+          clearStoredTokens();
+          setUser(null);
+        }
+        setIsInitializing(false);
+        return;
+      }
+
+      try {
+        const { accessToken, refreshToken } = await authService.refresh(
+          savedRefreshToken
+        );
+
+        localStorage.setItem('access_token', accessToken);
+        localStorage.setItem('refresh_token', refreshToken);
+        setUser(decodeUser(accessToken));
+      } catch {
+        clearStoredTokens();
+        setUser(null);
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+
+    void initializeAuth();
+  }, []);
 
   const login = async (
     username: string,
@@ -96,7 +142,7 @@ export const AuthProvider = ({ children }: PropsWithChildren): ReactElement => {
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated: !!user, login, logout }}
+      value={{ user, isAuthenticated: !!user, isInitializing, login, logout }}
     >
       {children}
     </AuthContext.Provider>
