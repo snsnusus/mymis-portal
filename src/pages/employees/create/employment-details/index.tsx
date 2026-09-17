@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form';
 import {
   useGetAllDepartments,
   useGetPositionsByDepartment,
-} from '~/hooks/department.hooks';
+} from '~/hooks/department.hook';
 import {
   Box,
   Button,

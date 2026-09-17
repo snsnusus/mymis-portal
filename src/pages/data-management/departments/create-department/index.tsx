@@ -3,7 +3,7 @@ import { type ReactElement } from 'react';
 
 import { useForm } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
-import { useCreateDepartment } from '~/hooks/department.hooks';
+import { useCreateDepartment } from '~/hooks/department.hook';
 
 import { Box, Stack, Typography, Button } from '@mui/material';
 import { Form } from '~/components/form';

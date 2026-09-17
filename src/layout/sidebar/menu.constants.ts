@@ -3,7 +3,6 @@ import type { MenuItems } from '~/models/sidebar.models';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import Face4Icon from '@mui/icons-material/Face4';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import ContactsIcon from '@mui/icons-material/Contacts';
 import CreateIcon from '@mui/icons-material/Create';
 import ListIcon from '@mui/icons-material/List';
 import BusinessIcon from '@mui/icons-material/Business';
@@ -22,25 +21,20 @@ export const MENU_ITEMS: MenuItems[] = [
     icon: Face4Icon,
   },
   {
-    label: 'Users',
+    label: 'Employees',
     icon: PeopleAltIcon,
     children: [
       {
-        label: 'Create User',
-        path: '/users/create',
+        label: 'Create',
+        path: '/employees/create',
         icon: CreateIcon,
       },
       {
         label: 'List',
-        path: '/users',
+        path: '/employees',
         icon: ListIcon,
       },
     ],
-  },
-  {
-    path: '/contacts',
-    label: 'Contacts',
-    icon: ContactsIcon,
   },
   {
     label: 'Data Management',

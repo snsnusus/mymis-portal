@@ -63,3 +63,14 @@ export type Department = Omit<
   id: string;
   coverImageUrl: string;
 };
+
+export type DepartmentNew = {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  status: string;
+  primaryContactName: string | null;
+  secondaryContactName: string | null;
+  employeeCount: number;
+};

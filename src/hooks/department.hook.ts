@@ -1,6 +1,7 @@
 import type {
   Department,
   DepartmentFormValues,
+  DepartmentNew,
 } from '~/models/department.models';
 import type { RawPosition } from '~/models/position.models';
 import {
@@ -11,6 +12,12 @@ import {
   type UseMutationResult,
 } from '@tanstack/react-query';
 import { departmentService } from '~/services/department.service';
+
+export const useGetDepartments = (): UseQueryResult<DepartmentNew[]> =>
+  useQuery({
+    queryKey: ['departments', 'new'],
+    queryFn: departmentService.getDepartments,
+  });
 
 export const useGetAllDepartments = (): UseQueryResult<Department> =>
   useQuery({

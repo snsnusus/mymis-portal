@@ -5,15 +5,20 @@ import type {
   DepartmentPayload,
   RawScope,
   RawDepartment,
+  DepartmentNew,
 } from '~/models/department.models';
 import type { UserModel } from '~/models/user.models';
 import type { RawOffice } from '~/models/location.models';
 import type { RawPosition } from '~/models/position.models';
 
-import { mockClient } from '~/api/client';
+import { apiClient, mockClient } from '~/api/client';
 import { uploadImageToCloud } from '~/utils';
 
 export const departmentService = {
+  getDepartments: async (): Promise<DepartmentNew[]> => {
+    const res = await apiClient.get('/Departments');
+    return res.data;
+  },
   createDepartment: async (formValues: DepartmentFormValues) => {
     const cloudImageUrl = await uploadImageToCloud(formValues.coverImage);
 

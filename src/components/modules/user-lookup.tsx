@@ -1,7 +1,7 @@
-import type { UserOption } from '~/models/user.models';
+import type { EmployeeOption } from '~/models/employee.model';
 import { type ReactElement } from 'react';
 import { useController } from 'react-hook-form';
-import { useGetUserOptions } from '~/hooks/user.hooks';
+import { useGetEmployeeOptions } from '~/hooks/employee.hook';
 import { Avatar, Box, Typography } from '@mui/material';
 import { Autocomplete, type AutocompleteProps } from '~/components/form/base';
 
@@ -14,7 +14,7 @@ export type UncontrolledUserLookupProps<
   DisableClearable extends boolean | undefined = false,
   FreeSolo extends boolean | undefined = false
 > = Omit<
-  AutocompleteProps<UserOption, Multiple, DisableClearable, FreeSolo>,
+  AutocompleteProps<EmployeeOption, Multiple, DisableClearable, FreeSolo>,
   'options'
 >;
 
@@ -25,24 +25,24 @@ export const UncontrolledUserLookup = <
 >(
   props: UncontrolledUserLookupProps<Multiple, DisableClearable, FreeSolo>
 ): ReactElement => {
-  const { data: userOptions = [], isLoading } = useGetUserOptions();
+  const { data: employeeOptions = [], isLoading } = useGetEmployeeOptions();
 
   return (
     <Autocomplete
       loading={isLoading}
-      options={userOptions}
+      options={employeeOptions}
       isOptionEqualToValue={(option, value) => {
-        const opt = option as UserOption;
-        const val = value as UserOption;
+        const opt = option as EmployeeOption;
+        const val = value as EmployeeOption;
         return opt?.id === val?.id;
       }}
       getOptionLabel={(option) => {
-        const user = option as UserOption;
-        return user?.formattedName || '';
+        const employee = option as EmployeeOption;
+        return employee?.formattedName || '';
       }}
       renderOption={(renderProps, option) => {
         const { key, ...optionProps } = renderProps;
-        const user = option as UserOption;
+        const employee = option as EmployeeOption;
 
         return (
           <Box
@@ -52,16 +52,16 @@ export const UncontrolledUserLookup = <
             sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 1 }}
           >
             <Avatar
-              src={user.avatarUrl}
-              alt={user.formattedName}
+              src={employee.avatarUrl ?? undefined}
+              alt={employee.formattedName}
               sx={{ width: 32, height: 32 }}
             />
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                {user.formattedName}
+                {employee.formattedName}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {user.position || 'No Position'}
+                {employee.position || 'No Position'}
               </Typography>
             </Box>
           </Box>

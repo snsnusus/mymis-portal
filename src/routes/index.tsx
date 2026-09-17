@@ -10,8 +10,10 @@ import { loadable } from '~/utils/loadable';
 
 const App = loadable(() => import('~/App'));
 const Login = loadable(() => import('~/pages/login'));
+const Dashboard = loadable(() => import('~/pages/dashboard'));
+const NotFound = loadable(() => import('~/pages/not-found'));
 const Profile = loadable(() => import('~/pages/profile'));
-const UsersCreate = loadable(() => import('~/pages/users/create'));
+const CreateEmployees = loadable(() => import('~/pages/employees/create'));
 const Departments = loadable(
   () => import('~/pages/data-management/departments')
 );
@@ -40,11 +42,18 @@ const routesConfig: RouteObject[] = [
     handle: { breadcrumb: 'Dashboard' },
     children: [
       {
-        errorElement: <h1>NOT FOUND PAGE</h1>,
+        errorElement: <NotFound />,
         children: [
           {
+            path: '*',
+            element: <NotFound />,
+            handle: {
+              breadcrumb: [],
+            },
+          },
+          {
             index: true,
-            element: <h1>DASHBOARD</h1>,
+            element: <Dashboard />,
             handle: {
               breadcrumb: [],
             },
@@ -55,23 +64,23 @@ const routesConfig: RouteObject[] = [
             handle: { breadcrumb: [{ label: 'Profile', path: '/profile' }] },
           },
           {
-            path: 'users',
+            path: 'employees',
             element: <Outlet />,
             handle: {
-              breadcrumb: [{ label: 'Users', path: 'null' }],
+              breadcrumb: [{ label: 'Employees', path: 'null' }],
             },
             children: [
               {
                 index: true,
-                element: <>Users: Index Page~.</>,
+                element: <>Employees: Index Page~.</>,
               },
               {
                 path: 'create',
-                element: <UsersCreate />,
+                element: <CreateEmployees />,
                 handle: {
                   breadcrumb: [
-                    { label: 'Users', path: '/users' },
-                    { label: 'Create User', path: 'null' },
+                    { label: 'Employees', path: '/employees' },
+                    { label: 'Create Employee', path: 'null' },
                   ],
                 },
               },

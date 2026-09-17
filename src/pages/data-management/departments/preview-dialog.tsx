@@ -1,4 +1,4 @@
-import type { Department } from '~/models/department.models';
+import type { DepartmentNew } from '~/models/department.models';
 import { type ReactElement } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -11,14 +11,14 @@ import {
   Avatar,
   Dialog,
   DialogContent,
-  List,
+  // List,
   // ListItem,
   // ListItemText,
   Paper,
   IconButton,
   Button,
-  ListItem,
-  ListItemText,
+  // ListItem,
+  // ListItemText,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 // import GroupsIcon from '@mui/icons-material/Groups';
@@ -30,7 +30,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 interface PreviewDialogProps {
   open: boolean;
   onClose: () => void;
-  selectedDepartment: Department | null;
+  selectedDepartment: DepartmentNew | null;
 }
 
 const PreviewDialog = ({
@@ -94,7 +94,7 @@ const PreviewDialog = ({
                 sx={{
                   width: '100%',
                   height: 220,
-                  backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.75) 100%), url(${selectedDepartment?.coverImageUrl})`,
+                  backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.75) 100%), url(${''})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   display: 'flex',
@@ -119,7 +119,7 @@ const PreviewDialog = ({
                       sx={{ fontWeight: 600 }}
                     />
                     <Chip
-                      label={selectedDepartment?.costCenterCode}
+                      label={'Cost Center Code'}
                       size="small"
                       color="secondary"
                       sx={{ fontWeight: 600 }}
@@ -160,31 +160,29 @@ const PreviewDialog = ({
                   Core Responsibilities
                 </Typography>
                 <Grid container spacing={2}>
-                  {(selectedDepartment?.scopes ?? []).map(
-                    ({ title, description }, index) => (
-                      <Grid size={{ xs: 12, md: 6 }} key={index}>
-                        <Paper
-                          variant="outlined"
-                          sx={{
-                            p: 2,
-                            borderRadius: 2,
-                            height: '100%',
-                            bgcolor: 'background.neutral',
-                          }}
+                  {[].map(({ title, description }, index) => (
+                    <Grid size={{ xs: 12, md: 6 }} key={index}>
+                      <Paper
+                        variant="outlined"
+                        sx={{
+                          p: 2,
+                          borderRadius: 2,
+                          height: '100%',
+                          bgcolor: 'background.neutral',
+                        }}
+                      >
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ fontWeight: 600, mb: 0.5 }}
                         >
-                          <Typography
-                            variant="subtitle2"
-                            sx={{ fontWeight: 600, mb: 0.5 }}
-                          >
-                            {title}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {description}
-                          </Typography>
-                        </Paper>
-                      </Grid>
-                    )
-                  )}
+                          {title}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {description}
+                        </Typography>
+                      </Paper>
+                    </Grid>
+                  ))}
                 </Grid>
 
                 <Box sx={{ mt: 4 }}>
@@ -243,31 +241,24 @@ const PreviewDialog = ({
                   spacing={1.5}
                   sx={{ alignItems: 'center' }}
                 >
-                  <Avatar
-                    src={
-                      selectedDepartment?.primaryContact?.avatarUrl ?? undefined
-                    }
-                    sx={{ width: 40, height: 40 }}
-                  >
-                    {selectedDepartment?.primaryContact?.formattedName.charAt(
-                      0
-                    )}
+                  <Avatar src={undefined} sx={{ width: 40, height: 40 }}>
+                    {selectedDepartment?.primaryContactName?.charAt(0)}
                   </Avatar>
                   <Box>
                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {selectedDepartment?.primaryContact?.formattedName}
+                      {selectedDepartment?.primaryContactName}
                     </Typography>
                     <Typography
                       variant="caption"
                       color="text.secondary"
                       sx={{ display: 'block' }}
                     >
-                      {selectedDepartment?.primaryContact?.position}
+                      {selectedDepartment?.primaryContactName}
                     </Typography>
                   </Box>
                 </Stack>
               </Paper>
-              {selectedDepartment?.secondaryContact && (
+              {/* {selectedDepartment?.secondaryContact && (
                 <Paper
                   variant="outlined"
                   sx={{ p: 2, borderRadius: 2, bgcolor: 'background.paper' }}
@@ -311,7 +302,7 @@ const PreviewDialog = ({
                     </Box>
                   </Stack>
                 </Paper>
-              )}
+              )} */}
             </Stack>
             <Stack
               direction="row"
@@ -325,7 +316,7 @@ const PreviewDialog = ({
                 Team Members
               </Typography>
             </Stack>
-            <Box sx={{ flexGrow: 1, overflowY: 'auto', pr: 1, mr: -1 }}>
+            {/* <Box sx={{ flexGrow: 1, overflowY: 'auto', pr: 1, mr: -1 }}>
               <List disablePadding>
                 {(selectedDepartment?.teamMembers ?? []).map((member) => (
                   <ListItem
@@ -372,7 +363,7 @@ const PreviewDialog = ({
                   </ListItem>
                 ))}
               </List>
-            </Box>
+            </Box> */}
           </Grid>
         </Grid>
       </DialogContent>

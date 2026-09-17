@@ -1,6 +1,6 @@
-import type { Department } from '~/models/department.models';
+import type { DepartmentNew } from '~/models/department.models';
 import { type ReactElement, useState } from 'react';
-import { useGetAllDepartments } from '~/hooks/department.hooks';
+import { useGetDepartments } from '~/hooks/department.hook';
 import {
   Stack,
   Grid,
@@ -12,23 +12,26 @@ import {
   Divider,
   Avatar,
 } from '@mui/material';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import GroupsIcon from '@mui/icons-material/Groups';
-import PersonIcon from '@mui/icons-material/Person';
+import {
+  AccountBalanceWallet as AccountBalanceWalletIcon,
+  Groups as GroupsIcon,
+  Person as PersonIcon,
+} from '@mui/icons-material';
 
 import { InteractiveCard } from '~/components/ui/interactive-card';
 import PreviewDialog from './preview-dialog';
 
 const Departments = (): ReactElement => {
   const [selectedDepartment, setSelectedDepartment] =
-    useState<Department | null>(null);
+    useState<DepartmentNew | null>(null);
   const [isOpenPreviewDialog, setIsOpenPreviewDialog] = useState(false);
 
-  const { data: departments = [] } = useGetAllDepartments();
+  const { data: departmentsNew = [] } = useGetDepartments();
 
-  const handleCardClick = (selectedDept: Department): void => {
-    console.log(`Open modal details for: ${selectedDept}`);
-    setSelectedDepartment(selectedDept);
+  console.log(departmentsNew, 'departmentsNew');
+
+  const handleCardClick = (department: DepartmentNew): void => {
+    setSelectedDepartment(department);
     setIsOpenPreviewDialog(true);
   };
 
@@ -55,7 +58,7 @@ const Departments = (): ReactElement => {
         </Box>
       </Stack>
       <Grid container spacing={2}>
-        {((departments as Department[]) ?? []).map((department) => (
+        {(departmentsNew ?? []).map((department) => (
           <Grid key={department.name} size={{ xs: 12, md: 4 }}>
             <InteractiveCard
               elevation={2}
@@ -64,7 +67,7 @@ const Departments = (): ReactElement => {
               <Box sx={{ position: 'relative' }}>
                 <CardMedia
                   sx={{ height: 130, filter: 'brightness(0.9)' }}
-                  image={department.coverImageUrl}
+                  image={''}
                 />
                 <Chip
                   label={department.slug}
@@ -119,7 +122,7 @@ const Departments = (): ReactElement => {
                       color="text.secondary"
                       sx={{ fontWeight: 500 }}
                     >
-                      {department.teamMembers.length} Members
+                      {department.employeeCount} Members
                     </Typography>
                   </Stack>
                   <Stack
@@ -139,7 +142,7 @@ const Departments = (): ReactElement => {
                         fontWeight: 500,
                       }}
                     >
-                      {department.costCenterCode}
+                      Cost Center Code
                     </Typography>
                   </Stack>
                 </Stack>
@@ -153,33 +156,29 @@ const Departments = (): ReactElement => {
                   justifyContent: 'space-between',
                 }}
               >
-                {department.primaryContact ? (
+                {department.primaryContactName ? (
                   <Stack
                     direction="row"
                     spacing={1}
                     sx={{ alignItems: 'center' }}
                   >
                     <Avatar
-                      src={department.primaryContact?.avatarUrl || undefined}
+                      src={undefined}
                       sx={{
                         width: 24,
                         height: 24,
                         fontSize: '0.875rem',
-                        bgcolor: department.primaryContact
-                          ? 'none'
-                          : 'secondary.main',
                       }}
                     >
-                      {department.primaryContact?.formattedName
-                        ?.charAt(0)
-                        .toUpperCase() || 'U'}
+                      {department.primaryContactName?.charAt(0).toUpperCase() ||
+                        'U'}
                     </Avatar>
                     <Typography
                       variant="body2"
                       color="text.secondary"
                       sx={{ fontWeight: 500 }}
                     >
-                      {department.primaryContact?.formattedName}
+                      {department.primaryContactName}
                     </Typography>
                   </Stack>
                 ) : (

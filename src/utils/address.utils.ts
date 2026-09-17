@@ -1,4 +1,4 @@
-import type { AddressFormValues } from '~/pages/users/create/contact-details/address';
+import type { AddressFormValues } from '~/pages/employees/create/contact-details/address';
 
 export const formatAddress = (values: AddressFormValues): string =>
   [

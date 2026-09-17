@@ -1,3 +1,9 @@
+// LEGACY - kept only for department.service.ts, department.models.ts, and
+// user-directory.tsx, which still consume json-server's old /users shape
+// (mockClient) rather than the real MyMIS.Api /Employees endpoint. Do not
+// use these types for anything migrated to the real API - see
+// employee.model.ts instead. Remove once those three files are migrated.
+
 import type { AddressFormValues } from './address.models';
 
 export type Gender = 'MALE' | 'FEMALE';
