@@ -8,12 +8,21 @@ import type { RawPosition } from '~/models/position.models';
 
 import { apiClient, mockClient } from '~/api/client';
 import { uploadImageToCloud } from '~/utils';
+import type { DepartmentDetail } from '~/models/department.model';
 
 export const departmentService = {
+  getDepartmentById: async (id: number): Promise<DepartmentDetail> => {
+    const { data } = await apiClient.get<DepartmentDetail>(
+      `/Departments/${id}`
+    );
+    return data;
+  },
+
   getDepartments: async (): Promise<DepartmentNew[]> => {
     const res = await apiClient.get('/Departments');
     return res.data;
   },
+
   createDepartment: async (formValues: DepartmentFormValues) => {
     const cloudImageUrl = await uploadImageToCloud(formValues.coverImage);
 

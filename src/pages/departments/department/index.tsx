@@ -1,4 +1,4 @@
-import { type ReactElement, useState } from 'react';
+import { type ReactElement } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Box,
@@ -17,17 +17,20 @@ import {
   IconButton,
   Paper,
   Tooltip,
+  LinearProgress,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EmailIcon from '@mui/icons-material/Email';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CloseIcon from '@mui/icons-material/Close';
 import HubIcon from '@mui/icons-material/Hub';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import Tab from '~/components/tab';
+import GroupsIcon from '@mui/icons-material/Groups';
+import { useGetDepartment } from '~/hooks/department.hook';
+import { isNotFoundError } from '~/utils/http.util';
 
 interface RosterMember {
   id: string;
@@ -39,86 +42,111 @@ interface RosterMember {
   employmentType: 'Permanent' | 'Contract';
 }
 
+const PLACEHOLDER_ROSTER: RosterMember[] = [
+  {
+    id: 'm1',
+    name: 'Heman',
+    email: 'heman@company.com',
+    position: 'Director of Engineering',
+    roleType: 'Head',
+    employmentType: 'Permanent',
+    avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=heman',
+  },
+  {
+    id: 'm2',
+    name: 'Nick',
+    email: 'nick@company.com',
+    position: 'Lead Frontend Engineer',
+    roleType: 'Lead',
+    employmentType: 'Permanent',
+    avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=nick',
+  },
+  {
+    id: 'm3',
+    name: 'Jason',
+    email: 'jason@company.com',
+    position: 'Senior Frontend Developer',
+    roleType: 'Member',
+    employmentType: 'Permanent',
+    avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=jason',
+  },
+  {
+    id: 'm4',
+    name: 'Issy',
+    email: 'issy@company.com',
+    position: 'UI/UX Designer',
+    roleType: 'Member',
+    employmentType: 'Permanent',
+    avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=issy',
+  },
+  {
+    id: 'm5',
+    name: 'Glenn',
+    email: 'glenn@company.com',
+    position: 'Fullstack Engineer',
+    roleType: 'Member',
+    employmentType: 'Contract',
+    avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=glenn',
+  },
+];
+
+const PLACEHOLDER_SCOPES = [
+  {
+    title: 'Infrastructure Management',
+    desc: 'Cloud platforms, container networks, deployment pipeline scaling, and system uptime checks.',
+  },
+  {
+    title: 'Application Development',
+    desc: 'Building custom client tools, web portals, and system component modernizations.',
+  },
+  {
+    title: 'Data Synchronization',
+    desc: 'Maintaining real-time calculations and updates across downstream business models.',
+  },
+];
+
+const ROLE_WEIGHTS = { Head: 1, Lead: 2, Member: 3 } as const;
+
 const Department = (): ReactElement => {
-  const { name, id } = useParams<{ name: string; id: string }>();
+  const { id } = useParams<{ name: string; id: string }>();
+  const departmentId = Number(id);
+  const isValidId = Number.isInteger(departmentId) && departmentId > 0;
 
-  const [department] = useState({
-    name: id,
-    code: name?.toUpperCase() || 'ENG',
-    costCenter: 'CC-1024',
-    location: 'Manila Office (Hybrid)',
-    businessUnit: 'Core Technology & Platforms',
-    description:
-      'Responsible for client tool modernization, data pipelines, internal calculators, and infrastructure performance updates.',
-    coverImage: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97',
-    responsibilities: [
-      {
-        title: 'Infrastructure Management',
-        desc: 'Cloud platforms, container networks, deployment pipeline scaling, and system uptime checks.',
-      },
-      {
-        title: 'Application Development',
-        desc: 'Building custom client tools, web portals, and system component modernizations.',
-      },
-      {
-        title: 'Data Synchronization',
-        desc: 'Maintaining real-time calculations and updates across downstream business models.',
-      },
-    ],
-    // 1. Unified Roster containing all members with explicit operational assignments
-    roster: [
-      {
-        id: 'm1',
-        name: 'Heman',
-        email: 'heman@company.com',
-        position: 'Director of Engineering',
-        roleType: 'Head',
-        employmentType: 'Permanent',
-        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=heman',
-      },
-      {
-        id: 'm2',
-        name: 'Nick',
-        email: 'nick@company.com',
-        position: 'Lead Frontend Engineer',
-        roleType: 'Lead',
-        employmentType: 'Permanent',
-        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=nick',
-      },
-      {
-        id: 'm3',
-        name: 'Jason',
-        email: 'jason@company.com',
-        position: 'Senior Frontend Developer',
-        roleType: 'Member',
-        employmentType: 'Permanent',
-        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=jason',
-      },
-      {
-        id: 'm4',
-        name: 'Issy',
-        email: 'issy@company.com',
-        position: 'UI/UX Designer',
-        roleType: 'Member',
-        employmentType: 'Permanent',
-        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=issy',
-      },
-      {
-        id: 'm5',
-        name: 'Glenn',
-        email: 'glenn@company.com',
-        position: 'Fullstack Engineer',
-        roleType: 'Member',
-        employmentType: 'Contract',
-        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=glenn',
-      },
-    ] as RosterMember[],
-  });
+  const {
+    data: department,
+    isLoading,
+    isError,
+    error,
+  } = useGetDepartment(isValidId ? departmentId : undefined);
 
-  const sortedRoster = [...department.roster].sort((a, b) => {
-    const weights = { Head: 1, Lead: 2, Member: 3 };
-    return weights[a.roleType] - weights[b.roleType];
-  });
+  const sortedRoster = [...PLACEHOLDER_ROSTER].sort(
+    (a, b) => ROLE_WEIGHTS[a.roleType] - ROLE_WEIGHTS[b.roleType]
+  );
+
+  if (!isValidId || isNotFoundError(error)) {
+    return (
+      <Box sx={{ py: 4 }}>
+        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+          Department not found
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          It may have been removed, or the link is incorrect.
+        </Typography>
+      </Box>
+    );
+  }
+
+  if (isLoading) {
+    return <LinearProgress sx={{ mt: 2 }} />;
+  }
+
+  if (isError || !department) {
+    return (
+      <Typography color="error" sx={{ py: 4 }}>
+        Couldn&apos;t load this department. Please try refreshing.
+      </Typography>
+    );
+  }
 
   return (
     <Box sx={{ py: 2, maxWidth: '1600px', mx: 'auto' }}>
@@ -133,7 +161,10 @@ const Department = (): ReactElement => {
           minHeight: '180px',
           display: 'flex',
           alignItems: 'center',
-          backgroundImage: `url(${department.coverImage})`,
+          backgroundImage: department.coverImageUrl
+            ? `url(${department.coverImageUrl})`
+            : 'none',
+          bgcolor: 'grey.100',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           color: '#fff',
@@ -168,7 +199,7 @@ const Department = (): ReactElement => {
               sx={{ flexDirection: 'row', gap: 1.5, alignItems: 'center' }}
             >
               <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                {department.name} ({department.code})
+                {department.name} ({department.costCenterCode})
               </Typography>
               <IconButton size="small" sx={{ color: 'rgba(255,255,255,0.8)' }}>
                 <EditIcon fontSize="small" />
@@ -194,8 +225,10 @@ const Department = (): ReactElement => {
             }}
           >
             <Chip
-              icon={<LocationOnIcon style={{ color: '#fff' }} />}
-              label={department.location}
+              icon={<GroupsIcon style={{ color: '#fff' }} />}
+              label={`${department.employeeCount} ${
+                department.employeeCount === 1 ? 'employee' : 'employees'
+              }`}
               sx={{
                 color: '#fff',
                 borderColor: 'rgba(255,255,255,0.4)',
@@ -205,7 +238,7 @@ const Department = (): ReactElement => {
             />
             <Chip
               icon={<HubIcon style={{ color: '#fff' }} />}
-              label={department.businessUnit}
+              label={department.status}
               sx={{
                 color: '#fff',
                 borderColor: 'rgba(255,255,255,0.4)',
@@ -424,7 +457,7 @@ const Department = (): ReactElement => {
                         variant="body1"
                         sx={{ fontWeight: 700, fontFamily: 'monospace' }}
                       >
-                        {department.costCenter}
+                        {department.costCenterCode}
                       </Typography>
                     </Paper>
                   </Grid>
@@ -481,7 +514,7 @@ const Department = (): ReactElement => {
               </Box>
               <CardContent sx={{ p: 3 }}>
                 <Stack sx={{ gap: 2 }}>
-                  {department.responsibilities.map((item, idx) => (
+                  {PLACEHOLDER_SCOPES.map((item, idx) => (
                     <Paper
                       key={idx}
                       variant="outlined"

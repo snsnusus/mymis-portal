@@ -11,6 +11,18 @@ import {
   type UseMutationResult,
 } from '@tanstack/react-query';
 import { departmentService } from '~/services/department.service';
+import type { DepartmentDetail } from '~/models/department.model';
+import { isNotFoundError } from '~/utils/http.util';
+
+export const useGetDepartment = (
+  id: number | undefined
+): UseQueryResult<DepartmentDetail> =>
+  useQuery({
+    queryKey: ['departments', 'detail', id],
+    queryFn: () => departmentService.getDepartmentById(id as number),
+    enabled: id !== undefined,
+    retry: (failureCount, error) => !isNotFoundError(error) && failureCount < 3,
+  });
 
 export const useGetDepartments = (): UseQueryResult<DepartmentNew[]> =>
   useQuery({

@@ -1,9 +1,7 @@
 import { type ReactElement } from 'react';
 import { useFormContext } from 'react-hook-form';
-import {
-  useGetDepartments,
-  useGetPositionsByDepartment,
-} from '~/hooks/department.hook';
+import { useGetDepartments } from '~/hooks/department.hook';
+import { useGetAll as useGetPositionsByDepartment } from '~/hooks/position.hook';
 import {
   Box,
   Button,
@@ -27,10 +25,14 @@ import { generateMockEmployeeId } from '~/utils';
 export const EmploymentDetails = (): ReactElement => {
   const { watch, setValue } = useFormContext<any>();
 
-  const departmentId = watch('departmentId') ?? '';
+  const departmentId = watch('departmentId');
+  const selectedDepartmentId =
+    typeof departmentId === 'number' ? departmentId : undefined;
 
   const { data: departments = [] } = useGetDepartments();
-  const { data: positions = [] } = useGetPositionsByDepartment(departmentId);
+  const { data: allPositions = [] } =
+    useGetPositionsByDepartment(selectedDepartmentId);
+  const positions = allPositions.filter((position) => position.isActive);
 
   const handleEmployeeTypeChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -110,7 +112,7 @@ export const EmploymentDetails = (): ReactElement => {
                     options={positions}
                     getOptionLabel={(option) => {
                       if (typeof option === 'string') return option;
-                      return option?.position ?? '';
+                      return option?.title ?? '';
                     }}
                     disabled={!departmentId}
                     placeholder="Select position"
