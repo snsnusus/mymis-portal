@@ -13,6 +13,7 @@ import MapIcon from '@mui/icons-material/Map';
 import LocationCityIcon from '@mui/icons-material/LocationCity';
 import HolidayVillageIcon from '@mui/icons-material/HolidayVillage';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import DomainAddIcon from '@mui/icons-material/DomainAdd';
 
 export const MENU_ITEMS: MenuItems[] = [
   {
@@ -47,8 +48,19 @@ export const MENU_ITEMS: MenuItems[] = [
     children: [
       {
         icon: BusinessIcon,
-        path: '/data-management/departments',
         label: 'Departments',
+        children: [
+          {
+            icon: ListIcon,
+            path: '/data-management/departments',
+            label: 'List',
+          },
+          {
+            icon: DomainAddIcon,
+            path: '/data-management/departments/create',
+            label: 'Create',
+          },
+        ],
       },
       {
         icon: HealthAndSafetyIcon,

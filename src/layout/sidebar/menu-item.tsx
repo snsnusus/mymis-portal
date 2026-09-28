@@ -30,6 +30,7 @@ interface PopoverLinkProps {
   label: string;
   icon?: MenuItems['icon'];
   isActive: boolean;
+  depth: number;
 }
 
 interface MenuItemProps extends MenuItems {
@@ -45,6 +46,10 @@ const NavigationLink = styled(Link)({
 const ListItem = styled(MuiListItem)<ListItemProps>({
   display: 'block',
 });
+
+const PopoverSection = styled(ListItem)(({ theme }) => ({
+  backgroundColor: theme.palette.grey[200],
+}));
 
 const ListItemButton = styled(MuiListItemButton, {
   shouldForwardProp: (prop) => prop != 'open',
@@ -103,10 +108,11 @@ const PopoverLink = ({
   label,
   icon: IconComponent,
   isActive,
+  depth,
 }: PopoverLinkProps): ReactElement => (
   <ListItem disablePadding>
     <NavigationLink to={path} aria-current={isActive ? 'page' : undefined}>
-      <ListItemButton open selected={isActive} sx={{ pl: 2 }}>
+      <ListItemButton open selected={isActive} sx={{ pl: 2 + depth * 2 }}>
         {IconComponent && (
           <ListItemIcon open isActive={isActive} sx={{ mr: 2 }}>
             <IconComponent />
@@ -120,33 +126,51 @@ const PopoverLink = ({
 
 const renderPopoverItems = (
   items: MenuItems[],
-  activePath: string | null
+  activePath: string | null,
+  depth = 0
 ): ReactElement[] =>
   items.flatMap((item, index) => {
+    const isGroup = !item.path;
+    const previousIsGroup = index > 0 && !items[index - 1]?.path;
+    const needsDivider = index > 0 && (isGroup || previousIsGroup);
+
+    const divider = needsDivider
+      ? [
+          <Divider
+            key={`${item.label}-divider`}
+            component="li"
+            sx={{ my: 0.5 }}
+          />,
+        ]
+      : [];
+
     if (item.path) {
       return [
+        ...divider,
         <PopoverLink
           key={item.path}
           path={item.path}
           label={item.label}
           icon={item.icon}
           isActive={item.path === activePath}
+          depth={depth}
         />,
       ];
     }
 
     return [
-      ...(index > 0
-        ? [<Divider key={`${item.label}-divider`} sx={{ my: 0.5 }} />]
-        : []),
-      <ListSubheader
-        key={`${item.label}-header`}
-        disableSticky
-        sx={{ lineHeight: 2.5 }}
-      >
-        {item.label}
-      </ListSubheader>,
-      ...renderPopoverItems(item.children ?? [], activePath),
+      ...divider,
+      <PopoverSection key={`${item.label}-section`} disablePadding>
+        <List disablePadding>
+          <ListSubheader
+            disableSticky
+            sx={{ lineHeight: 2.5, fontWeight: 700, color: 'text.primary' }}
+          >
+            {item.label}
+          </ListSubheader>
+          {renderPopoverItems(item.children ?? [], activePath)}
+        </List>
+      </PopoverSection>,
     ];
   });
 
@@ -178,11 +202,8 @@ const MenuItem = ({
     setAnchorEl(null);
   }, [location]);
 
-  // Drawer indentation: children line up under the parent's text.
-  // On the collapsed rail, keep the styled default.
   const indent = open ? 3.5 + depth * 3.25 : undefined;
 
-  // ── Link item ────────────────────────────────────────────────────────
   if (path) {
     return (
       <ListItem disablePadding>
@@ -209,7 +230,6 @@ const MenuItem = ({
     );
   }
 
-  // ── Group item ───────────────────────────────────────────────────────
   const handleGroupClick = (event: MouseEvent<HTMLDivElement>): void => {
     if (open) {
       setExpanded((prev) => !prev);
