@@ -55,8 +55,6 @@ const ChatWidget = ({
 
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const fullName = user ? `${user.firstname} ${user.lastname}` : '';
-
   useEffect(() => {
     if (!currentRoomId) return;
 
@@ -98,7 +96,7 @@ const ChatWidget = ({
     e.preventDefault();
     if (!text.trim() || !user || !recipient) return;
 
-    const displayName = fullName || user.username;
+    const displayName = user.name;
     const timestampString = new Date().toLocaleTimeString([], {
       hour: '2-digit',
       minute: '2-digit',
@@ -110,7 +108,7 @@ const ChatWidget = ({
       senderName: displayName,
       recipientId: recipient.id,
       roomId: currentRoomId,
-      avatar: user.avatarUrl || '',
+      avatar: '',
       timestamp: timestampString,
     };
 
@@ -210,7 +208,7 @@ const ChatWidget = ({
         >
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
             {activeRoomMessages.map((msg, idx) => {
-              const isMe = msg.user === `${user?.firstname} ${user?.lastname}`;
+              const isMe = msg.user === user?.name;
               const isFirstInSequence =
                 idx === 0 || activeRoomMessages[idx - 1]?.user !== msg.user;
 

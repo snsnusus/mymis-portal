@@ -96,7 +96,6 @@ const Profile = (): ReactElement => {
               }}
             >
               <Avatar
-                src={currentUser?.avatarUrl}
                 variant="circular"
                 sx={{
                   width: { xs: 75, md: 100 },
@@ -135,7 +134,7 @@ const Profile = (): ReactElement => {
                         fontWeight: 'fontWeightBold',
                       }}
                     >
-                      {`${currentUser?.firstname} ${currentUser?.lastname}`}
+                      {currentUser?.name}
                     </Typography>
                     <CheckCircleIcon
                       color="secondary"
