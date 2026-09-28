@@ -1,8 +1,7 @@
-import type { Department } from '~/models/department.models';
 import { type ReactElement } from 'react';
 import { useFormContext } from 'react-hook-form';
 import {
-  useGetAllDepartments,
+  useGetDepartments,
   useGetPositionsByDepartment,
 } from '~/hooks/department.hook';
 import {
@@ -30,7 +29,7 @@ export const EmploymentDetails = (): ReactElement => {
 
   const departmentId = watch('departmentId') ?? '';
 
-  const { data: departments = [] } = useGetAllDepartments();
+  const { data: departments = [] } = useGetDepartments();
   const { data: positions = [] } = useGetPositionsByDepartment(departmentId);
 
   const handleEmployeeTypeChange = (
@@ -90,7 +89,7 @@ export const EmploymentDetails = (): ReactElement => {
                   <ControlledAutocomplete
                     name="departmentId"
                     valueKey="id"
-                    options={departments as Department[]}
+                    options={departments}
                     getOptionLabel={(option) => {
                       if (typeof option === 'string') return option;
                       return option?.name ?? '';

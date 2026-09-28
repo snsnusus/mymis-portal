@@ -1,4 +1,4 @@
-import { type UserOption } from '~/models/user.models';
+import type { EmployeeOption } from '~/models/employee.model';
 import { useState, type ReactElement } from 'react';
 
 import {
@@ -15,7 +15,7 @@ import { AlertDialog } from '~/components/ui/alert-dialog';
 import DataDisplayRow from '~/components/ui/data-display-row';
 import { useFormContext } from 'react-hook-form';
 
-const defaultFilter = createFilterOptions<UserOption>({
+const defaultFilter = createFilterOptions<EmployeeOption>({
   stringify: (option) => option.formattedName,
 });
 
@@ -28,7 +28,7 @@ export const Leadership = (): ReactElement => {
   // Interception State
   const [pendingSelection, setPendingSelection] = useState<{
     fieldName: 'primaryContact' | 'secondaryContact';
-    user: UserOption | null;
+    user: EmployeeOption | null;
   } | null>(null);
 
   /**
@@ -36,7 +36,7 @@ export const Leadership = (): ReactElement => {
    */
   const handleInterceptSelection = (
     fieldName: 'primaryContact' | 'secondaryContact',
-    selectedUser: UserOption | null
+    selectedUser: EmployeeOption | null
   ): void => {
     // 1. If cleared (selectedUser is null), update form state immediately
     if (!selectedUser) {
@@ -105,7 +105,7 @@ export const Leadership = (): ReactElement => {
                   onChange={(_, newValue) =>
                     handleInterceptSelection(
                       'primaryContact',
-                      newValue as UserOption
+                      newValue as EmployeeOption
                     )
                   }
                 />
@@ -125,7 +125,7 @@ export const Leadership = (): ReactElement => {
                   onChange={(_, newValue) =>
                     handleInterceptSelection(
                       'secondaryContact',
-                      newValue as UserOption
+                      newValue as EmployeeOption
                     )
                   }
                 />

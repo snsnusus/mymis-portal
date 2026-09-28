@@ -1,5 +1,4 @@
 import type {
-  Department,
   DepartmentFormValues,
   DepartmentNew,
 } from '~/models/department.models';
@@ -17,12 +16,6 @@ export const useGetDepartments = (): UseQueryResult<DepartmentNew[]> =>
   useQuery({
     queryKey: ['departments', 'new'],
     queryFn: departmentService.getDepartments,
-  });
-
-export const useGetAllDepartments = (): UseQueryResult<Department> =>
-  useQuery({
-    queryKey: ['departments'],
-    queryFn: departmentService.getAllDepartments,
   });
 
 export const useCreateDepartment = (): UseMutationResult<

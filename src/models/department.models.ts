@@ -1,6 +1,6 @@
-import type { UserOption } from './user.models';
 import type { RawOffice } from './location.model';
 import type { PositionFormValues } from './position.models';
+import type { EmployeeOption } from './employee.model';
 
 export type RawDepartment = {
   name: string;
@@ -8,8 +8,8 @@ export type RawDepartment = {
   description: string;
   costCenterCode: string;
   coverImageUrl: string;
-  primaryContactId: string;
-  secondaryContactId: string;
+  primaryContactId: number;
+  secondaryContactId: number;
   officeId: string;
   status: string;
   id: string;
@@ -31,11 +31,11 @@ export type BaseDepartment = {
 // 2. FORM VALUES - What React state and inputs use
 export type DepartmentFormValues = BaseDepartment & {
   status: string;
-  primaryContact: UserOption | null;
-  secondaryContact: UserOption | null;
+  primaryContact: EmployeeOption | null;
+  secondaryContact: EmployeeOption | null;
   coverImage: File | null;
   scopes: Array<Scope>;
-  teamMembers: Array<UserOption>;
+  teamMembers: Array<EmployeeOption>;
   office: RawOffice | null;
   positions: PositionFormValues[];
 };

@@ -17,7 +17,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DataDisplayRow from '~/components/ui/data-display-row';
 import { UncontrolledUserLookup } from '~/components/modules/user-lookup';
 import { useFieldArray, useFormContext } from 'react-hook-form';
-import type { UserOption } from '~/models/user.models';
+import type { EmployeeOption } from '~/models/employee.model';
 
 export const ScopeAndTeam = (): ReactElement => {
   const { watch } = useFormContext<DepartmentFormValues>();
@@ -62,7 +62,7 @@ export const ScopeAndTeam = (): ReactElement => {
     removeScope(indexToRemove);
   };
 
-  const handleAddMember = (member: UserOption): void => {
+  const handleAddMember = (member: EmployeeOption): void => {
     addMember(member);
   };
 
@@ -213,7 +213,7 @@ export const ScopeAndTeam = (): ReactElement => {
               <UncontrolledUserLookup
                 placeholder="Add team members..."
                 onChange={(_, newValue) =>
-                  handleAddMember(newValue as UserOption)
+                  handleAddMember(newValue as EmployeeOption)
                 }
                 filterOptions={(options, state) => {
                   const inputValue = state.inputValue.toLowerCase();
@@ -266,7 +266,6 @@ export const ScopeAndTeam = (): ReactElement => {
                       // Pass the avatar component directly
                       avatar={
                         <Avatar
-                          src={member.avatarUrl}
                           alt={member.formattedName}
                           sx={{ width: 50, height: 50 }}
                         />
