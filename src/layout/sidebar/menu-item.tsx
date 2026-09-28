@@ -1,7 +1,7 @@
 import type { MenuItems } from '~/models/sidebar.models';
 
 import { useState, useEffect, type ReactElement, type MouseEvent } from 'react';
-import { useLocation, matchPath, NavLink } from 'react-router-dom';
+import { useLocation, NavLink } from 'react-router-dom';
 import { styled } from '@mui/material';
 
 import List from '@mui/material/List';
@@ -19,6 +19,22 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Collapse from '@mui/material/Collapse';
 import Menu from '@mui/material/Menu';
+import Divider from '@mui/material/Divider';
+import ListSubheader from '@mui/material/ListSubheader';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+
+import { isMenuItemActive } from './menu.utils';
+
+interface PopoverLinkProps {
+  path: string;
+  label: string;
+  icon?: MenuItems['icon'];
+}
+
+interface MenuItemProps extends MenuItems {
+  open: boolean; // is the sidebar drawer expanded?
+  depth?: number; // 0 = top level, 1 = child, 2 = grandchild...
+}
 
 const NavigationLink = styled(NavLink)({
   color: 'inherit',
@@ -73,147 +89,182 @@ const ExpandIconWrapper = styled('span')(({ theme }) => ({
   marginLeft: theme.spacing(2),
 }));
 
-const MenuItem = ({
-  open,
+const RailChevron = styled(ChevronRightIcon)(({ theme }) => ({
+  position: 'absolute',
+  right: theme.spacing(1.5),
+  top: '50%',
+  transform: 'translateY(-50%)',
+  color: 'inherit',
+}));
+
+const PopoverLink = ({
   path,
   label,
-  icon,
-  children,
-}: MenuItems & { open: boolean }): ReactElement => {
-  const [collapsed, setCollapsed] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const location = useLocation();
+  icon: IconComponent,
+}: PopoverLinkProps): ReactElement => (
+  <ListItem disablePadding>
+    <NavigationLink to={path} end>
+      {({ isActive }) => (
+        <ListItemButton open selected={isActive} sx={{ pl: 2 }}>
+          {IconComponent && (
+            <ListItemIcon open isActive={isActive} sx={{ mr: 2 }}>
+              <IconComponent />
+            </ListItemIcon>
+          )}
+          <ListItemText primary={label} open />
+        </ListItemButton>
+      )}
+    </NavigationLink>
+  </ListItem>
+);
 
-  const IconComponent = icon;
-  const hasChildren = !!children;
-
-  const isParentActive = hasChildren
-    ? children.some((child) => {
-        if (child.path) {
-          const match = matchPath(
-            { path: child.path, end: true },
-            location.pathname
-          );
-          return !!match;
-        }
-        return false;
-      })
-    : false;
-
-  const handleClick = (e: MouseEvent<HTMLDivElement>): void => {
-    if (open && hasChildren) {
-      setCollapsed(!collapsed);
-    } else {
-      setAnchorEl(e.currentTarget);
+const renderPopoverItems = (items: MenuItems[]): ReactElement[] =>
+  items.flatMap((item, index) => {
+    if (item.path) {
+      return [
+        <PopoverLink
+          key={item.path}
+          path={item.path}
+          label={item.label}
+          icon={item.icon}
+        />,
+      ];
     }
-  };
+
+    return [
+      ...(index > 0
+        ? [<Divider key={`${item.label}-divider`} sx={{ my: 0.5 }} />]
+        : []),
+      <ListSubheader
+        key={`${item.label}-header`}
+        disableSticky
+        sx={{ lineHeight: 2.5 }}
+      >
+        {item.label}
+      </ListSubheader>,
+      ...renderPopoverItems(item.children ?? []),
+    ];
+  });
+
+const MenuItem = ({
+  open,
+  depth = 0,
+  path,
+  label,
+  icon: IconComponent,
+  children,
+}: MenuItemProps): ReactElement => {
+  const location = useLocation();
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  const isGroupActive =
+    !path && isMenuItemActive({ label, children }, location.pathname);
+
+  const [expanded, setExpanded] = useState(isGroupActive);
+
+  useEffect(() => {
+    if (isGroupActive) {
+      setExpanded(true);
+    }
+  }, [isGroupActive]);
 
   useEffect(() => {
     setAnchorEl(null);
   }, [location]);
 
-  return (
-    <ListItem disablePadding>
-      {path ? (
+  // Drawer indentation: children line up under the parent's text.
+  // On the collapsed rail, keep the styled default.
+  const indent = open ? 3.5 + depth * 3.25 : undefined;
+
+  // ── Link item ────────────────────────────────────────────────────────
+  if (path) {
+    return (
+      <ListItem disablePadding>
         <NavigationLink to={path} end>
           {({ isActive }) => (
-            <ListItemButton open={open} selected={isActive}>
+            <ListItemButton
+              open={open}
+              selected={isActive}
+              divider={depth > 0}
+              sx={{ pl: indent }}
+            >
               {IconComponent && (
                 <ListItemIcon open={open} isActive={isActive}>
                   <IconComponent />
                 </ListItemIcon>
               )}
               <ListItemText primary={label} open={open} />
-              <ExpandIconWrapper />
+              {depth === 0 && open && <ExpandIconWrapper />}
             </ListItemButton>
           )}
         </NavigationLink>
-      ) : (
-        <ListItemButton
-          open={open}
-          onClick={handleClick}
-          divider={hasChildren && collapsed && open}
-          selected={isParentActive}
-        >
-          <ListItemIcon open={open} isActive={isParentActive}>
-            {IconComponent && <IconComponent />}
-          </ListItemIcon>
-          <ListItemText primary={label} open={open} />
-          <ExpandIconWrapper>
-            {hasChildren &&
-              (collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
-          </ExpandIconWrapper>
-        </ListItemButton>
-      )}
+      </ListItem>
+    );
+  }
 
-      {hasChildren &&
-        (open ? (
-          <Collapse in={collapsed && open} unmountOnExit>
-            <List component="div" disablePadding>
-              {children.map((child) => {
-                const ChildIconComponent = child.icon;
-                return (
-                  <NavigationLink
-                    key={child.path}
-                    to={child.path as string}
-                    end
-                  >
-                    {({ isActive }) => (
-                      <ListItemButton
-                        open={open}
-                        selected={isActive}
-                        divider
-                        sx={{ paddingLeft: 6.75 }}
-                      >
-                        {icon && (
-                          <ListItemIcon open={open} isActive={isActive}>
-                            {ChildIconComponent && <ChildIconComponent />}
-                          </ListItemIcon>
-                        )}
-                        <ListItemText primary={child.label} open={open} />
-                      </ListItemButton>
-                    )}
-                  </NavigationLink>
-                );
-              })}
-            </List>
-          </Collapse>
+  // ── Group item ───────────────────────────────────────────────────────
+  const handleGroupClick = (event: MouseEvent<HTMLDivElement>): void => {
+    if (open) {
+      setExpanded((prev) => !prev);
+    } else {
+      setAnchorEl(event.currentTarget);
+    }
+  };
+
+  return (
+    <ListItem disablePadding>
+      <ListItemButton
+        open={open}
+        onClick={handleGroupClick}
+        selected={isGroupActive && depth === 0}
+        divider={depth > 0 || (expanded && open)}
+        aria-expanded={open ? expanded : Boolean(anchorEl)}
+        sx={{
+          pl: indent,
+          color: isGroupActive && depth > 0 ? 'primary.main' : undefined,
+        }}
+      >
+        {IconComponent && (
+          <ListItemIcon open={open} isActive={isGroupActive}>
+            <IconComponent />
+          </ListItemIcon>
+        )}
+        <ListItemText primary={label} open={open} />
+        {open ? (
+          <ExpandIconWrapper>
+            {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </ExpandIconWrapper>
         ) : (
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={() => setAnchorEl(null)}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-          >
-            {children.map((child) => {
-              const ChildIconComponent = child.icon;
-              return (
-                <NavigationLink key={child.path} to={child.path as string} end>
-                  {({ isActive }) => (
-                    <ListItemButton
-                      selected={isActive}
-                      divider
-                      sx={{ pl: 6, pr: 7 }}
-                    >
-                      {icon && (
-                        <ListItemIcon
-                          isActive={isActive}
-                          sx={{ marginRight: 4, minWidth: 0 }}
-                        >
-                          {ChildIconComponent && <ChildIconComponent />}
-                        </ListItemIcon>
-                      )}
-                      <ListItemText primary={child.label} />
-                    </ListItemButton>
-                  )}
-                </NavigationLink>
-              );
-            })}
-          </Menu>
-        ))}
+          <RailChevron />
+        )}
+      </ListItemButton>
+
+      {open ? (
+        <Collapse in={expanded} unmountOnExit>
+          <List disablePadding>
+            {children?.map((child) => (
+              <MenuItem
+                key={child.path ?? child.label}
+                open
+                depth={depth + 1}
+                {...child}
+              />
+            ))}
+          </List>
+        </Collapse>
+      ) : (
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={() => setAnchorEl(null)}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+          <ListSubheader disableSticky sx={{ lineHeight: 2.5 }}>
+            {label}
+          </ListSubheader>
+          {renderPopoverItems(children ?? [])}
+        </Menu>
+      )}
     </ListItem>
   );
 };
