@@ -1,4 +1,6 @@
-import type { Barangay, City, Region } from '~/models/location.models';
+import type { Region } from '~/models/region.model';
+import type { City } from '~/models/city.model';
+import type { Barangay } from '~/models/barangay.model';
 import type { FormValues } from '..';
 import {
   useEffect,
@@ -7,11 +9,9 @@ import {
   type ReactElement,
 } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
-import {
-  useGetRegions,
-  useGetCitiesByRegion,
-  useGetBarangaysByCity,
-} from '~/hooks/location.hooks';
+import { useGetAll as useGetBarangaysByCity } from '~/hooks/barangay.hooks';
+import { useGetAll as useGetCitiesByRegion } from '~/hooks/city.hooks';
+import { useGetAll as useGetRegions } from '~/hooks/region.hooks';
 import {
   Box,
   Button,
@@ -104,8 +104,8 @@ export const Address = (): ReactElement => {
   const hasAddress = addresses.length > 0;
 
   const { data: regions } = useGetRegions();
-  const { data: cities } = useGetCitiesByRegion(formValues.region?.id ?? '');
-  const { data: barangays } = useGetBarangaysByCity(formValues.city?.id ?? '');
+  const { data: cities } = useGetCitiesByRegion(formValues.region?.id ?? 0);
+  const { data: barangays } = useGetBarangaysByCity(formValues.city?.id ?? 0);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>

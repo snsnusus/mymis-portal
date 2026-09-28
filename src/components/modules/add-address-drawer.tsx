@@ -1,11 +1,11 @@
-import type { Barangay, City, Region } from '~/models/location.models';
+import type { Region } from '~/models/region.model';
+import type { City } from '~/models/city.model';
+import type { Barangay } from '~/models/barangay.model';
 import type { AddressPayload } from '~/models/address.models';
 import { useEffect, useState, type ReactElement } from 'react';
-import {
-  useGetRegions,
-  useGetCitiesByRegion,
-  useGetBarangaysByCity,
-} from '~/hooks/location.hooks';
+import { useGetAll as useGetRegions } from '~/hooks/region.hooks';
+import { useGetAll as useGetCitiesByRegion } from '~/hooks/city.hooks';
+import { useGetAll as useGetBarangaysByCity } from '~/hooks/barangay.hooks';
 import {
   Autocomplete,
   Button,
@@ -74,11 +74,9 @@ const AddressForm = ({
   const [isPrimary, setIsPrimary] = useState(false);
 
   const { data: provinceOptions } = useGetRegions();
-  const { data: cityOptions } = useGetCitiesByRegion(
-    selectedProvince?.id ?? ''
-  );
+  const { data: cityOptions } = useGetCitiesByRegion(selectedProvince?.id);
   const { data: barangayOptions } = useGetBarangaysByCity(
-    selectedCity?.id ?? ''
+    selectedCity?.id ?? 0
   );
 
   useEffect(() => {
@@ -92,9 +90,9 @@ const AddressForm = ({
         userId: '',
         addressLine1,
         addressLine2,
-        regionId: selectedProvince?.id ?? '',
-        cityId: selectedCity?.id ?? '',
-        barangayId: selectedBarangay?.id ?? '',
+        regionId: String(selectedProvince?.id) ?? '',
+        cityId: String(selectedCity?.id) ?? '',
+        barangayId: String(selectedBarangay?.id) ?? '',
         postalCode: zipcode,
         tag,
         isPrimary,

@@ -1,5 +1,5 @@
 import type { UserOption } from './user.models';
-import type { RawOffice } from './location.models';
+import type { RawOffice } from './location.model';
 import type { PositionFormValues } from './position.models';
 
 export type RawDepartment = {

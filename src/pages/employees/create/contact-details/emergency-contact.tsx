@@ -1,11 +1,9 @@
 import type { FormValues } from '..';
 import { useState, type ReactElement } from 'react';
 import { useFormContext } from 'react-hook-form';
-import {
-  useGetBarangaysByCity,
-  useGetCitiesByRegion,
-  useGetRegions,
-} from '~/hooks/location.hooks';
+import { useGetAll as useGetBarangaysByCity } from '~/hooks/barangay.hooks';
+import { useGetAll as useGetCitiesByRegion } from '~/hooks/city.hooks';
+import { useGetAll as useGetRegions } from '~/hooks/region.hooks';
 import {
   Box,
   Button,
@@ -27,7 +25,9 @@ import DataDisplayRow from '~/components/ui/data-display-row';
 import Switch from '~/components/form/base/switch';
 import { ControlledLocationAutocomplete } from '~/components/form/controlled/location-autocomplete';
 import { ControlledTextField } from '~/components/form/controlled/textfield';
-import type { Barangay, City, Region } from '~/models/location.models';
+import type { Region } from '~/models/region.model';
+import type { City } from '~/models/city.model';
+import type { Barangay } from '~/models/barangay.model';
 import { ControlledPhoneNumberInput } from '~/components/form/controlled';
 
 type AddressFormValues = {

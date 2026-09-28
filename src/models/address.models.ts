@@ -1,4 +1,4 @@
-import type { Region, City, Barangay } from './location.models';
+import type { Region, City, Barangay } from './location.model';
 
 export type BaseAddress = {
   addressLine1: string;

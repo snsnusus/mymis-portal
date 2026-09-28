@@ -8,7 +8,7 @@ import type {
   DepartmentNew,
 } from '~/models/department.models';
 import type { UserModel } from '~/models/user.models';
-import type { RawOffice } from '~/models/location.models';
+import type { RawOffice } from '~/models/location.model';
 import type { RawPosition } from '~/models/position.models';
 
 import { apiClient, mockClient } from '~/api/client';
