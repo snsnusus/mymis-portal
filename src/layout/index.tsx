@@ -19,7 +19,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ForumIcon from '@mui/icons-material/Forum';
 
-import Breadcrumb from '../components/breadcrumb';
+import { AppBreadcrumbs } from '../components/breadcrumb';
 import Navbar from './navbar';
 import Sidebar from './sidebar';
 import Footer from './footer';
@@ -158,7 +158,7 @@ const Layout = (props: PropsWithChildren): ReactElement => {
                       px: 4,
                     }}
                   >
-                    <Breadcrumb />
+                    <AppBreadcrumbs />
                     {children}
                   </Stack>
                 </Box>
