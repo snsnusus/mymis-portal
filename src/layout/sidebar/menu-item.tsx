@@ -1,7 +1,7 @@
 import type { MenuItems } from '~/models/sidebar.model';
 
 import { useState, useEffect, type ReactElement, type MouseEvent } from 'react';
-import { useLocation, NavLink } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { styled } from '@mui/material';
 
 import List from '@mui/material/List';
@@ -22,13 +22,14 @@ import Menu from '@mui/material/Menu';
 import Divider from '@mui/material/Divider';
 import ListSubheader from '@mui/material/ListSubheader';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-
-import { isMenuItemActive } from './menu.utils';
+import { getActiveMenuPath, isMenuItemActive } from './menu.utils';
+import { MENU_ITEMS } from './menu.constants';
 
 interface PopoverLinkProps {
   path: string;
   label: string;
   icon?: MenuItems['icon'];
+  isActive: boolean;
 }
 
 interface MenuItemProps extends MenuItems {
@@ -36,7 +37,7 @@ interface MenuItemProps extends MenuItems {
   depth?: number; // 0 = top level, 1 = child, 2 = grandchild...
 }
 
-const NavigationLink = styled(NavLink)({
+const NavigationLink = styled(Link)({
   color: 'inherit',
   textDecoration: 'none',
 });
@@ -101,24 +102,26 @@ const PopoverLink = ({
   path,
   label,
   icon: IconComponent,
+  isActive,
 }: PopoverLinkProps): ReactElement => (
   <ListItem disablePadding>
-    <NavigationLink to={path} end>
-      {({ isActive }) => (
-        <ListItemButton open selected={isActive} sx={{ pl: 2 }}>
-          {IconComponent && (
-            <ListItemIcon open isActive={isActive} sx={{ mr: 2 }}>
-              <IconComponent />
-            </ListItemIcon>
-          )}
-          <ListItemText primary={label} open />
-        </ListItemButton>
-      )}
+    <NavigationLink to={path} aria-current={isActive ? 'page' : undefined}>
+      <ListItemButton open selected={isActive} sx={{ pl: 2 }}>
+        {IconComponent && (
+          <ListItemIcon open isActive={isActive} sx={{ mr: 2 }}>
+            <IconComponent />
+          </ListItemIcon>
+        )}
+        <ListItemText primary={label} open />
+      </ListItemButton>
     </NavigationLink>
   </ListItem>
 );
 
-const renderPopoverItems = (items: MenuItems[]): ReactElement[] =>
+const renderPopoverItems = (
+  items: MenuItems[],
+  activePath: string | null
+): ReactElement[] =>
   items.flatMap((item, index) => {
     if (item.path) {
       return [
@@ -127,6 +130,7 @@ const renderPopoverItems = (items: MenuItems[]): ReactElement[] =>
           path={item.path}
           label={item.label}
           icon={item.icon}
+          isActive={item.path === activePath}
         />,
       ];
     }
@@ -142,7 +146,7 @@ const renderPopoverItems = (items: MenuItems[]): ReactElement[] =>
       >
         {item.label}
       </ListSubheader>,
-      ...renderPopoverItems(item.children ?? []),
+      ...renderPopoverItems(item.children ?? [], activePath),
     ];
   });
 
@@ -157,8 +161,10 @@ const MenuItem = ({
   const location = useLocation();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
+  const activePath = getActiveMenuPath(MENU_ITEMS, location.pathname);
+  const isLinkActive = path !== undefined && path === activePath;
   const isGroupActive =
-    !path && isMenuItemActive({ label, children }, location.pathname);
+    !path && isMenuItemActive({ label, children }, activePath);
 
   const [expanded, setExpanded] = useState(isGroupActive);
 
@@ -180,23 +186,24 @@ const MenuItem = ({
   if (path) {
     return (
       <ListItem disablePadding>
-        <NavigationLink to={path} end>
-          {({ isActive }) => (
-            <ListItemButton
-              open={open}
-              selected={isActive}
-              divider={depth > 0}
-              sx={{ pl: indent }}
-            >
-              {IconComponent && (
-                <ListItemIcon open={open} isActive={isActive}>
-                  <IconComponent />
-                </ListItemIcon>
-              )}
-              <ListItemText primary={label} open={open} />
-              {depth === 0 && open && <ExpandIconWrapper />}
-            </ListItemButton>
-          )}
+        <NavigationLink
+          to={path}
+          aria-current={isLinkActive ? 'page' : undefined}
+        >
+          <ListItemButton
+            open={open}
+            selected={isLinkActive}
+            divider={depth > 0}
+            sx={{ pl: indent }}
+          >
+            {IconComponent && (
+              <ListItemIcon open={open} isActive={isLinkActive}>
+                <IconComponent />
+              </ListItemIcon>
+            )}
+            <ListItemText primary={label} open={open} />
+            {depth === 0 && open && <ExpandIconWrapper />}
+          </ListItemButton>
         </NavigationLink>
       </ListItem>
     );
@@ -262,7 +269,7 @@ const MenuItem = ({
           <ListSubheader disableSticky sx={{ lineHeight: 2.5 }}>
             {label}
           </ListSubheader>
-          {renderPopoverItems(children ?? [])}
+          {renderPopoverItems(children ?? [], activePath)}
         </Menu>
       )}
     </ListItem>
