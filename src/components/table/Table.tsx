@@ -49,8 +49,7 @@ export const ReactTable = <TData extends object>(
 
   useEffect(() => {
     getRowSelection?.(selectedFlatRows);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedFlatRows]);
+  }, [selectedFlatRows, getRowSelection]);
 
   const handlePageChange = (
     _evt: MouseEvent<HTMLButtonElement> | null,
