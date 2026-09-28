@@ -1,4 +1,4 @@
-import type { MenuItems } from '~/models/sidebar.models';
+import type { MenuItems } from '~/models/sidebar.model';
 
 import { useState, useEffect, type ReactElement, type MouseEvent } from 'react';
 import { useLocation, NavLink } from 'react-router-dom';

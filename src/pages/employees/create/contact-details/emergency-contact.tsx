@@ -51,10 +51,10 @@ export const EmergencyContact = (): ReactElement => {
 
   const { data: regions = [] } = useGetRegions();
   const { data: cities = [] } = useGetCitiesByRegion(
-    emergencyContact?.address?.region?.id ?? ''
+    emergencyContact?.address?.region?.id
   );
   const { data: barangays = [] } = useGetBarangaysByCity(
-    emergencyContact?.address?.city?.id ?? ''
+    emergencyContact?.address?.city?.id ?? 0
   );
 
   const handleToggleSameAddress = (

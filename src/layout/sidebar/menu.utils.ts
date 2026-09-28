@@ -1,5 +1,5 @@
 import { matchPath } from 'react-router-dom';
-import type { MenuItems } from '~/models/sidebar.models';
+import type { MenuItems } from '~/models/sidebar.model';
 
 // A link is active if the URL is at or below its path.
 // A group is active if ANY descendant is active, at any depth.

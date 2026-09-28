@@ -1,4 +1,4 @@
-import type { MenuItems } from '~/models/sidebar.models';
+import type { MenuItems } from '~/models/sidebar.model';
 
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import Face4Icon from '@mui/icons-material/Face4';
