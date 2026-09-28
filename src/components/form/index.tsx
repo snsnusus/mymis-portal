@@ -21,7 +21,9 @@ export const Form = <Type extends object>(
 
   return (
     <FormProvider<Type> {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)}>{children}</form>
+      <form noValidate onSubmit={methods.handleSubmit(onSubmit)}>
+        {children}
+      </form>
     </FormProvider>
   );
 };
