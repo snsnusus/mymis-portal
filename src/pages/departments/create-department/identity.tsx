@@ -1,6 +1,5 @@
 import { useState, type ReactElement } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { useGetOffices } from '~/hooks/location.hooks';
 
 import { Box, Card, CardContent, Grid, Typography } from '@mui/material';
 
@@ -74,7 +73,7 @@ const CoverImage = (): ReactElement => {
 };
 
 export const Identity = (): ReactElement => {
-  const { data: offices } = useGetOffices();
+  const offices: { label: string; value: string }[] = [];
 
   return (
     <Card variant="outlined">
@@ -141,7 +140,7 @@ export const Identity = (): ReactElement => {
                   }
                   return ''; // Safe fallback string
                 }}
-                options={offices ?? []}
+                options={offices}
               />
             </DataDisplayRow>
           </Grid>
