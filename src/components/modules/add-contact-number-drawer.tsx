@@ -3,8 +3,8 @@ import { Button, Stack } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { MuiTelInput, type MuiTelInputInfo } from 'mui-tel-input';
 import Drawer from '~/components/ui/drawer';
-import DataDisplayRow from '~/components/ui/data-display-row';
-import CustomSwitch from '~/components/form/base/switch';
+import { DataDisplayRow } from '~/components/ui/data-display-row';
+import { Switch } from '~/components/form/inputs/base/switch';
 import OtpVerificationDialog from '../../pages/profile/tabs/contact/contact-number/otp-verification-dialog';
 
 import { nodeClient } from '~/api/client';
@@ -224,7 +224,7 @@ const AddContactNumberDrawer = ({
                 },
               }}
             >
-              <CustomSwitch
+              <Switch
                 checked={phoneNumberDetails?.isPrimary ?? false}
                 onChange={(e) =>
                   setPhoneNumberDetails((prev) =>

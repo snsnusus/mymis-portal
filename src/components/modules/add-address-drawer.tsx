@@ -3,9 +3,9 @@ import type { City } from '~/models/city.model';
 import type { Barangay } from '~/models/barangay.model';
 import type { AddressPayload } from '~/models/address.models';
 import { useEffect, useState, type ReactElement } from 'react';
-import { useGetAll as useGetRegions } from '~/hooks/region.hooks';
-import { useGetAll as useGetCitiesByRegion } from '~/hooks/city.hooks';
-import { useGetAll as useGetBarangaysByCity } from '~/hooks/barangay.hooks';
+import { useGetAll as useGetRegions } from '~/queries/region.query';
+import { useGetAll as useGetCitiesByRegion } from '~/queries/city.query';
+import { useGetAll as useGetBarangaysByCity } from '~/queries/barangay.query';
 import {
   Autocomplete,
   Button,
@@ -14,9 +14,9 @@ import {
   TextField,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import CustomSwitch from '~/components/form/base/switch';
+import { Switch } from '~/components/form/inputs/base/switch';
 import Drawer from '~/components/ui/drawer';
-import DataDisplayRow from '~/components/ui/data-display-row';
+import { DataDisplayRow } from '~/components/ui/data-display-row';
 
 const customConfig = {
   labelBox: {
@@ -232,7 +232,7 @@ const AddressForm = ({
             },
           }}
         >
-          <CustomSwitch
+          <Switch
             checked={isPrimary}
             onChange={(e) => setIsPrimary(e.target.checked)}
           />

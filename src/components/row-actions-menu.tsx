@@ -15,7 +15,7 @@ interface RowActionsMenuProps {
   onEdit: () => void;
 }
 
-const RowActionsMenu = ({
+export const RowActionsMenu = ({
   itemLabel,
   onEdit,
 }: RowActionsMenuProps): ReactElement => {

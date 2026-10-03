@@ -36,8 +36,8 @@ import {
   useGetAll,
   useCreateOrUpdate,
   useBulkCreate,
-} from '~/hooks/city.hooks';
-import { useGetAll as useGetRegions } from '~/hooks/region.hooks';
+} from '~/queries/city.query';
+import { useGetAll as useGetRegions } from '~/queries/region.query';
 import { usePagination } from '~/hooks/use-pagination';
 import type { City } from '~/models/city.model';
 import type { Region } from '~/models/region.model';
@@ -222,141 +222,139 @@ const Cities = (): ReactElement => {
   };
 
   return (
-    <Stack spacing={2} sx={{ pt: 2 }}>
-      <Card variant="outlined">
-        <Stack
-          direction="row"
-          sx={{
-            p: 2,
-            gap: 2,
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-          }}
-        >
-          <Box sx={{ flexGrow: 1 }}>
-            <Typography sx={{ fontWeight: 600 }}>Cities</Typography>
-            <Typography variant="caption" color="text.secondary">
-              Cities and municipalities, grouped by region.
-            </Typography>
-          </Box>
-          <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
-            <Tooltip title={isCompact ? 'Comfortable rows' : 'Compact rows'}>
-              <IconButton
-                size="small"
-                aria-label={
-                  isCompact
-                    ? 'Switch to comfortable rows'
-                    : 'Switch to compact rows'
-                }
-                onClick={() => setTableSize(isCompact ? 'medium' : 'small')}
-              >
-                {isCompact ? (
-                  <DensityMediumIcon fontSize="small" />
-                ) : (
-                  <DensitySmallIcon fontSize="small" />
-                )}
-              </IconButton>
-            </Tooltip>
-            {/* Opens the bulk upload modal for selectedRegion (next step) */}
-            <Button
-              variant="outlined"
+    <Card variant="outlined">
+      <Stack
+        direction="row"
+        sx={{
+          p: 2,
+          gap: 2,
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+        }}
+      >
+        <Box>
+          <Typography sx={{ fontWeight: 600 }}>Cities</Typography>
+          <Typography variant="caption" color="text.secondary">
+            Cities and municipalities, grouped by region.
+          </Typography>
+        </Box>
+        <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
+          <Tooltip title={isCompact ? 'Comfortable rows' : 'Compact rows'}>
+            <IconButton
               size="small"
-              startIcon={<UploadFileIcon />}
-              onClick={openBulkUpload}
-              disabled={!selectedRegion}
+              aria-label={
+                isCompact
+                  ? 'Switch to comfortable rows'
+                  : 'Switch to compact rows'
+              }
+              onClick={() => setTableSize(isCompact ? 'medium' : 'small')}
             >
-              Bulk upload
-            </Button>
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<AddIcon />}
-              onClick={() => openForm(null)}
-              disabled={!selectedRegion}
-            >
-              Add city
-            </Button>
-          </Stack>
+              {isCompact ? (
+                <DensityMediumIcon fontSize="small" />
+              ) : (
+                <DensitySmallIcon fontSize="small" />
+              )}
+            </IconButton>
+          </Tooltip>
+          {/* Opens the bulk upload modal for selectedRegion (next step) */}
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<UploadFileIcon />}
+            onClick={openBulkUpload}
+            disabled={!selectedRegion}
+          >
+            Bulk upload
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<AddIcon />}
+            onClick={() => openForm(null)}
+            disabled={!selectedRegion}
+          >
+            Add city
+          </Button>
         </Stack>
+      </Stack>
 
-        <CardContent
-          sx={{
-            p: 2,
-            '&.MuiCardContent-root:last-child': { paddingBottom: 2 },
-          }}
-        >
-          <Stack sx={{ gap: 2 }}>
-            <TextField
-              select
-              size="small"
-              label="Region"
-              value={selectedRegion?.id ?? ''}
-              onChange={(event) => selectRegion(Number(event.target.value))}
-              disabled={regions.length === 0}
-              sx={{ maxWidth: 320 }}
+      <CardContent
+        sx={{
+          p: 2,
+          '&.MuiCardContent-root:last-child': { paddingBottom: 2 },
+        }}
+      >
+        <Stack sx={{ gap: 2 }}>
+          <TextField
+            select
+            size="small"
+            label="Region"
+            value={selectedRegion?.id ?? ''}
+            onChange={(event) => selectRegion(Number(event.target.value))}
+            disabled={regions.length === 0}
+            sx={{ maxWidth: 320 }}
+          >
+            {regions.map((region) => (
+              <MenuItem key={region.id} value={region.id}>
+                {region.name}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          {regionsLoading && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+              <CircularProgress size={24} />
+            </Box>
+          )}
+
+          {!regionsLoading && !selectedRegion && (
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ py: 4, textAlign: 'center' }}
             >
-              {regions.map((region) => (
-                <MenuItem key={region.id} value={region.id}>
-                  {region.name}
-                </MenuItem>
-              ))}
-            </TextField>
+              No regions yet. Add a region first, then come back to add its
+              cities.
+            </Typography>
+          )}
 
-            {regionsLoading && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-                <CircularProgress size={24} />
-              </Box>
-            )}
+          {selectedRegion && (
+            <CitiesTable
+              key={selectedRegion.id}
+              region={selectedRegion}
+              size={tableSize}
+              onEdit={openForm}
+            />
+          )}
+        </Stack>
+      </CardContent>
 
-            {!regionsLoading && !selectedRegion && (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ py: 4, textAlign: 'center' }}
-              >
-                No regions yet. Add a region first, then come back to add its
-                cities.
-              </Typography>
-            )}
-
-            {selectedRegion && (
-              <CitiesTable
-                key={selectedRegion.id}
-                region={selectedRegion}
-                size={tableSize}
-                onEdit={openForm}
-              />
-            )}
-          </Stack>
-        </CardContent>
-
-        <CityFormDialog
-          open={formOpen}
-          city={editingCity}
-          regions={regions}
-          defaultRegionId={selectedRegion?.id}
-          isSaving={saveCity.isPending}
-          errorMessage={saveCity.error?.message ?? null}
-          onClose={() => setFormOpen(false)}
-          onSubmit={handleSubmit}
-        />
-        <BulkUploadDialog
-          open={bulkOpen}
-          title="Bulk Upload: Cities"
-          context={
-            selectedRegion
-              ? `Cities will be added to ${selectedRegion.name}.`
-              : undefined
-          }
-          instructions="Each row needs a name. psgcCode is optional. Don't include a regionId: every row goes to the region above. Cities whose name already exists in this region are skipped."
-          example={CITY_EXAMPLE}
-          mutation={bulkUpload}
-          onClose={() => setBulkOpen(false)}
-        />
-      </Card>
-    </Stack>
+      <CityFormDialog
+        open={formOpen}
+        city={editingCity}
+        regions={regions}
+        defaultRegionId={selectedRegion?.id}
+        isSaving={saveCity.isPending}
+        errorMessage={saveCity.error?.message ?? null}
+        onClose={() => setFormOpen(false)}
+        onSubmit={handleSubmit}
+      />
+      <BulkUploadDialog
+        open={bulkOpen}
+        title="Bulk Upload: Cities"
+        context={
+          selectedRegion
+            ? `Cities will be added to ${selectedRegion.name}.`
+            : undefined
+        }
+        instructions="Each row needs a name. psgcCode is optional. Don't include a regionId: every row goes to the region above. Cities whose name already exists in this region are skipped."
+        example={CITY_EXAMPLE}
+        mutation={bulkUpload}
+        onClose={() => setBulkOpen(false)}
+      />
+    </Card>
   );
 };
 

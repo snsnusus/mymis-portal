@@ -134,7 +134,7 @@ const FileCriteria = ({
               />
             </Box>
             <Typography
-              variant="body2"
+              variant="caption"
               sx={{ color: textColor, transition: 'color 0.2s ease-in-out' }}
             >
               {item.label}

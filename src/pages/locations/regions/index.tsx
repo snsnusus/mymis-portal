@@ -34,7 +34,7 @@ import {
   useGetAll,
   useCreateOrUpdate,
   useBulkCreate,
-} from '~/hooks/region.hooks';
+} from '~/queries/region.query';
 import { usePagination } from '~/hooks/use-pagination';
 import type { Region } from '~/models/region.model';
 import RegionFormDialog from './region-form-dialog';
@@ -136,144 +136,142 @@ const Regions = (): ReactElement => {
   };
 
   return (
-    <Stack spacing={2} sx={{ pt: 2 }}>
-      <Card variant="outlined">
-        <Stack
-          direction="row"
-          sx={{
-            p: 2,
-            gap: 2,
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-          }}
-        >
-          <Box sx={{ flexGrow: 1 }}>
-            <Typography sx={{ fontWeight: 600 }}>Regions</Typography>
-            <Typography variant="caption" color="text.secondary">
-              Subtitle here...
-            </Typography>
-          </Box>
-          <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
-            <Tooltip title={isCompact ? 'Comfortable rows' : 'Compact rows'}>
-              <IconButton
-                size="small"
-                aria-label={
-                  isCompact
-                    ? 'Switch to comfortable rows'
-                    : 'Switch to compact rows'
-                }
-                onClick={() => setTableSize(isCompact ? 'medium' : 'small')}
-              >
-                {isCompact ? (
-                  <DensityMediumIcon fontSize="small" />
-                ) : (
-                  <DensitySmallIcon fontSize="small" />
-                )}
-              </IconButton>
-            </Tooltip>
-            {/* Opens the bulk upload modal (next step) */}
-            <Button
-              variant="outlined"
+    <Card variant="outlined">
+      <Stack
+        direction="row"
+        sx={{
+          p: 2,
+          gap: 2,
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+        }}
+      >
+        <Box>
+          <Typography sx={{ fontWeight: 600 }}>Regions</Typography>
+          <Typography variant="caption" color="text.secondary">
+            Subtitle here...
+          </Typography>
+        </Box>
+        <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
+          <Tooltip title={isCompact ? 'Comfortable rows' : 'Compact rows'}>
+            <IconButton
               size="small"
-              startIcon={<UploadFileIcon />}
-              onClick={openBulkUpload}
+              aria-label={
+                isCompact
+                  ? 'Switch to comfortable rows'
+                  : 'Switch to compact rows'
+              }
+              onClick={() => setTableSize(isCompact ? 'medium' : 'small')}
             >
-              Bulk upload
-            </Button>
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<AddIcon />}
-              onClick={() => openForm(null)}
-            >
-              Add region
-            </Button>
-          </Stack>
+              {isCompact ? (
+                <DensityMediumIcon fontSize="small" />
+              ) : (
+                <DensitySmallIcon fontSize="small" />
+              )}
+            </IconButton>
+          </Tooltip>
+          {/* Opens the bulk upload modal (next step) */}
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<UploadFileIcon />}
+            onClick={openBulkUpload}
+          >
+            Bulk upload
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<AddIcon />}
+            onClick={() => openForm(null)}
+          >
+            Add region
+          </Button>
         </Stack>
+      </Stack>
 
-        <CardContent
-          sx={{
-            p: 2,
-            '&.MuiCardContent-root:last-child': { paddingBottom: 2 },
-          }}
-        >
-          <TableContainer component={Paper} variant="outlined">
-            <Table size={tableSize}>
-              <TableHead>
+      <CardContent
+        sx={{
+          p: 2,
+          '&.MuiCardContent-root:last-child': { paddingBottom: 2 },
+        }}
+      >
+        <TableContainer component={Paper} variant="outlined">
+          <Table size={tableSize}>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>PSGC Code</TableCell>
+                <TableCell align="right" width={56} />
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {isLoading && (
                 <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>PSGC Code</TableCell>
-                  <TableCell align="right" width={56} />
+                  <TableCell
+                    colSpan={COLUMN_COUNT}
+                    align="center"
+                    sx={{ py: 4 }}
+                  >
+                    <CircularProgress size={24} />
+                  </TableCell>
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {isLoading && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={COLUMN_COUNT}
-                      align="center"
-                      sx={{ py: 4 }}
-                    >
-                      <CircularProgress size={24} />
-                    </TableCell>
-                  </TableRow>
-                )}
-                {!isLoading && pagination.count === 0 && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={COLUMN_COUNT}
-                      align="center"
-                      sx={{ py: 4 }}
-                    >
-                      <Typography variant="body2" color="text.secondary">
-                        No regions yet. Add one or use bulk upload.
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                )}
-                {pagination.pageItems.map((region) => (
-                  <TableRow key={region.id} hover>
-                    <TableCell>{region.name}</TableCell>
-                    <TableCell>{region.psgcCode ?? '—'}</TableCell>
-                    <TableCell align="right">
-                      <RegionRowActions region={region} onEdit={openForm} />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <TablePagination
-              component="div"
-              count={pagination.count}
-              page={pagination.page}
-              rowsPerPage={pagination.rowsPerPage}
-              rowsPerPageOptions={[5, 10, 25]}
-              onPageChange={pagination.onPageChange}
-              onRowsPerPageChange={pagination.onRowsPerPageChange}
-            />
-          </TableContainer>
-        </CardContent>
+              )}
+              {!isLoading && pagination.count === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={COLUMN_COUNT}
+                    align="center"
+                    sx={{ py: 4 }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      No regions yet. Add one or use bulk upload.
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              )}
+              {pagination.pageItems.map((region) => (
+                <TableRow key={region.id} hover>
+                  <TableCell>{region.name}</TableCell>
+                  <TableCell>{region.psgcCode ?? '—'}</TableCell>
+                  <TableCell align="right">
+                    <RegionRowActions region={region} onEdit={openForm} />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <TablePagination
+            component="div"
+            count={pagination.count}
+            page={pagination.page}
+            rowsPerPage={pagination.rowsPerPage}
+            rowsPerPageOptions={[5, 10, 25]}
+            onPageChange={pagination.onPageChange}
+            onRowsPerPageChange={pagination.onRowsPerPageChange}
+          />
+        </TableContainer>
+      </CardContent>
 
-        <RegionFormDialog
-          open={formOpen}
-          region={editingRegion}
-          isSaving={saveRegion.isPending}
-          errorMessage={saveRegion.error?.message ?? null}
-          onClose={() => setFormOpen(false)}
-          onSubmit={handleSubmit}
-        />
-        <BulkUploadDialog
-          open={bulkOpen}
-          title="Bulk Upload: Regions"
-          instructions="Each row needs a name. psgcCode is optional. Regions whose name already exists are skipped."
-          example={REGION_EXAMPLE}
-          mutation={bulkUpload}
-          onClose={() => setBulkOpen(false)}
-        />
-      </Card>
-    </Stack>
+      <RegionFormDialog
+        open={formOpen}
+        region={editingRegion}
+        isSaving={saveRegion.isPending}
+        errorMessage={saveRegion.error?.message ?? null}
+        onClose={() => setFormOpen(false)}
+        onSubmit={handleSubmit}
+      />
+      <BulkUploadDialog
+        open={bulkOpen}
+        title="Bulk Upload: Regions"
+        instructions="Each row needs a name. psgcCode is optional. Regions whose name already exists are skipped."
+        example={REGION_EXAMPLE}
+        mutation={bulkUpload}
+        onClose={() => setBulkOpen(false)}
+      />
+    </Card>
   );
 };
 

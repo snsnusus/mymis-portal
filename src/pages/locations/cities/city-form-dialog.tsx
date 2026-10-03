@@ -15,8 +15,8 @@ import {
 import type { City } from '~/models/city.model';
 import type { Region } from '~/models/region.model';
 import { citySchema, type CityFormValues } from '~/schema/city.schema';
-import { ControlledTextField } from '~/components/form/controlled';
-import { Form } from '~/components/form';
+import { ControlledTextField } from '~/components/form/inputs/controlled/textfield';
+import { FormProvider } from '~/components/form/form-provider';
 
 interface CityFormDialogProps {
   open: boolean;
@@ -48,7 +48,7 @@ const CityForm = ({
   });
 
   return (
-    <Form {...methods} onSubmit={onSubmit}>
+    <FormProvider {...methods} onSubmit={onSubmit}>
       <DialogTitle>{city ? `Edit ${city.name}` : 'Add city'}</DialogTitle>
       <DialogContent>
         <Stack sx={{ gap: 2, pt: 1 }}>
@@ -88,7 +88,7 @@ const CityForm = ({
           {isSaving ? 'Saving...' : 'Save'}
         </Button>
       </DialogActions>
-    </Form>
+    </FormProvider>
   );
 };
 

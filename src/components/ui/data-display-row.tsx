@@ -35,12 +35,11 @@ const labelBoxConfig: SxProps<Theme> = {
 };
 
 const labelProps: SxProps<Theme> = {
-  variant: 'body2',
+  variant: 'body1',
   color: 'text.secondary',
-  fontWeight: 500,
 };
 
-const DataDisplayRow = ({
+export const DataDisplayRow = ({
   label,
   action,
   config,
@@ -77,5 +76,3 @@ const DataDisplayRow = ({
     </Stack>
   </Stack>
 );
-
-export default DataDisplayRow;

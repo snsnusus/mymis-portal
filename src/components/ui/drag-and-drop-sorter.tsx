@@ -133,7 +133,6 @@ interface DragAndDropSorterProps<T extends Identifiable> {
   onReorder: (newItems: T[]) => void;
   renderItem: (props: RenderItemProps<T>) => ReactNode;
   showIndexBadge?: boolean;
-  maxWidth?: number | string;
 }
 
 export const DragAndDropSorter = <T extends Identifiable>({
@@ -141,7 +140,6 @@ export const DragAndDropSorter = <T extends Identifiable>({
   onReorder,
   renderItem,
   showIndexBadge = true,
-  maxWidth = 560,
 }: DragAndDropSorterProps<T>): ReactElement => {
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -175,17 +173,16 @@ export const DragAndDropSorter = <T extends Identifiable>({
       onDragEnd={handleDragEnd}
     >
       <SortableContext items={items} strategy={verticalListSortingStrategy}>
-        <List sx={{ width: '100%', maxWidth, p: 0 }}>
+        <List sx={{ width: '100%', p: 0 }}>
           {items.length === 0 ? (
-            <Stack sx={{ alignItems: 'center' }}>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontStyle: 'italic',
-                }}
-              >
-                No items added yet.
-              </Typography>
+            <Stack
+              sx={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: '150px',
+              }}
+            >
+              <Typography variant="body1">No position added yet.</Typography>
             </Stack>
           ) : (
             items.map((item, index) => (

@@ -12,8 +12,8 @@ import {
 } from '@mui/material';
 import type { Region } from '~/models/region.model';
 import { regionSchema, type RegionFormValues } from '~/schema/region.schema';
-import { Form } from '~/components/form';
-import { ControlledTextField } from '~/components/form/controlled/textfield';
+import { FormProvider } from '~/components/form/form-provider';
+import { ControlledTextField } from '~/components/form/inputs/controlled/textfield';
 
 interface RegionFormDialogProps {
   open: boolean;
@@ -40,7 +40,7 @@ const RegionForm = ({
   });
 
   return (
-    <Form {...methods} onSubmit={onSubmit}>
+    <FormProvider {...methods} onSubmit={onSubmit}>
       <DialogTitle>{region ? `Edit Region` : 'Add Region'}</DialogTitle>
       <DialogContent dividers>
         <Stack sx={{ gap: 2, pt: 1 }}>
@@ -57,7 +57,7 @@ const RegionForm = ({
           {isSaving ? 'Saving...' : 'Save'}
         </Button>
       </DialogActions>
-    </Form>
+    </FormProvider>
   );
 };
 

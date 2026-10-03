@@ -1,9 +1,12 @@
 import type { EmployeeOption } from '~/models/employee.model';
 import { type ReactElement } from 'react';
 import { useController } from 'react-hook-form';
-import { useGetEmployeeOptions } from '~/hooks/employee.hook';
+import { useGetEmployeeOptions } from '~/queries/employee.query';
 import { Avatar, Box, Typography } from '@mui/material';
-import { Autocomplete, type AutocompleteProps } from '~/components/form/base';
+import {
+  Autocomplete,
+  type AutocompleteProps,
+} from '~/components/form/inputs/base/autocomplete';
 
 // ==========================================
 // 1. Uncontrolled User Lookup Component

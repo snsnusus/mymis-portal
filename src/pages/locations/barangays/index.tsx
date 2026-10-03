@@ -26,14 +26,14 @@ import AddIcon from '@mui/icons-material/Add';
 import DensityMediumIcon from '@mui/icons-material/DensityMedium';
 import DensitySmallIcon from '@mui/icons-material/DensitySmall';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-import RowActionsMenu from '~/components/row-actions-menu';
+import { RowActionsMenu } from '~/components/row-actions-menu';
 import {
   useGetAll,
   useCreateOrUpdate,
   useBulkCreate,
-} from '~/hooks/barangay.hooks';
-import { useGetAll as useGetCities } from '~/hooks/city.hooks';
-import { useGetAll as useGetRegions } from '~/hooks/region.hooks';
+} from '~/queries/barangay.query';
+import { useGetAll as useGetCities } from '~/queries/city.query';
+import { useGetAll as useGetRegions } from '~/queries/region.query';
 import { usePagination } from '~/hooks/use-pagination';
 import type { Barangay } from '~/models/barangay.model';
 import type { City } from '~/models/city.model';
@@ -195,169 +195,167 @@ const Barangays = (): ReactElement => {
   const isFilterLoading = regionsLoading || citiesLoading;
 
   return (
-    <Stack spacing={2} sx={{ pt: 2 }}>
-      <Card variant="outlined">
-        <Stack
-          direction="row"
-          sx={{
-            p: 2,
-            gap: 2,
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-          }}
-        >
-          <Box sx={{ flexGrow: 1 }}>
-            <Typography sx={{ fontWeight: 600 }}>Barangays</Typography>
-            <Typography variant="caption" color="text.secondary">
-              Barangays, grouped by city.
-            </Typography>
-          </Box>
-          <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
-            <Tooltip title={isCompact ? 'Comfortable rows' : 'Compact rows'}>
-              <IconButton
-                size="small"
-                aria-label={
-                  isCompact
-                    ? 'Switch to comfortable rows'
-                    : 'Switch to compact rows'
-                }
-                onClick={() => setTableSize(isCompact ? 'medium' : 'small')}
-              >
-                {isCompact ? (
-                  <DensityMediumIcon fontSize="small" />
-                ) : (
-                  <DensitySmallIcon fontSize="small" />
-                )}
-              </IconButton>
-            </Tooltip>
-            {/* Opens the bulk upload modal for selectedCity (next step) */}
-            <Button
-              variant="outlined"
+    <Card variant="outlined">
+      <Stack
+        direction="row"
+        sx={{
+          p: 2,
+          gap: 2,
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+        }}
+      >
+        <Box>
+          <Typography sx={{ fontWeight: 600 }}>Barangays</Typography>
+          <Typography variant="caption" color="text.secondary">
+            Barangays, grouped by city.
+          </Typography>
+        </Box>
+        <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
+          <Tooltip title={isCompact ? 'Comfortable rows' : 'Compact rows'}>
+            <IconButton
               size="small"
-              startIcon={<UploadFileIcon />}
-              onClick={openBulkUpload}
-              disabled={!selectedCity}
+              aria-label={
+                isCompact
+                  ? 'Switch to comfortable rows'
+                  : 'Switch to compact rows'
+              }
+              onClick={() => setTableSize(isCompact ? 'medium' : 'small')}
             >
-              Bulk upload
-            </Button>
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<AddIcon />}
-              onClick={() => openForm(null)}
-              disabled={!selectedCity}
-            >
-              Add barangay
-            </Button>
-          </Stack>
+              {isCompact ? (
+                <DensityMediumIcon fontSize="small" />
+              ) : (
+                <DensitySmallIcon fontSize="small" />
+              )}
+            </IconButton>
+          </Tooltip>
+          {/* Opens the bulk upload modal for selectedCity (next step) */}
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<UploadFileIcon />}
+            onClick={openBulkUpload}
+            disabled={!selectedCity}
+          >
+            Bulk upload
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<AddIcon />}
+            onClick={() => openForm(null)}
+            disabled={!selectedCity}
+          >
+            Add barangay
+          </Button>
         </Stack>
+      </Stack>
 
-        <CardContent
-          sx={{
-            p: 2,
-            '&.MuiCardContent-root:last-child': { paddingBottom: 2 },
-          }}
-        >
-          <Stack sx={{ gap: 2 }}>
-            <Stack direction="row" sx={{ gap: 2, flexWrap: 'wrap' }}>
-              <TextField
-                select
-                size="small"
-                label="Region"
-                value={selectedRegion?.id ?? ''}
-                onChange={(event) => selectRegion(Number(event.target.value))}
-                disabled={regions.length === 0}
-                sx={{ minWidth: 240 }}
-              >
-                {regions.map((region) => (
-                  <MenuItem key={region.id} value={region.id}>
-                    {region.name}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField
-                select
-                size="small"
-                label="City"
-                value={selectedCity?.id ?? ''}
-                onChange={(event) => selectCity(Number(event.target.value))}
-                disabled={cities.length === 0}
-                sx={{ minWidth: 240 }}
-              >
-                {cities.map((city) => (
-                  <MenuItem key={city.id} value={city.id}>
-                    {city.name}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Stack>
-
-            {isFilterLoading && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-                <CircularProgress size={24} />
-              </Box>
-            )}
-
-            {!isFilterLoading && !selectedRegion && (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ py: 4, textAlign: 'center' }}
-              >
-                No regions yet. Add a region and its cities first.
-              </Typography>
-            )}
-
-            {!isFilterLoading && selectedRegion && !selectedCity && (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ py: 4, textAlign: 'center' }}
-              >
-                No cities in {selectedRegion.name} yet. Add cities first, then
-                come back to add barangays.
-              </Typography>
-            )}
-
-            {selectedCity && (
-              <BarangaysTable
-                key={selectedCity.id}
-                city={selectedCity}
-                size={tableSize}
-                onEdit={openForm}
-              />
-            )}
+      <CardContent
+        sx={{
+          p: 2,
+          '&.MuiCardContent-root:last-child': { paddingBottom: 2 },
+        }}
+      >
+        <Stack sx={{ gap: 2 }}>
+          <Stack direction="row" sx={{ gap: 2, flexWrap: 'wrap' }}>
+            <TextField
+              select
+              size="small"
+              label="Region"
+              value={selectedRegion?.id ?? ''}
+              onChange={(event) => selectRegion(Number(event.target.value))}
+              disabled={regions.length === 0}
+              sx={{ minWidth: 240 }}
+            >
+              {regions.map((region) => (
+                <MenuItem key={region.id} value={region.id}>
+                  {region.name}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              select
+              size="small"
+              label="City"
+              value={selectedCity?.id ?? ''}
+              onChange={(event) => selectCity(Number(event.target.value))}
+              disabled={cities.length === 0}
+              sx={{ minWidth: 240 }}
+            >
+              {cities.map((city) => (
+                <MenuItem key={city.id} value={city.id}>
+                  {city.name}
+                </MenuItem>
+              ))}
+            </TextField>
           </Stack>
-        </CardContent>
 
-        <BarangayFormDialog
-          open={formOpen}
-          barangay={editingBarangay}
-          cities={cities}
-          regionName={selectedRegion?.name ?? ''}
-          defaultCityId={selectedCity?.id}
-          isSaving={saveBarangay.isPending}
-          errorMessage={saveBarangay.error?.message ?? null}
-          onClose={() => setFormOpen(false)}
-          onSubmit={handleSubmit}
-        />
-        <BulkUploadDialog
-          open={bulkOpen}
-          title="Bulk Upload: Barangays"
-          context={
-            selectedCity && selectedRegion
-              ? `Barangays will be added to ${selectedCity.name}, ${selectedRegion.name}.`
-              : undefined
-          }
-          instructions="Each row needs a name. psgcCode and zipCode are optional. Don't include a cityId: every row goes to the city above. Barangays whose name already exists in this city are skipped."
-          example={BARANGAY_EXAMPLE}
-          mutation={bulkUpload}
-          onClose={() => setBulkOpen(false)}
-        />
-      </Card>
-    </Stack>
+          {isFilterLoading && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+              <CircularProgress size={24} />
+            </Box>
+          )}
+
+          {!isFilterLoading && !selectedRegion && (
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ py: 4, textAlign: 'center' }}
+            >
+              No regions yet. Add a region and its cities first.
+            </Typography>
+          )}
+
+          {!isFilterLoading && selectedRegion && !selectedCity && (
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ py: 4, textAlign: 'center' }}
+            >
+              No cities in {selectedRegion.name} yet. Add cities first, then
+              come back to add barangays.
+            </Typography>
+          )}
+
+          {selectedCity && (
+            <BarangaysTable
+              key={selectedCity.id}
+              city={selectedCity}
+              size={tableSize}
+              onEdit={openForm}
+            />
+          )}
+        </Stack>
+      </CardContent>
+
+      <BarangayFormDialog
+        open={formOpen}
+        barangay={editingBarangay}
+        cities={cities}
+        regionName={selectedRegion?.name ?? ''}
+        defaultCityId={selectedCity?.id}
+        isSaving={saveBarangay.isPending}
+        errorMessage={saveBarangay.error?.message ?? null}
+        onClose={() => setFormOpen(false)}
+        onSubmit={handleSubmit}
+      />
+      <BulkUploadDialog
+        open={bulkOpen}
+        title="Bulk Upload: Barangays"
+        context={
+          selectedCity && selectedRegion
+            ? `Barangays will be added to ${selectedCity.name}, ${selectedRegion.name}.`
+            : undefined
+        }
+        instructions="Each row needs a name. psgcCode and zipCode are optional. Don't include a cityId: every row goes to the city above. Barangays whose name already exists in this city are skipped."
+        example={BARANGAY_EXAMPLE}
+        mutation={bulkUpload}
+        onClose={() => setBulkOpen(false)}
+      />
+    </Card>
   );
 };
 

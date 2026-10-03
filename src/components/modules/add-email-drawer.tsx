@@ -3,8 +3,8 @@ import { useState, type ReactElement } from 'react';
 import { Button, Stack, TextField } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import Drawer from '~/components/ui/drawer';
-import DataDisplayRow from '~/components/ui/data-display-row';
-import Switch from '~/components/form/base/switch';
+import { DataDisplayRow } from '~/components/ui/data-display-row';
+import { Switch } from '~/components/form/inputs/base/switch';
 
 interface AddEmailDrawerProps {
   withVerification?: boolean;

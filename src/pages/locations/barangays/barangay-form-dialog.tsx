@@ -18,8 +18,8 @@ import {
   barangaySchema,
   type BarangayFormValues,
 } from '~/schema/barangay.schema';
-import { ControlledTextField } from '~/components/form/controlled';
-import { Form } from '~/components/form';
+import { ControlledTextField } from '~/components/form/inputs/controlled/textfield';
+import { FormProvider } from '~/components/form/form-provider';
 // keep your existing BaseTextField import here
 
 interface BarangayFormDialogProps {
@@ -55,7 +55,7 @@ const BarangayForm = ({
   });
 
   return (
-    <Form {...methods} onSubmit={onSubmit}>
+    <FormProvider {...methods} onSubmit={onSubmit}>
       <DialogTitle>
         {barangay ? `Edit ${barangay.name}` : 'Add barangay'}
       </DialogTitle>
@@ -100,7 +100,7 @@ const BarangayForm = ({
           {isSaving ? 'Saving...' : 'Save'}
         </Button>
       </DialogActions>
-    </Form>
+    </FormProvider>
   );
 };
 
