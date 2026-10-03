@@ -1,6 +1,6 @@
 import { type ReactElement } from 'react';
 import { Box, Card, CardMedia, IconButton, Typography } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
+import { Delete as DeleteIcon } from '@mui/icons-material';
 import { truncateFilename } from '~/utils';
 
 export const CoverImagePreview = ({
@@ -26,37 +26,34 @@ export const CoverImagePreview = ({
       }}
     >
       <IconButton
-        size="small"
         onClick={(e) => {
           e.stopPropagation();
           removeFile(0);
         }}
         sx={{
           position: 'absolute',
-          top: 8,
-          right: 8,
+          top: 12,
+          right: 12,
           bgcolor: 'rgba(0, 0, 0, 0.6)',
           color: 'common.white',
           '&:hover': { bgcolor: 'rgba(0, 0, 0, 0.8)' },
           zIndex: 2,
         }}
       >
-        <CloseIcon fontSize="small" />
+        <DeleteIcon />
       </IconButton>
       <CardMedia
-        component="img"
-        height="180"
-        image={previewUrl}
         alt="Upload preview"
+        component="img"
+        height="250"
+        image={previewUrl}
         sx={{ objectFit: 'cover' }}
       />
       <Box
         sx={{ p: 1.5, display: 'flex', flexDirection: 'column', minWidth: 0 }}
       >
         <Typography
-          variant="body2"
           sx={{
-            fontWeight: 600,
             textOverflow: 'ellipsis',
             overflow: 'hidden',
             whiteSpace: 'nowrap',
@@ -64,7 +61,7 @@ export const CoverImagePreview = ({
         >
           {truncateFilename(selectedFile.name)}
         </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="subtitle2" color="text.secondary">
           {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
         </Typography>
       </Box>

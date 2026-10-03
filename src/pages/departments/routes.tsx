@@ -2,25 +2,23 @@ import { type RouteObject } from 'react-router-dom';
 import { type RouteHandle } from '~/hooks/use-breadcrumbs';
 import { loadable } from '~/utils/loadable';
 
-const Departments = loadable(() => import('~/pages/departments'));
-const Department = loadable(() => import('~/pages/departments/department'));
-const CreateDepartment = loadable(
-  () => import('~/pages/departments/create-department')
-);
+const DepartmentCreate = loadable(() => import('~/pages/departments/create'));
+const DepartmentDetail = loadable(() => import('~/pages/departments/detail'));
+const DepartmentList = loadable(() => import('~/pages/departments/list'));
 
 export const routes: RouteObject = {
   path: 'departments',
   handle: { crumb: 'Departments' },
   children: [
-    { index: true, element: <Departments /> },
+    { index: true, element: <DepartmentList /> },
     {
       path: 'create',
-      element: <CreateDepartment />,
+      element: <DepartmentCreate />,
       handle: { crumb: 'Create' },
     },
     {
-      path: ':name/:id',
-      element: <Department />,
+      path: ':id/:name',
+      element: <DepartmentDetail />,
       handle: {
         crumb: ({ params }) => params.name ?? 'Department',
       } satisfies RouteHandle,

@@ -1,96 +1,90 @@
-import type {
-  DepartmentModel,
-  DepartmentFormValues,
-  DepartmentPayload,
-  DepartmentNew,
-} from '~/models/department.models';
 import type { RawPosition } from '~/models/position.models';
 
 import { apiClient, mockClient } from '~/api/client';
-import { uploadImageToCloud } from '~/utils';
-import type { DepartmentDetail } from '~/models/department.model';
+// import { uploadImageToCloud } from '~/utils';
+import type { DepartmentDetail, Department } from '~/models/department.model';
+
+const BASE_URL = '/departments';
 
 export const departmentService = {
   getDepartmentById: async (id: number): Promise<DepartmentDetail> => {
-    const { data } = await apiClient.get<DepartmentDetail>(
-      `/Departments/${id}`
-    );
+    const { data } = await apiClient.get<DepartmentDetail>(`${BASE_URL}/${id}`);
     return data;
   },
 
-  getDepartments: async (): Promise<DepartmentNew[]> => {
-    const res = await apiClient.get('/Departments');
+  getDepartments: async (): Promise<Department[]> => {
+    const res = await apiClient.get(BASE_URL);
     return res.data;
   },
 
-  createDepartment: async (formValues: DepartmentFormValues) => {
-    const cloudImageUrl = await uploadImageToCloud(formValues.coverImage);
+  // createDepartment: async (formValues: DepartmentFormValues) => {
+  //   const cloudImageUrl = await uploadImageToCloud(formValues.coverImage);
 
-    const payload: DepartmentPayload = {
-      name: formValues.name,
-      slug: formValues.slug,
-      description: formValues.description,
-      costCenterCode: formValues.costCenterCode,
-      coverImageUrl: cloudImageUrl,
-      primaryContactId: formValues.primaryContact
-        ? String(formValues.primaryContact.id)
-        : null,
-      secondaryContactId: formValues.secondaryContact
-        ? String(formValues.secondaryContact.id)
-        : null,
-      officeId: formValues.office?.id ?? '',
-      status: 'active',
-    };
+  //   const payload: DepartmentPayload = {
+  //     name: formValues.name,
+  //     slug: formValues.slug,
+  //     description: formValues.description,
+  //     costCenterCode: formValues.costCenterCode,
+  //     coverImageUrl: cloudImageUrl,
+  //     primaryContactId: formValues.primaryContact
+  //       ? String(formValues.primaryContact.id)
+  //       : null,
+  //     secondaryContactId: formValues.secondaryContact
+  //       ? String(formValues.secondaryContact.id)
+  //       : null,
+  //     officeId: formValues.office?.id ?? '',
+  //     status: 'active',
+  //   };
 
-    const { data: department } = await mockClient.post<DepartmentModel>(
-      '/departments',
-      payload
-    );
-    const departmentId = department.id;
+  //   const { data: department } = await mockClient.post<DepartmentModel>(
+  //     '/departments',
+  //     payload
+  //   );
+  //   const departmentId = department.id;
 
-    const rawMemberIds = [
-      formValues.primaryContact?.id,
-      formValues.secondaryContact?.id,
-      ...(formValues.teamMembers?.map((m) => m.id) ?? []),
-    ];
-    const uniqueMemberIds = Array.from(
-      new Set(rawMemberIds.filter((id): id is number => id !== undefined))
-    );
+  //   const rawMemberIds = [
+  //     formValues.primaryContact?.id,
+  //     formValues.secondaryContact?.id,
+  //     ...(formValues.teamMembers?.map((m) => m.id) ?? []),
+  //   ];
+  //   const uniqueMemberIds = Array.from(
+  //     new Set(rawMemberIds.filter((id): id is number => id !== undefined))
+  //   );
 
-    const userPatchPromises = uniqueMemberIds.map((userId) =>
-      mockClient.patch(`/users/${userId}`, { departmentId })
-    );
+  //   const userPatchPromises = uniqueMemberIds.map((userId) =>
+  //     mockClient.patch(`/users/${userId}`, { departmentId })
+  //   );
 
-    const scopePostPromises = (formValues.scopes ?? []).map(
-      ({ title, description }) =>
-        mockClient.post('/scopes', {
-          departmentId: departmentId,
-          title,
-          description,
-        })
-    );
+  //   const scopePostPromises = (formValues.scopes ?? []).map(
+  //     ({ title, description }) =>
+  //       mockClient.post('/scopes', {
+  //         departmentId: departmentId,
+  //         title,
+  //         description,
+  //       })
+  //   );
 
-    const positionPostPromises = (formValues.positions ?? []).map(
-      ({ position, slug, description, sortOrder, isActive, isApprover }) =>
-        mockClient.post('/positions', {
-          position,
-          slug,
-          description,
-          sortOrder,
-          isActive,
-          isApprover,
-          departmentId: departmentId,
-        })
-    );
+  //   const positionPostPromises = (formValues.positions ?? []).map(
+  //     ({ position, slug, description, sortOrder, isActive, isApprover }) =>
+  //       mockClient.post('/positions', {
+  //         position,
+  //         slug,
+  //         description,
+  //         sortOrder,
+  //         isActive,
+  //         isApprover,
+  //         departmentId: departmentId,
+  //       })
+  //   );
 
-    await Promise.all([
-      ...userPatchPromises,
-      ...scopePostPromises,
-      ...positionPostPromises,
-    ]);
+  //   await Promise.all([
+  //     ...userPatchPromises,
+  //     ...scopePostPromises,
+  //     ...positionPostPromises,
+  //   ]);
 
-    return departmentId;
-  },
+  //   return departmentId;
+  // },
 
   getPositionsByDepartment: async (
     departmentId: string
