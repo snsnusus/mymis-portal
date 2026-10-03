@@ -1,4 +1,3 @@
-// Mirrors BulkRowParser.MaxRows on the backend.
 export const MAX_BULK_ROWS = 1000;
 
 export type ParseBulkJsonResult =
