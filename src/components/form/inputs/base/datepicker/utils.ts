@@ -1,10 +1,6 @@
 import moment from 'moment';
 import range from 'lodash/range';
 
-/**
- * Date Helpers
- *
- */
 export const getCurrentYear = (): number => moment(new Date()).year() + 1;
 
 export const getYears = (): number[] => range(1990, getCurrentYear(), 1);

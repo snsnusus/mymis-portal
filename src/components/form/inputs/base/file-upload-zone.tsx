@@ -92,16 +92,13 @@ const FileUploadZone = ({
             }}
           />
         </Box>
-        <Typography
-          variant="body1"
-          sx={{ fontSize: '1.2rem', fontWeight: 600 }}
-        >
+        <Typography variant="body1" sx={{ fontWeight: 'fontWeightMedium' }}>
           Drag & drop files here, or{' '}
           <Typography
             component="span"
-            variant="body1"
+            variant="h6"
             color="primary"
-            sx={{ fontSize: '1.2rem', fontWeight: 600 }}
+            sx={{ fontWeight: 'fontWeightMedium' }}
           >
             browse
           </Typography>
@@ -109,11 +106,11 @@ const FileUploadZone = ({
       </Stack>
       {criteria && (
         <Stack
-          spacing={0.75}
+          spacing={1}
           sx={{
-            mt: 2,
-            maxWidth: 'fit-content',
+            mt: 1,
             mx: 'auto',
+            maxWidth: 'fit-content',
             alignItems: 'flex-start',
           }}
         >

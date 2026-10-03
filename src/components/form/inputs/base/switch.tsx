@@ -1,6 +1,6 @@
 import { Switch as MuiSwitch, styled, type SwitchProps } from '@mui/material';
 
-const Switch = styled((props: SwitchProps) => (
+export const Switch = styled((props: SwitchProps) => (
   <MuiSwitch
     focusVisibleClassName=".Mui-focusVisible"
     disableRipple
@@ -63,5 +63,3 @@ const Switch = styled((props: SwitchProps) => (
     }),
   },
 }));
-
-export default Switch;

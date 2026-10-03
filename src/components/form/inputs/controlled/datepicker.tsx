@@ -6,19 +6,26 @@ import DatePicker, { type DatePickerProps } from '../base/datepicker';
 
 type ControlledDatePickerProps = Omit<DatePickerProps, 'value' | 'onChange'>;
 
-const ControlledDatePicker = (
+export const ControlledDatePicker = (
   props: ControlledDatePickerProps
 ): ReactElement => {
   const { name, type, ...rest } = props;
 
   const {
-    field: { ...field },
+    field: { value, onChange, onBlur },
   } = useController({
     name,
     defaultValue: type === 'default' ? new Date() : [],
   });
 
-  return <DatePicker {...field} {...rest} />;
+  return (
+    <DatePicker
+      {...rest}
+      name={name}
+      type={type}
+      value={value}
+      onChange={onChange}
+      onBlur={onBlur}
+    />
+  );
 };
-
-export default ControlledDatePicker;

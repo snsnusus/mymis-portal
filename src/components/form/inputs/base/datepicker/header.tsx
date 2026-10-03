@@ -27,11 +27,11 @@ const StyledYearsContainer = styled(Box)(({ theme }) => ({
 }));
 
 const StyledYearButton = styled(IconButton)(({ theme }) => ({
-  fontWeight: 900,
+  fontWeight: 'fontWeightBold',
   borderRadius: '50%',
   padding: theme.spacing(1),
-  fontSize: '.8735rem',
   fontFamily: 'Google Sans',
+  fontSize: 'medium',
 }));
 
 type HeaderProps = ReactDatePickerCustomHeaderProps;
@@ -76,16 +76,15 @@ const DatePickerHeader = (props: HeaderProps): ReactElement => {
           }}
         >
           <Typography
-            variant="body1"
             color="independence"
             sx={{
-              fontWeight: 900,
+              fontWeight: 'fontWeightBold',
             }}
           >
             {getMonth(date)}
           </Typography>
           <IconButton disableRipple onClick={toggleYearsOptions}>
-            <Typography variant="body1" sx={{ fontWeight: 900 }}>
+            <Typography sx={{ fontWeight: 'fontWeightBold' }}>
               {getYear(date)}
             </Typography>
             {isYearsOptionsVisible ? <ExpandLessIcon /> : <ExpandMoreIcon />}

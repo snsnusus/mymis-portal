@@ -3,10 +3,11 @@ import { useController } from 'react-hook-form';
 import {
   LocationAutocomplete,
   type LocationOption,
-} from '~/components/form/base/location-autocomplete';
+} from '../base/location-autocomplete';
 
 export type ControlledLocationAutocompleteProps<T extends LocationOption> = {
   name: string;
+  label?: string;
   options: T[];
   disabled?: boolean;
   defaultValue?: T | null;
@@ -15,6 +16,7 @@ export type ControlledLocationAutocompleteProps<T extends LocationOption> = {
 
 export const ControlledLocationAutocomplete = <T extends LocationOption>({
   name,
+  label,
   options,
   disabled,
   defaultValue = null,
@@ -29,6 +31,7 @@ export const ControlledLocationAutocomplete = <T extends LocationOption>({
 
   return (
     <LocationAutocomplete
+      label={label}
       value={value ?? null}
       onChange={(nextValue) => {
         formOnChange(nextValue);

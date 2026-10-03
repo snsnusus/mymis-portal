@@ -1,6 +1,6 @@
 import { type ReactElement } from 'react';
 import { useController } from 'react-hook-form';
-import { BaseTextField, type BaseTextFieldProps } from '~/components/form/base';
+import { BaseTextField, type BaseTextFieldProps } from '../base/textfield';
 
 export const ControlledTextField = (
   props: BaseTextFieldProps

@@ -10,13 +10,12 @@ export type BaseTextFieldProps = MuiTextFieldProps & {
 export const BaseTextField = (props: BaseTextFieldProps): ReactElement => (
   <TextField
     variant="outlined"
-    size="small"
+    size={props.size ?? 'small'}
     fullWidth={props.fullWidth ?? true}
     {...props}
     slotProps={{
       ...props.slotProps,
       inputLabel: {
-        shrink: true,
         ...props.slotProps?.inputLabel,
       },
     }}

@@ -1,6 +1,6 @@
 import { useMemo, type ReactElement } from 'react';
 import { useController } from 'react-hook-form';
-import { Autocomplete, type AutocompleteProps } from '~/components/form/base';
+import { Autocomplete, type AutocompleteProps } from '../base/autocomplete';
 
 export type ControlledAutocompleteProps<
   T,

@@ -5,7 +5,7 @@ import type {
 
 import { type ReactElement, forwardRef } from 'react';
 
-import { TextField } from '@mui/material';
+import { TextField, type TextFieldProps } from '@mui/material';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ReactDatePicker from 'react-datepicker';
 import DatePickerHeader from './header';
@@ -21,38 +21,31 @@ export interface DatePickerProps
   onChange: (date: Date | [Date | null, Date | null] | null) => void;
 }
 
-interface MuiInputProps {
-  label?: string;
-  name?: string;
-}
-
 const DatePicker = (ReactDatePicker as any).default ?? ReactDatePicker;
 
-const MuiDatePickerInput = forwardRef<HTMLDivElement, MuiInputProps>(
-  (props, ref) => {
-    const { label, name, ...restProps } = props;
+const MuiDatePickerInput = forwardRef<
+  HTMLDivElement,
+  TextFieldProps & { name?: string }
+>((props, ref) => {
+  const { label, name, ...restProps } = props;
 
-    return (
-      <TextField
-        {...restProps} // 🚀 Spreads react-datepicker's custom click/focus events seamlessly
-        inputRef={ref} // 🚀 Binds the focus positioning tracking reference natively
-        id={name}
-        label={label}
-        variant="outlined"
-        fullWidth
-        size="small"
-        slotProps={{
-          input: {
-            endAdornment: <CalendarMonthIcon />,
-          },
-          inputLabel: {
-            shrink: true,
-          },
-        }}
-      />
-    );
-  }
-);
+  return (
+    <TextField
+      {...restProps}
+      inputRef={ref}
+      id={name}
+      label={label}
+      variant="outlined"
+      fullWidth
+      size={props.size ?? 'small'}
+      slotProps={{
+        input: {
+          endAdornment: <CalendarMonthIcon />,
+        },
+      }}
+    />
+  );
+});
 
 MuiDatePickerInput.displayName = 'MuiDatePickerInput';
 

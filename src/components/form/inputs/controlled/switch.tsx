@@ -1,5 +1,5 @@
 import { type ReactElement } from 'react';
-import Switch from '../base/switch';
+import { Switch } from '../base/switch';
 import {
   type FieldPath,
   type FieldPathValue,
