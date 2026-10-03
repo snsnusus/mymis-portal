@@ -69,8 +69,8 @@ export const PlanSection = (): ReactElement => {
         <Stack>
           <Typography variant="h6">Plans</Typography>
           <Typography variant="subtitle1" color="text.secondary">
-            Plans offered under this provider's contract, with their benefits
-            and coverage.
+            Plans offered under this provider&apos;s contract, with their
+            benefits and coverage.
           </Typography>
         </Stack>
         <Button
@@ -86,8 +86,8 @@ export const PlanSection = (): ReactElement => {
       <CardContent>
         {fields.length === 0 ? (
           <Typography variant="body1" color="text.secondary">
-            No plans yet. Add the plans included in this provider's contract.
-            You can also add them later from the provider's page.
+            No plans yet. Add the plans included in this provider&apos;s
+            contract. You can also add them later from the provider&apos;s page.
           </Typography>
         ) : (
           <Stack spacing={1.5}>

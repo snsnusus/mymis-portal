@@ -85,7 +85,10 @@ const amount = (label: string, required: boolean): z.ZodNullable<z.ZodNumber> =>
     .nullable()
     .refine((value) => !required || value !== null, `${label} is required.`);
 
-const percentage = (label: string, required: boolean) =>
+const percentage = (
+  label: string,
+  required: boolean
+): z.ZodNullable<z.ZodNumber> =>
   z
     .number({ error: `${label} must be a number.` })
     .min(0, `${label} cannot be negative.`)

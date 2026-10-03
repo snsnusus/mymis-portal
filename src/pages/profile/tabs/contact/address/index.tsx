@@ -3,7 +3,7 @@ import { type ReactElement } from 'react';
 import { Chip, Stack, Typography } from '@mui/material';
 
 import { AddAddressDrawer } from '~/components/modules/add-address-drawer';
-import DataDisplayRow from '~/components/ui/data-display-row';
+import { DataDisplayRow } from '~/components/ui/data-display-row';
 
 const Address = (): ReactElement => (
   <>

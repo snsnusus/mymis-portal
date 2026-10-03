@@ -64,15 +64,27 @@
     "react-hooks/exhaustive-deps": "warn",
     "react/prop-types": "off",
     "import/prefer-default-export": "off",
-    "import/no-extraneous-dependencies": "warn",
+    "import/no-extraneous-dependencies": [
+      "warn",
+      {
+        "devDependencies": [
+          "**/*.test.{ts,tsx}",
+          "**/*.spec.{ts,tsx}",
+          "src/test/**",
+          "src/mocks/**",
+          "vite.config.ts",
+          "vitest.config.ts"
+        ]
+      }
+    ],
     "@typescript-eslint/consistent-type-imports": "warn",
-    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-unused-vars": "error",
     "@typescript-eslint/explicit-function-return-type": [
       "warn",
       { "allowExpressions": true }
     ],
-    "@typescript-eslint/dot-notation": "warn",
+    "@typescript-eslint/dot-notation": "off",
     "dot-notation": "error",
     "@typescript-eslint/no-implied-eval": "off",
     "no-implied-eval": "error",

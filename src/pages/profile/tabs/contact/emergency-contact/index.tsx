@@ -1,7 +1,7 @@
 import { type ReactElement } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { ReactCountryFlag } from 'react-country-flag';
-import DataDisplayRow from '~/components/ui/data-display-row';
+import { DataDisplayRow } from '~/components/ui/data-display-row';
 
 const EmergencyContact = (): ReactElement => (
   <>

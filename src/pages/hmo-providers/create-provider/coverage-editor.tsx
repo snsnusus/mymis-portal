@@ -45,7 +45,7 @@ export const CoverageEditor = ({
 
       {fields.length === 0 ? (
         <Typography variant="body1" color="text.secondary">
-          No coverage yet. Add categories as they appear in the provider's
+          No coverage yet. Add categories as they appear in the provider&apos;s
           brochure, such as Inpatient care and Outpatient care.
         </Typography>
       ) : (

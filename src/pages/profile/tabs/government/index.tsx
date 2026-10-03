@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 
 import { Box, Stack, Typography } from '@mui/material';
-import DataDisplayRow from '~/components/ui/data-display-row';
+import { DataDisplayRow } from '~/components/ui/data-display-row';
 
 export const Government = (): ReactElement => (
   <Stack

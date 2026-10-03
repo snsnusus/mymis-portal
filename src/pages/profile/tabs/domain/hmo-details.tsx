@@ -1,7 +1,7 @@
 import { type ReactElement } from 'react';
 
 import { Typography, Stack, Box } from '@mui/material';
-import DataDisplayRow from '~/components/ui/data-display-row';
+import { DataDisplayRow } from '~/components/ui/data-display-row';
 
 const HMODetails = (): ReactElement => (
   <>

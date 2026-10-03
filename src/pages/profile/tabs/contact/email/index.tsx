@@ -1,7 +1,7 @@
 import { type ReactElement } from 'react';
 import { Chip, Stack, Typography } from '@mui/material';
-import DataDisplayRow from '~/components/ui/data-display-row';
-import AddEmailDrawer from '../../../../../components/modules/add-email-drawer';
+import { DataDisplayRow } from '~/components/ui/data-display-row';
+import AddEmailDrawer from '~/components/modules/add-email-drawer';
 
 const Email = (): ReactElement => (
   <DataDisplayRow

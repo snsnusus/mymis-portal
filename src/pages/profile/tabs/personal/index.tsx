@@ -18,7 +18,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import moment from 'moment';
 import { shallow } from 'zustand/shallow';
 
-import DataDisplayRow from '~/components/ui/data-display-row';
+import { DataDisplayRow } from '~/components/ui/data-display-row';
 
 export const Personal = (): ReactElement => {
   const theme = useTheme();

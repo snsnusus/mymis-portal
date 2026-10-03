@@ -1,7 +1,7 @@
 import { type ReactElement } from 'react';
 
 import { Typography, Stack, Box, Divider } from '@mui/material';
-import DataDisplayRow from '~/components/ui/data-display-row';
+import { DataDisplayRow } from '~/components/ui/data-display-row';
 
 const EmploymentDetails = (): ReactElement => (
   <>

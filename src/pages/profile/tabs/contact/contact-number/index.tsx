@@ -1,8 +1,8 @@
 import { type ReactElement } from 'react';
 import { Chip, Stack, Typography } from '@mui/material';
 import { ReactCountryFlag } from 'react-country-flag';
-import DataDisplayRow from '~/components/ui/data-display-row';
-import AddNewContactNumberDrawer from '../../../../../components/modules/add-contact-number-drawer';
+import { DataDisplayRow } from '~/components/ui/data-display-row';
+import AddNewContactNumberDrawer from '~/components/modules/add-contact-number-drawer';
 
 const ContactNumber = (): ReactElement => (
   <DataDisplayRow

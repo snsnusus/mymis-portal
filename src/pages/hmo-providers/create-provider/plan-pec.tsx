@@ -54,7 +54,7 @@ export const PlanPec = ({ namePrefix }: PlanFieldsProps): ReactElement => {
         </Grid>
       ) : (
         <Typography variant="body1" color="text.secondary">
-          Pre-existing conditions aren't covered by this plan.
+          Pre-existing conditions aren&apos;t covered by this plan.
         </Typography>
       )}
     </Stack>
