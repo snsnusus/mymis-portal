@@ -1,7 +1,5 @@
 import { useState, type ReactElement } from 'react';
-
 import {
-  Box,
   Card,
   CardContent,
   Divider,
@@ -10,24 +8,21 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-
-import { ControlledTextField } from '~/components/form/controlled/textfield';
-import ControlledDatePicker from '~/components/form/controlled/controlled-datepicker';
-import DataDisplayRow from '~/components/ui/data-display-row';
-import FileUploadZone from '~/components/form/base/file-upload-zone';
+import { ControlledAutocomplete } from '~/components/form/inputs/controlled/autocomplete';
+import { ControlledDatePicker } from '~/components/form/inputs/controlled/datepicker';
+import { ControlledTextField } from '~/components/form/inputs/controlled/textfield';
+import FileUploadZone from '~/components/form/inputs/base/file-upload-zone';
 import ImageCropperDialog from '~/components/ui/image-cropper-dialog';
 import FileCriteria from '~/components/ui/file-criteria';
-
 import DynamicAvatar from './dynamic-avatar';
 import ImagePreview from './image-preview';
-
-import { validateFile } from '~/utils';
-import { ControlledAutocomplete } from '~/components/form/controlled/autocomplete';
 import { useFormContext } from 'react-hook-form';
+import { validateFile } from '~/utils';
+import { SectionLabel } from '~/components/section-label';
 
 const FILE_CONFIG = {
   maxFileSize: { bytes: 5 * 1024 * 1024, formattedLabel: '5MB' },
-  acceptedFormats: ['image/jpeg', 'image/png', 'image/tiff'],
+  acceptedFormats: ['image/jpeg', 'image/png'],
 };
 
 export const PersonalInfo = (): ReactElement => {
@@ -56,21 +51,18 @@ export const PersonalInfo = (): ReactElement => {
 
   return (
     <Card variant="outlined">
-      <Box
+      <Stack
         sx={{
           p: 2,
-          bgcolor: 'grey.50',
           borderBottom: '1px solid',
           borderColor: 'divider',
         }}
       >
-        <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-          Personal Information
-        </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="h6">Personal Information</Typography>
+        <Typography variant="subtitle1" color="text.secondary">
           Capture identity, demographics, and a profile photo for this record.
         </Typography>
-      </Box>
+      </Stack>
       <CardContent>
         <Grid container spacing={3}>
           <Grid size={{ xs: 12, md: 5 }}>
@@ -80,7 +72,9 @@ export const PersonalInfo = (): ReactElement => {
               ) : (
                 <DynamicAvatar />
               )}
-              <Divider>OR</Divider>
+              <Divider>
+                <Typography variant="body1">OR</Typography>
+              </Divider>
               <FileUploadZone
                 onFilesSelected={handleFileUpload}
                 multiple={false}
@@ -97,164 +91,66 @@ export const PersonalInfo = (): ReactElement => {
             </Stack>
           </Grid>
           <Grid size={{ xs: 12, md: 7 }}>
-            <Grid container spacing={2} columnSpacing={3}>
-              <Grid size={12}>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ fontWeight: 600 }}
-                >
-                  IDENTITY
-                </Typography>
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <DataDisplayRow
-                  label="First Name *"
-                  config={{
-                    row: {
-                      flexDirection: 'column',
-                      gap: 1,
-                    },
-                  }}
-                >
-                  <ControlledTextField
-                    size="small"
-                    name="firstName"
-                    fullWidth
-                  />
-                </DataDisplayRow>
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <DataDisplayRow
-                  label="Middle Name *"
-                  config={{
-                    row: {
-                      flexDirection: 'column',
-                      gap: 1,
-                    },
-                  }}
-                >
-                  <ControlledTextField
-                    size="small"
-                    name="middleName"
-                    fullWidth
-                  />
-                </DataDisplayRow>
-              </Grid>
-              <Grid size={{ xs: 12, md: 8 }}>
-                <DataDisplayRow
-                  label="Last Name *"
-                  config={{
-                    row: {
-                      flexDirection: 'column',
-                      gap: 1,
-                    },
-                  }}
-                >
-                  <ControlledTextField size="small" name="lastName" fullWidth />
-                </DataDisplayRow>
-              </Grid>
-              <Grid size={{ xs: 12, md: 4 }}>
-                <DataDisplayRow
-                  label="Suffix"
-                  config={{
-                    row: {
-                      flexDirection: 'column',
-                      gap: 1,
-                    },
-                  }}
-                >
-                  <ControlledTextField size="small" name="suffix" fullWidth />
-                </DataDisplayRow>
-              </Grid>
-              <Grid size={12}>
-                <Divider sx={{ mt: 1 }} />
-              </Grid>
-              <Grid size={12}>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ fontWeight: 600 }}
-                >
-                  DEMOGRAPHICS
-                </Typography>
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <DataDisplayRow
-                  label="Gender *"
-                  config={{
-                    row: {
-                      flexDirection: 'column',
-                      gap: 1,
-                    },
-                  }}
-                >
-                  <ControlledTextField size="small" name="gender" select>
-                    <MenuItem value="MALE">Male</MenuItem>
-                    <MenuItem value="FEMALE">Female</MenuItem>
-                  </ControlledTextField>
-                </DataDisplayRow>
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <DataDisplayRow
-                  label="Marital Status"
-                  config={{
-                    row: {
-                      flexDirection: 'column',
-                      gap: 1,
-                    },
-                  }}
-                >
-                  <ControlledTextField name="maritalStatus" select fullWidth>
-                    <MenuItem value="SINGLE">Single</MenuItem>
-                    <MenuItem value="MARRIED">Married</MenuItem>
-                  </ControlledTextField>
-                </DataDisplayRow>
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <DataDisplayRow
-                  label="Birthdate *"
-                  config={{
-                    row: {
-                      flexDirection: 'column',
-                      gap: 1,
-                    },
-                  }}
-                >
-                  <ControlledDatePicker name="birthdate" />
-                </DataDisplayRow>
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <DataDisplayRow
-                  label="Place of Birth"
-                  config={{
-                    row: {
-                      flexDirection: 'column',
-                      gap: 1,
-                    },
-                  }}
-                >
-                  <ControlledTextField
-                    size="small"
-                    name="birthplace"
-                    fullWidth
-                  />
-                </DataDisplayRow>
-              </Grid>
-              <Grid size={6}>
-                <DataDisplayRow
-                  label="Nationality"
-                  config={{
-                    row: {
-                      flexDirection: 'column',
-                      gap: 1,
-                    },
-                  }}
-                >
-                  <ControlledAutocomplete name="nationality" options={[]} />
-                </DataDisplayRow>
-              </Grid>
-            </Grid>
+            <Stack sx={{ gap: 2 }}>
+              <Stack>
+                <SectionLabel title="Identity" />
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <ControlledTextField
+                      label="First Name *"
+                      name="firstName"
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <ControlledTextField
+                      label="Middle Name *"
+                      name="middleName"
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 8 }}>
+                    <ControlledTextField label="Last Name *" name="lastName" />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <ControlledTextField label="Suffix" name="suffix" />
+                  </Grid>
+                </Grid>
+              </Stack>
+              <Divider />
+              <Stack>
+                <SectionLabel title="Demographics" />
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <ControlledTextField label="Gender *" name="gender" select>
+                      <MenuItem value="MALE">Male</MenuItem>
+                      <MenuItem value="FEMALE">Female</MenuItem>
+                    </ControlledTextField>
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <ControlledTextField
+                      label="Marital Status *"
+                      name="maritalStatus"
+                      select
+                    >
+                      <MenuItem value="SINGLE">Single</MenuItem>
+                      <MenuItem value="MARRIED">Married</MenuItem>
+                    </ControlledTextField>
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <ControlledDatePicker label="Birthdate" name="birthdate" />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <ControlledTextField label="Birthplace" name="birthplace" />
+                  </Grid>
+                  <Grid size={6}>
+                    <ControlledAutocomplete
+                      label="Nationality"
+                      name="nationality"
+                      options={[]}
+                    />
+                  </Grid>
+                </Grid>
+              </Stack>
+            </Stack>
           </Grid>
         </Grid>
       </CardContent>

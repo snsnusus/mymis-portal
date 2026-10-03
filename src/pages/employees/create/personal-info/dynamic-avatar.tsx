@@ -7,7 +7,6 @@ import { alpha } from '@mui/material/styles';
 
 const DynamicAvatar = (): ReactElement => {
   const { watch } = useFormContext();
-
   const firstName = watch('firstName');
   const lastName = watch('lastName');
   const gender = watch('gender');
@@ -77,20 +76,14 @@ const DynamicAvatar = (): ReactElement => {
             }}
           />
           <Typography
-            variant="h6"
             sx={{
-              fontWeight: 600,
-              color: '#37474F',
+              fontWeight: 'fontWeightMedium',
               mb: 1,
-              fontSize: '1rem',
             }}
           >
-            Hey there! I&apos;m a dynamic avatar.
+            Hey there! <br /> I&apos;m a dynamic avatar.
           </Typography>
-          <Typography
-            variant="body2"
-            sx={{ color: '#607D8B', lineHeight: 1.5 }}
-          >
+          <Typography variant="body2" color="text.secondary">
             Fill-out the form and I&apos;ll personalize my appearance based on
             your inputs.
           </Typography>

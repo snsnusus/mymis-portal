@@ -2,14 +2,17 @@ import { useState, type ReactElement } from 'react';
 import {
   Box,
   Button,
-  Chip,
   Grid,
+  IconButton,
+  Paper,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import DataDisplayRow from '~/components/ui/data-display-row';
+import EmailIcon from '@mui/icons-material/Email';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import type { FormValues } from '..';
 import { z } from 'zod';
@@ -69,83 +72,90 @@ export const Email = (): ReactElement => {
   };
 
   return (
-    <Grid container spacing={2} columnSpacing={3}>
+    <Grid container spacing={2} sx={{ padding: 2 }}>
       <Grid size={{ xs: 12, md: 6 }}>
         <Stack sx={{ gap: 2 }}>
-          <Typography
-            variant="body1"
-            sx={{
-              fontWeight: 600,
-            }}
-          >
+          <Typography variant="body1" sx={{ fontWeight: 'fontWeightMedium' }}>
             Emails
           </Typography>
           {hasEmail ? (
             <Stack
-              direction="row"
               spacing={1}
-              useFlexGap
               sx={{
                 flexWrap: 'wrap',
+                overflowY: 'auto',
+                maxHeight: 200,
+                scrollbarGutter: 'stable',
+                paddingRight: 1,
               }}
             >
               {emails.map((email, index) => (
-                <Chip
-                  key={email.id ?? `${email.value}-${index}`}
-                  label={email.value}
+                <Paper
+                  key={email.id}
                   variant="outlined"
-                  color="primary"
-                  onDelete={() => remove(index)}
                   sx={{
-                    '&.MuiChip-root': {
-                      height: 'fit-content',
-                    },
-                    '& .MuiChip-label': {
-                      whiteSpace: 'normal',
-                      padding: 1.4,
-                      fontSize: '0.875rem',
-                      fontWeight: 500,
-                    },
+                    p: 1.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.5,
+                    width: '100%',
                   }}
-                />
+                >
+                  <EmailIcon
+                    color="primary"
+                    fontSize="large"
+                    sx={{ mt: 0.25 }}
+                  />
+                  <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Email {index + 1}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{ overflowWrap: 'anywhere' }}
+                    >
+                      {email.value}
+                    </Typography>
+                  </Box>
+                  <Tooltip title="Remove Email">
+                    <IconButton
+                      aria-label={`Remove address ${index + 1}`}
+                      sx={{ '&:hover': { color: 'error.main' } }}
+                      onClick={() => remove(index)}
+                    >
+                      <DeleteIcon fontSize="medium" />
+                    </IconButton>
+                  </Tooltip>
+                </Paper>
               ))}
             </Stack>
           ) : (
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ fontStyle: 'italic' }}
-            >
-              No email added yet.
-            </Typography>
+            <Typography color="text.secondary">No email added yet.</Typography>
           )}
         </Stack>
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
         <Stack spacing={2}>
-          <DataDisplayRow label="Email *">
-            <Stack spacing={1}>
-              <TextField
-                type="email"
-                variant="outlined"
-                size="small"
-                value={inputValue}
-                onChange={(e) => {
-                  setInputValue(e.target.value);
-                  if (errorMessage) setErrorMessage('');
-                }}
-                onBlur={handleBlur}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleAdd();
-                  }
-                }}
-                error={!!errorMessage}
-                helperText={errorMessage}
-              />
-            </Stack>
-          </DataDisplayRow>
+          <TextField
+            label="Email Address *"
+            type="email"
+            variant="outlined"
+            size="small"
+            value={inputValue}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              if (errorMessage) setErrorMessage('');
+            }}
+            onBlur={handleBlur}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleAdd();
+              }
+            }}
+            error={!!errorMessage}
+            helperText={errorMessage}
+          />
           <Box
             sx={{
               display: 'flex',
@@ -154,11 +164,10 @@ export const Email = (): ReactElement => {
             }}
           >
             <Button
-              variant="text"
-              color="inherit"
-              size="medium"
+              variant="outlined"
+              size="small"
               sx={{
-                minWidth: 120,
+                minWidth: 150,
               }}
               onClick={() => reset()}
             >
@@ -167,12 +176,12 @@ export const Email = (): ReactElement => {
             <Button
               variant="contained"
               startIcon={<AddIcon />}
-              size="medium"
-              sx={{
-                minWidth: 120,
-              }}
+              size="small"
               onClick={handleAdd}
               disabled={Boolean(errorMessage)}
+              sx={{
+                minWidth: 150,
+              }}
             >
               Add Email
             </Button>

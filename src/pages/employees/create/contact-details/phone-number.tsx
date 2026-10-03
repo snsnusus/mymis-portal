@@ -2,10 +2,20 @@ import { type FormValues } from '..';
 import { type MuiTelInputInfo } from 'mui-tel-input';
 import { useState, type ReactElement } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
-import { Box, Button, Chip, Grid, Stack, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  Paper,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import DataDisplayRow from '~/components/ui/data-display-row';
-import { PhoneNumberInput } from '~/components/form/base/phone-number-input';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SmartphoneIcon from '@mui/icons-material/Smartphone';
+import { PhoneNumberInput } from '~/components/form/inputs/base/phone-number-input';
 import { formatPhoneNumber } from '~/utils/phone-number.utils';
 import { z } from 'zod';
 import { isValidPhoneNumber } from 'libphonenumber-js';
@@ -104,57 +114,65 @@ export const PhoneNumber = (): ReactElement => {
   };
 
   return (
-    <Grid container spacing={2} columnSpacing={3}>
+    <Grid container spacing={2} sx={{ padding: 2 }}>
       <Grid size={{ xs: 12, md: 6 }}>
-        <Stack
-          sx={{
-            gap: 2,
-          }}
-        >
-          <Typography
-            variant="body1"
-            sx={{
-              fontWeight: 600,
-            }}
-          >
+        <Stack sx={{ gap: 2 }}>
+          <Typography variant="body1" sx={{ fontWeight: 'fontWeightMedium' }}>
             Phone Numbers
           </Typography>
           {hasPhoneNumber ? (
             <Stack
-              direction="row"
               spacing={1}
-              useFlexGap
               sx={{
                 flexWrap: 'wrap',
+                overflowY: 'auto',
+                maxHeight: 200,
+                scrollbarGutter: 'stable',
+                paddingRight: 1,
               }}
             >
               {phoneNumbers.map((phone, index) => (
-                <Chip
-                  key={phone.international}
-                  label={phone.formatted}
+                <Paper
+                  key={phone.id}
                   variant="outlined"
-                  color="primary"
-                  onDelete={() => remove(index)}
                   sx={{
-                    '&.MuiChip-root': {
-                      height: 'fit-content',
-                    },
-                    '& .MuiChip-label': {
-                      whiteSpace: 'normal',
-                      padding: 1.4,
-                      fontSize: '0.875rem',
-                      fontWeight: 500,
-                    },
+                    p: 1.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.5,
+                    width: '100%',
                   }}
-                />
+                >
+                  <SmartphoneIcon
+                    color="primary"
+                    fontSize="large"
+                    sx={{ mt: 0.25 }}
+                  />
+                  <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Phone Number {index + 1}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{ overflowWrap: 'anywhere' }}
+                    >
+                      {phone.international}
+                    </Typography>
+                  </Box>
+                  <Tooltip title="Remove Phone Number">
+                    <IconButton
+                      aria-label={`Remove address ${index + 1}`}
+                      sx={{ '&:hover': { color: 'error.main' } }}
+                      onClick={() => remove(index)}
+                    >
+                      <DeleteIcon fontSize="medium" />
+                    </IconButton>
+                  </Tooltip>
+                </Paper>
               ))}
             </Stack>
           ) : (
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ fontStyle: 'italic' }}
-            >
+            <Typography color="text.secondary">
               No phone number added yet.
             </Typography>
           )}
@@ -162,19 +180,18 @@ export const PhoneNumber = (): ReactElement => {
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
         <Stack spacing={2}>
-          <DataDisplayRow label="Phone Number *">
-            <Stack spacing={1}>
-              <PhoneNumberInput
-                value={formValues.international}
-                onChange={handleChange}
-              />
-              {errorMessage && (
-                <Typography variant="caption" color="error">
-                  {errorMessage}
-                </Typography>
-              )}
-            </Stack>
-          </DataDisplayRow>
+          <Stack spacing={1}>
+            <PhoneNumberInput
+              label="Phone Number *"
+              value={formValues.international}
+              onChange={handleChange}
+            />
+            {errorMessage && (
+              <Typography variant="caption" color="error">
+                {errorMessage}
+              </Typography>
+            )}
+          </Stack>
           <Box
             sx={{
               display: 'flex',
@@ -183,22 +200,21 @@ export const PhoneNumber = (): ReactElement => {
             }}
           >
             <Button
-              variant="text"
-              color="inherit"
-              size="medium"
-              sx={{
-                minWidth: 120,
-              }}
+              variant="outlined"
+              size="small"
               onClick={handleClear}
+              sx={{
+                minWidth: 150,
+              }}
             >
               Clear
             </Button>
             <Button
               variant="contained"
+              size="small"
               startIcon={<AddIcon />}
-              size="medium"
               sx={{
-                minWidth: 120,
+                minWidth: 150,
               }}
               onClick={handleAddPhoneNumber}
             >

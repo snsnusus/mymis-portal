@@ -2,31 +2,26 @@ import type { Region } from '~/models/region.model';
 import type { City } from '~/models/city.model';
 import type { Barangay } from '~/models/barangay.model';
 import type { FormValues } from '..';
-import {
-  useEffect,
-  useState,
-  type ChangeEvent,
-  type ReactElement,
-} from 'react';
+import { useState, type ChangeEvent, type ReactElement } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
-import { useGetAll as useGetBarangaysByCity } from '~/hooks/barangay.hooks';
-import { useGetAll as useGetCitiesByRegion } from '~/hooks/city.hooks';
-import { useGetAll as useGetRegions } from '~/hooks/region.hooks';
+import { useGetAll as useGetBarangaysByCity } from '~/queries/barangay.query';
+import { useGetAll as useGetCitiesByRegion } from '~/queries/city.query';
+import { useGetAll as useGetRegions } from '~/queries/region.query';
 import {
   Box,
   Button,
-  Chip,
   Grid,
+  IconButton,
+  Paper,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-
-import DataDisplayRow, {
-  type DataDisplayRowProps,
-} from '~/components/ui/data-display-row';
-import { LocationAutocomplete } from '~/components/form/base/location-autocomplete';
+import PlaceIcon from '@mui/icons-material/Place';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { LocationAutocomplete } from '~/components/form/inputs/base/location-autocomplete';
 
 import { formatAddress } from '~/utils/address.utils';
 
@@ -40,14 +35,6 @@ export type AddressFormValues = {
   formattedAddress: string;
 };
 
-type IsolatedInputProps = {
-  label: string;
-  config?: DataDisplayRowProps['config'];
-  name: string;
-  value: string | undefined;
-  onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-};
-
 const initialFormValues: AddressFormValues = {
   addressLine1: '',
   addressLine2: '',
@@ -56,36 +43,6 @@ const initialFormValues: AddressFormValues = {
   barangay: null,
   postalCode: '',
   formattedAddress: '',
-};
-
-const IsolatedInput = ({
-  label,
-  config,
-  name,
-  value,
-  onChange,
-}: IsolatedInputProps): ReactElement => {
-  const [localValue, setLocalValue] = useState(value);
-
-  useEffect(() => {
-    setLocalValue(value);
-  }, [value]);
-
-  return (
-    <DataDisplayRow label={label} config={config}>
-      <TextField
-        name={name}
-        value={localValue}
-        onChange={(e) => {
-          setLocalValue(e.target.value);
-          onChange(e);
-        }}
-        variant="outlined"
-        size="small"
-        fullWidth
-      />
-    </DataDisplayRow>
-  );
 };
 
 export const Address = (): ReactElement => {
@@ -103,9 +60,13 @@ export const Address = (): ReactElement => {
 
   const hasAddress = addresses.length > 0;
 
-  const { data: regions } = useGetRegions();
-  const { data: cities } = useGetCitiesByRegion(formValues.region?.id ?? 0);
-  const { data: barangays } = useGetBarangaysByCity(formValues.city?.id ?? 0);
+  const { data: regions = [] } = useGetRegions();
+  const { data: cities = [] } = useGetCitiesByRegion(
+    formValues.region?.id ?? 0
+  );
+  const { data: barangays = [] } = useGetBarangaysByCity(
+    formValues.city?.id ?? 0
+  );
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -128,57 +89,65 @@ export const Address = (): ReactElement => {
   };
 
   return (
-    <Grid container spacing={2} columnSpacing={3}>
+    <Grid container spacing={2} sx={{ padding: 2 }}>
       <Grid size={{ xs: 12, md: 6 }}>
-        <Stack
-          sx={{
-            gap: 2,
-          }}
-        >
-          <Typography
-            variant="body1"
-            sx={{
-              fontWeight: 600,
-            }}
-          >
+        <Stack sx={{ gap: 2 }}>
+          <Typography variant="body1" sx={{ fontWeight: 'fontWeightMedium' }}>
             Addresses
           </Typography>
           {hasAddress ? (
             <Stack
-              direction="row"
               spacing={1}
-              useFlexGap
               sx={{
                 flexWrap: 'wrap',
+                overflowY: 'auto',
+                maxHeight: 200,
+                scrollbarGutter: 'stable',
+                paddingRight: 1,
               }}
             >
               {addresses.map((address, index) => (
-                <Chip
-                  key={address.id ?? `${address.formattedAddress}-${index}`}
-                  label={address.formattedAddress}
+                <Paper
+                  key={address.id}
                   variant="outlined"
-                  color="primary"
-                  onDelete={() => remove(index)}
                   sx={{
-                    '&.MuiChip-root': {
-                      height: 'fit-content',
-                    },
-                    '& .MuiChip-label': {
-                      whiteSpace: 'normal',
-                      padding: 1.4,
-                      fontSize: '0.875rem',
-                      fontWeight: 500,
-                    },
+                    p: 1.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.5,
+                    width: '100%',
                   }}
-                />
+                >
+                  <PlaceIcon
+                    color="primary"
+                    fontSize="large"
+                    sx={{ mt: 0.25 }}
+                  />
+                  <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Address {index + 1}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{ overflowWrap: 'anywhere' }}
+                    >
+                      {address.formattedAddress}
+                    </Typography>
+                  </Box>
+                  <Tooltip title="Remove Address">
+                    <IconButton
+                      aria-label={`Remove address ${index + 1}`}
+                      sx={{ '&:hover': { color: 'error.main' } }}
+                      onClick={() => remove(index)}
+                    >
+                      <DeleteIcon fontSize="medium" />
+                    </IconButton>
+                  </Tooltip>
+                </Paper>
               ))}
             </Stack>
           ) : (
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ fontStyle: 'italic' }}
-            >
+            <Typography variant="body1" color="text.secondary">
               No address added yet.
             </Typography>
           )}
@@ -187,129 +156,86 @@ export const Address = (): ReactElement => {
       <Grid size={{ xs: 12, md: 6 }}>
         <Grid container spacing={2}>
           <Grid size={12}>
-            <IsolatedInput
+            <TextField
               name="addressLine1"
               label="Address Line 1 *"
               value={formValues.addressLine1}
               onChange={handleChange}
-              config={{
-                row: {
-                  flexDirection: 'column',
-                  gap: 1,
-                },
-              }}
+              fullWidth
+              size="small"
             />
           </Grid>
           <Grid size={12}>
-            <IsolatedInput
+            <TextField
               name="addressLine2"
               label="Address Line 2"
               value={formValues.addressLine2}
               onChange={handleChange}
-              config={{
-                row: {
-                  flexDirection: 'column',
-                  gap: 1,
-                },
-              }}
+              fullWidth
+              size="small"
             />
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
-            <DataDisplayRow
+            <LocationAutocomplete
               label="Region *"
-              config={{
-                row: {
-                  flexDirection: 'column',
-                  gap: 1,
-                },
-              }}
-            >
-              <LocationAutocomplete
-                value={formValues.region}
-                onChange={(value) =>
-                  setFormValues((prev) => ({
-                    ...prev,
-                    region: value,
-                    city: null,
-                    barangay: null,
-                    postalCode: '',
-                  }))
-                }
-                options={regions ?? []}
-              />
-            </DataDisplayRow>
+              value={formValues.region}
+              onChange={(value) =>
+                setFormValues((prev) => ({
+                  ...prev,
+                  region: value,
+                  city: null,
+                  barangay: null,
+                  postalCode: '',
+                }))
+              }
+              options={regions}
+            />
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
-            <DataDisplayRow
+            <LocationAutocomplete
               label="City *"
-              config={{
-                row: {
-                  flexDirection: 'column',
-                  gap: 1,
-                },
-              }}
-            >
-              <LocationAutocomplete
-                value={formValues.city}
-                onChange={(value) =>
-                  setFormValues((prev) => ({
-                    ...prev,
-                    city: value,
-                    barangay: null,
-                    postalCode: '',
-                  }))
-                }
-                options={cities ?? []}
-                disabled={!formValues.region}
-              />
-            </DataDisplayRow>
+              value={formValues.city}
+              onChange={(value) =>
+                setFormValues((prev) => ({
+                  ...prev,
+                  city: value,
+                  barangay: null,
+                  postalCode: '',
+                }))
+              }
+              options={cities}
+              disabled={!formValues.region}
+            />
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
-            <DataDisplayRow
+            <LocationAutocomplete
               label="Barangay *"
-              config={{
-                row: {
-                  flexDirection: 'column',
-                  gap: 1,
-                },
-              }}
-            >
-              <LocationAutocomplete
-                value={formValues.barangay}
-                onChange={(value) =>
-                  setFormValues((prev) => ({
-                    ...prev,
-                    barangay: value,
-                    postalCode: value?.zipCode ?? '',
-                  }))
-                }
-                options={barangays ?? []}
-                disabled={!formValues.city}
-              />
-            </DataDisplayRow>
+              value={formValues.barangay}
+              onChange={(value) =>
+                setFormValues((prev) => ({
+                  ...prev,
+                  barangay: value,
+                  postalCode: value?.zipCode ?? '',
+                }))
+              }
+              options={barangays}
+              disabled={!formValues.city}
+            />
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
-            <DataDisplayRow
+            <TextField
               label="Postal Code *"
-              config={{
-                row: {
-                  flexDirection: 'column',
-                  gap: 1,
+              value={formValues.postalCode}
+              onChange={handleChange}
+              variant="outlined"
+              size="small"
+              slotProps={{
+                input: {
+                  readOnly: Boolean(formValues.postalCode),
                 },
               }}
-            >
-              <TextField
-                value={formValues.postalCode}
-                onChange={handleChange}
-                variant="outlined"
-                size="small"
-                slotProps={{
-                  input: {
-                    readOnly: Boolean(formValues.postalCode),
-                  },
-                }}
-              />
-            </DataDisplayRow>
+              fullWidth
+            />
           </Grid>
           <Grid size={12}>
             <Box
@@ -320,11 +246,10 @@ export const Address = (): ReactElement => {
               }}
             >
               <Button
-                variant="text"
-                color="inherit"
-                size="medium"
+                variant="outlined"
+                size="small"
                 sx={{
-                  minWidth: 120,
+                  minWidth: 150,
                 }}
                 onClick={() => setFormValues(initialFormValues)}
               >
@@ -332,10 +257,10 @@ export const Address = (): ReactElement => {
               </Button>
               <Button
                 variant="contained"
+                size="small"
                 startIcon={<AddIcon />}
-                size="medium"
                 sx={{
-                  minWidth: 120,
+                  minWidth: 150,
                 }}
                 onClick={handleAddAddress}
               >

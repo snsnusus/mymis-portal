@@ -5,11 +5,11 @@ import type {
 } from '~/models/employee.model';
 import { apiClient, mockClient } from '~/api/client';
 
+const BASE_URL = '/employees';
+
 export const employeeService = {
   getEmployeesWithFullDetails: async (): Promise<Employee[]> => {
-    const { data: employees } = await apiClient.get<EmployeeModel[]>(
-      '/Employees'
-    );
+    const { data: employees } = await apiClient.get<EmployeeModel[]>(BASE_URL);
 
     return employees.map((employee) => ({
       id: employee.id,
@@ -33,9 +33,7 @@ export const employeeService = {
     }));
   },
   getEmployeeOptions: async (): Promise<EmployeeOption[]> => {
-    const { data: employees } = await apiClient.get<EmployeeModel[]>(
-      '/Employees'
-    );
+    const { data: employees } = await apiClient.get<EmployeeModel[]>(BASE_URL);
 
     return employees.map((employee) => ({
       id: employee.id,

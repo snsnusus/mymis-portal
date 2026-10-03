@@ -1,8 +1,14 @@
 import type { Region } from '~/models/region.model';
 import type { City } from '~/models/city.model';
 import type { Barangay } from '~/models/barangay.model';
-import { useState, type ReactElement } from 'react';
-import { useForm, type SubmitHandler } from 'react-hook-form';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ComponentType,
+  type ReactElement,
+} from 'react';
+import { useForm, type FieldPath, type SubmitHandler } from 'react-hook-form';
 import {
   styled,
   Stepper,
@@ -19,12 +25,29 @@ import {
   KeyboardDoubleArrowRight as KeyboardDoubleArrowRightIcon,
   KeyboardDoubleArrowLeft as KeyboardDoubleArrowLeftIcon,
 } from '@mui/icons-material';
-
-import { Form } from '~/components/form';
+import { FormProvider } from '~/components/form/form-provider';
 import { AuthCredentials } from './auth-credentials';
 import { ContactDetails } from './contact-details';
 import { EmploymentDetails } from './employment-details';
 import { PersonalInfo } from './personal-info';
+
+type AddressValues = {
+  addressLine1: string;
+  addressLine2?: string;
+  region: Region | null;
+  city: City | null;
+  barangay: Barangay | null;
+  postalCode: string;
+  formattedAddress: string;
+};
+
+type PhoneValues = {
+  countryCode: string;
+  dialCode: string;
+  international: string;
+  local: string;
+  formatted: string;
+};
 
 export type FormValues = {
   firstName: string;
@@ -37,50 +60,106 @@ export type FormValues = {
   birthplace?: string;
   nationality?: string;
   avatar: File | null;
-  addresses: Array<{
-    addressLine1: string;
-    addressLine2?: string;
-    region: Region | null;
-    city: City | null;
-    barangay: Barangay | null;
-    postalCode: string;
-    formattedAddress: string;
-  }>;
-  phoneNumbers: Array<{
-    countryCode: string;
-    dialCode: string;
-    international: string;
-    local: string;
-    formatted: string;
-  }>;
+  addresses: AddressValues[];
+  phoneNumbers: PhoneValues[];
   emails: Array<{ value: string }>;
   emergencyContact: {
     firstName: string;
     lastName: string;
     relationship: string;
-    contactNumber: {
-      countryCode: string;
-      dialCode: string;
-      international: string;
-      local: string;
-      formatted: string;
-    };
-    address: {
-      addressLine1: string;
-      addressLine2?: string;
-      region: Region | null;
-      city: City | null;
-      barangay: Barangay | null;
-      postalCode: string;
-      formattedAddress: string;
-    } | null;
+    contactNumber: PhoneValues;
+    address: AddressValues | null;
   };
   employeeType: string;
   employeeId: string;
-  departmentId: string;
-  positionId: string;
+  departmentId: number | null;
+  positionId: number | null;
   employmentStatus: string;
   joiningDate: Date | null;
+};
+
+type WizardStep = {
+  label: string;
+  component: ComponentType;
+  fields: FieldPath<FormValues>[];
+};
+
+const STEPS: WizardStep[] = [
+  {
+    label: 'Personal Information',
+    component: PersonalInfo,
+    fields: [
+      'firstName',
+      'middleName',
+      'lastName',
+      'suffix',
+      'gender',
+      'maritalStatus',
+      'birthdate',
+      'birthplace',
+      'nationality',
+      'avatar',
+    ],
+  },
+  {
+    label: 'Contact Details',
+    component: ContactDetails,
+    fields: ['addresses', 'phoneNumbers', 'emails', 'emergencyContact'],
+  },
+  {
+    label: 'Employment Details',
+    component: EmploymentDetails,
+    fields: [
+      'employeeType',
+      'employeeId',
+      'departmentId',
+      'positionId',
+      'employmentStatus',
+      'joiningDate',
+    ],
+  },
+  {
+    label: 'Auth Credentials',
+    component: AuthCredentials,
+    fields: [],
+  },
+];
+
+const EMPTY_PHONE: PhoneValues = {
+  countryCode: '',
+  dialCode: '',
+  international: '',
+  local: '',
+  formatted: '',
+};
+
+const DEFAULT_VALUES: FormValues = {
+  firstName: '',
+  middleName: '',
+  lastName: '',
+  suffix: '',
+  gender: '',
+  maritalStatus: '',
+  birthdate: null,
+  birthplace: '',
+  nationality: '',
+  avatar: null,
+  addresses: [],
+  phoneNumbers: [],
+  emails: [],
+  emergencyContact: {
+    firstName: '',
+    lastName: '',
+    relationship: '',
+    contactNumber: EMPTY_PHONE,
+    address: null,
+  },
+  employeeType: '',
+  employeeId: '',
+  departmentId: null,
+  positionId: null,
+  employmentStatus: '',
+  joiningDate: null,
 };
 
 const StyledStepper = styled(Stepper)(({ theme }) => ({
@@ -88,8 +167,7 @@ const StyledStepper = styled(Stepper)(({ theme }) => ({
   flexShrink: 0,
   backgroundColor: theme.palette.grey[100],
   borderRadius: 50,
-  padding: 8,
-  boxShadow: 'inset 0px 1px 3px rgba(0,0,0,0.02)',
+  padding: theme.spacing(1),
   '& .MuiStep-root': {
     flex: 1,
   },
@@ -119,10 +197,10 @@ const StyledConnector = styled(StepConnector)(({ theme }) => ({
       height: 2,
       display: 'block',
       background: `linear-gradient(
-        to right, 
-        ${theme.palette.success.main} 0%, 
-        ${theme.palette.success.main} 50%, 
-        ${theme.palette.primary.main} 50%, 
+        to right,
+        ${theme.palette.success.main} 0%,
+        ${theme.palette.success.main} 50%,
+        ${theme.palette.primary.main} 50%,
         ${theme.palette.primary.main} 100%
       )`,
     },
@@ -133,7 +211,7 @@ const StyledConnector = styled(StepConnector)(({ theme }) => ({
     },
   },
   [`& .${stepConnectorClasses.line}`]: {
-    borderColor: '#eaeaf0',
+    borderColor: theme.palette.grey[300],
     borderTopWidth: 2,
     borderRadius: 1,
     ...theme.applyStyles('dark', {
@@ -142,138 +220,113 @@ const StyledConnector = styled(StepConnector)(({ theme }) => ({
   },
 }));
 
-const StyleStepLabel = styled(StepLabel)(({ theme }) => ({
+const StyledStepLabel = styled(StepLabel)(({ theme }) => ({
   '& .MuiStepLabel-label': {
-    fontSize: '0.925rem',
-    fontWeight: 500,
+    fontSize: theme.typography.body1.fontSize,
     color: theme.palette.text.primary,
     '&.Mui-active': {
       color: theme.palette.primary.main,
     },
     '&.Mui-disabled': {
-      color: 'text.disabled',
+      color: theme.palette.text.disabled,
     },
     '&.Mui-completed': {
       color: theme.palette.success.main,
     },
     '&.MuiStepLabel-alternativeLabel': {
-      marginTop: '4px',
+      marginTop: theme.spacing(1),
     },
   },
 }));
 
-const STEPS = [
-  'Personal Information',
-  'Contact Details',
-  'Employment Details',
-  'Auth Credentials',
-];
+// Stays pinned to the bottom of the viewport while the step content scrolls.
+const ActionBar = styled(Stack)(({ theme }) => ({
+  position: 'sticky',
+  bottom: 0,
+  zIndex: theme.zIndex.appBar - 1,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  padding: theme.spacing(1.5, 2),
+  backgroundColor: theme.palette.background.paper,
+  borderTop: `1px solid ${theme.palette.divider}`,
+}));
 
-const STEP_COMPONENTS = [
-  PersonalInfo,
-  ContactDetails,
-  EmploymentDetails,
-  AuthCredentials,
-];
-
-const Users = (): ReactElement => {
+const CreateEmployee = (): ReactElement => {
   const [activeStep, setActiveStep] = useState(0);
-  const formState = useForm<FormValues>({
-    defaultValues: {
-      firstName: '',
-      middleName: '',
-      lastName: '',
-      suffix: '',
-      gender: '',
-      maritalStatus: '',
-      birthdate: null,
-      birthplace: '',
-      nationality: '',
-      avatar: null,
-      addresses: [],
-      phoneNumbers: [],
-      emails: [],
-      emergencyContact: {
-        firstName: '',
-        lastName: '',
-        relationship: '',
-        contactNumber: {
-          countryCode: '',
-          dialCode: '',
-          international: '',
-          local: '',
-          formatted: '',
-        },
-        address: null,
-      },
-    },
-    shouldUnregister: false,
-  });
-  const StepComponent = STEP_COMPONENTS[activeStep];
+  const topRef = useRef<HTMLDivElement>(null);
+  const methods = useForm<FormValues>({ defaultValues: DEFAULT_VALUES });
+
+  const { component: StepComponent, fields } = STEPS[activeStep];
+  const isLastStep = activeStep === STEPS.length - 1;
+
+  useEffect(() => {
+    topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [activeStep]);
+
+  const handleNext = async (): Promise<void> => {
+    const isStepValid = await methods.trigger(fields);
+    if (isStepValid) {
+      setActiveStep((step) => step + 1);
+    }
+  };
+
+  const handleBack = (): void => {
+    setActiveStep((step) => step - 1);
+  };
 
   const handleSubmit: SubmitHandler<FormValues> = (data) => console.log(data);
 
   return (
-    <Form {...formState} onSubmit={handleSubmit}>
-      <Stack spacing={3} sx={{ width: '100%', pt: 2 }}>
+    <FormProvider {...methods} onSubmit={handleSubmit}>
+      <Stack spacing={2} ref={topRef}>
         <Box>
-          <Typography
-            variant="h5"
-            sx={{ fontWeight: 700, color: 'text.primary' }}
-          >
-            Create User
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Set up a new user profile, access permission, and organization
+          <Typography variant="h6">Create Employee</Typography>
+          <Typography variant="subtitle1" color="text.secondary">
+            Set up a new employee profile, access permission, and organization
             assignment.
           </Typography>
         </Box>
-        <Stack spacing={3}>
-          <StyledStepper
-            activeStep={activeStep}
-            connector={<StyledConnector />}
-            alternativeLabel
+        <StyledStepper
+          activeStep={activeStep}
+          connector={<StyledConnector />}
+          alternativeLabel
+        >
+          {STEPS.map((step) => (
+            <Step key={step.label}>
+              <StyledStepLabel>{step.label}</StyledStepLabel>
+            </Step>
+          ))}
+        </StyledStepper>
+        <StepComponent />
+        <ActionBar>
+          <Button
+            variant="contained"
+            disabled={activeStep === 0}
+            startIcon={<KeyboardDoubleArrowLeftIcon fontSize="small" />}
+            onClick={handleBack}
           >
-            {STEPS.map((step) => (
-              <Step key={step}>
-                <StyleStepLabel>{step}</StyleStepLabel>
-              </Step>
-            ))}
-          </StyledStepper>
-          <StepComponent />
-          <Stack
-            direction="row"
-            sx={{
-              justifyContent: 'space-between',
-              bottom: 0,
-            }}
-          >
-            <Button
-              disabled={activeStep === 0}
-              startIcon={<KeyboardDoubleArrowLeftIcon fontSize="small" />}
-              onClick={() => setActiveStep((p) => p - 1)}
-            >
-              Back
+            Back
+          </Button>
+          {isLastStep ? (
+            <Button key="submit" variant="contained" type="submit">
+              Submit
             </Button>
-            {activeStep === 3 ? (
-              <Button variant="contained" type="submit">
-                Submit
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                endIcon={<KeyboardDoubleArrowRightIcon fontSize="small" />}
-                onClick={() => setActiveStep((p) => p + 1)}
-              >
-                Next
-              </Button>
-            )}
-          </Stack>
-          <Button type="submit">Submit</Button>
-        </Stack>
+          ) : (
+            <Button
+              key="next"
+              variant="contained"
+              endIcon={<KeyboardDoubleArrowRightIcon fontSize="small" />}
+              onClick={() => {
+                void handleNext();
+              }}
+            >
+              Next
+            </Button>
+          )}
+        </ActionBar>
       </Stack>
-    </Form>
+    </FormProvider>
   );
 };
 
-export default Users;
+export default CreateEmployee;

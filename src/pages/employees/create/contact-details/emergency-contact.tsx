@@ -1,9 +1,12 @@
+import type { Region } from '~/models/region.model';
+import type { City } from '~/models/city.model';
+import type { Barangay } from '~/models/barangay.model';
 import type { FormValues } from '..';
 import { useState, type ReactElement } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { useGetAll as useGetBarangaysByCity } from '~/hooks/barangay.hooks';
-import { useGetAll as useGetCitiesByRegion } from '~/hooks/city.hooks';
-import { useGetAll as useGetRegions } from '~/hooks/region.hooks';
+import { useGetAll as useGetBarangaysByCity } from '~/queries/barangay.query';
+import { useGetAll as useGetCitiesByRegion } from '~/queries/city.query';
+import { useGetAll as useGetRegions } from '~/queries/region.query';
 import {
   Box,
   Button,
@@ -21,14 +24,12 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import DataDisplayRow from '~/components/ui/data-display-row';
-import Switch from '~/components/form/base/switch';
-import { ControlledLocationAutocomplete } from '~/components/form/controlled/location-autocomplete';
-import { ControlledTextField } from '~/components/form/controlled/textfield';
-import type { Region } from '~/models/region.model';
-import type { City } from '~/models/city.model';
-import type { Barangay } from '~/models/barangay.model';
-import { ControlledPhoneNumberInput } from '~/components/form/controlled';
+import { DataDisplayRow } from '~/components/ui/data-display-row';
+import { SectionLabel } from '~/components/section-label';
+import { Switch } from '~/components/form/inputs/base/switch';
+import { ControlledLocationAutocomplete } from '~/components/form/inputs/controlled/location-autocomplete';
+import { ControlledTextField } from '~/components/form/inputs/controlled/textfield';
+import { ControlledPhoneNumberInput } from '~/components/form/inputs/controlled/phone-number-input';
 
 type AddressFormValues = {
   addressLine1: string;
@@ -75,111 +76,80 @@ export const EmergencyContact = (): ReactElement => {
 
   return (
     <Card variant="outlined">
-      <Box
+      <Stack
         sx={{
           p: 2,
-          bgcolor: 'grey.50',
           borderBottom: '1px solid',
           borderColor: 'divider',
         }}
       >
-        <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-          Emergency Contact
-        </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="h6">Emergency Contact</Typography>
+        <Typography variant="subtitle1" color="text.secondary">
           Provide primary contact details to reach in case of an emergency.
         </Typography>
-      </Box>
+      </Stack>
       <CardContent>
         <Grid container columnSpacing={6}>
           <Grid size={{ xs: 12, md: 6 }}>
             <Stack spacing={2}>
-              <Typography
-                variant="overline"
-                color="text.secondary"
-                sx={{ fontWeight: 600 }}
-              >
-                Identity
-              </Typography>
+              <SectionLabel title="Identity" />
               <Grid container spacing={2}>
                 <Grid size={6}>
-                  <DataDisplayRow
+                  <ControlledTextField
                     label="First Name *"
-                    config={{
-                      row: {
-                        flexDirection: 'column',
-                        gap: 1,
-                        width: '100%',
-                      },
-                    }}
-                  >
-                    <ControlledTextField name="emergencyContact.firstName" />
-                  </DataDisplayRow>
+                    name="emergencyContact.firstName"
+                  />
                 </Grid>
                 <Grid size={6}>
-                  <DataDisplayRow
+                  <ControlledTextField
+                    label="Middle Name *"
+                    name="emergencyContact.middleName"
+                  />
+                </Grid>
+                <Grid size={8}>
+                  <ControlledTextField
                     label="Last Name *"
-                    config={{
-                      row: {
-                        flexDirection: 'column',
-                        gap: 1,
-                      },
-                    }}
-                  >
-                    <ControlledTextField name="emergencyContact.lastName" />
-                  </DataDisplayRow>
+                    name="emergencyContact.lastName"
+                  />
+                </Grid>
+                <Grid size={4}>
+                  <ControlledTextField
+                    label="Suffix"
+                    name="emergencyContact.suffix"
+                  />
                 </Grid>
                 <Grid size={12}>
-                  <DataDisplayRow
+                  <ControlledTextField
                     label="Relationship *"
-                    config={{
-                      row: {
-                        flexDirection: 'column',
-                        gap: 1,
-                      },
-                    }}
-                  >
-                    <ControlledTextField name="emergencyContact.relationship" />
-                  </DataDisplayRow>
+                    name="emergencyContact.relationship"
+                  />
                 </Grid>
                 <Grid size={12}>
-                  <DataDisplayRow
+                  <ControlledPhoneNumberInput
                     label="Contact Number *"
-                    config={{
-                      row: {
-                        flexDirection: 'column',
-                        gap: 1,
-                      },
-                    }}
-                  >
-                    <ControlledPhoneNumberInput name="emergencyContact.contactNumber" />
-                  </DataDisplayRow>
+                    name="emergencyContact.contactNumber"
+                  />
                 </Grid>
               </Grid>
             </Stack>
           </Grid>
-
           <Grid size={{ xs: 12, md: 6 }}>
-            <Stack spacing={2}>
-              <Typography
-                variant="overline"
-                color="text.secondary"
-                sx={{
-                  fontWeight: 600,
-                }}
-              >
-                Address
-              </Typography>
+            <SectionLabel title="Address" />
+            <Stack sx={{ gap: 2 }}>
               <DataDisplayRow
                 label="Reuse an existing address?"
                 config={{
+                  row: {
+                    alignItems: 'center',
+                  },
                   labelBox: {
-                    width: '250px',
+                    width: 250,
                   },
                   label: {
-                    variant: 'body1',
+                    variant: 'body2',
                     sx: {
-                      fontWeight: 600,
+                      fontWeight: 'fontWeightMedium',
+                      textTransform: 'uppercase',
                     },
                   },
                 }}
@@ -192,7 +162,6 @@ export const EmergencyContact = (): ReactElement => {
                 </Stack>
               </DataDisplayRow>
               <Divider />
-
               {useSameAddress ? (
                 <Box
                   sx={{
@@ -205,16 +174,16 @@ export const EmergencyContact = (): ReactElement => {
                 >
                   <Stack spacing={1.5}>
                     <Typography
-                      variant="body2"
+                      variant="body1"
                       sx={{
-                        fontWeight: 600,
+                        fontWeight: 'fontWeightMedium',
                       }}
                     >
                       Choose an existing address
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Pick one of the user’s available addresses to reuse for
-                      this emergency contact.
+                      Pick one of the user&apos;s available addresses to reuse
+                      for this emergency contact.
                     </Typography>
                     <Button
                       variant="outlined"
@@ -249,118 +218,64 @@ export const EmergencyContact = (): ReactElement => {
               ) : (
                 <Grid container spacing={2}>
                   <Grid size={12}>
-                    <DataDisplayRow
+                    <ControlledTextField
                       label="Address Line 1 *"
-                      config={{
-                        row: {
-                          flexDirection: 'column',
-                          gap: 1,
-                        },
-                      }}
-                    >
-                      <ControlledTextField
-                        name="emergencyContact.address.addressLine1"
-                        size="small"
-                        fullWidth
-                      />
-                    </DataDisplayRow>
+                      name="emergencyContact.address.addressLine1"
+                      size="small"
+                      fullWidth
+                    />
                   </Grid>
                   <Grid size={12}>
-                    <DataDisplayRow
+                    <ControlledTextField
                       label="Address Line 2"
-                      config={{
-                        row: {
-                          flexDirection: 'column',
-                          gap: 1,
-                        },
-                      }}
-                    >
-                      <ControlledTextField
-                        name="emergencyContact.address.addressLine2"
-                        size="small"
-                        fullWidth
-                      />
-                    </DataDisplayRow>
+                      name="emergencyContact.address.addressLine2"
+                      size="small"
+                      fullWidth
+                    />
                   </Grid>
 
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <DataDisplayRow
+                    <ControlledLocationAutocomplete
                       label="Region *"
-                      config={{
-                        row: {
-                          flexDirection: 'column',
-                          gap: 1,
-                        },
-                      }}
-                    >
-                      <ControlledLocationAutocomplete
-                        name="emergencyContact.address.region"
-                        options={regions}
-                      />
-                    </DataDisplayRow>
+                      name="emergencyContact.address.region"
+                      options={regions}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <DataDisplayRow
+                    <ControlledLocationAutocomplete
                       label="City *"
-                      config={{
-                        row: {
-                          flexDirection: 'column',
-                          gap: 1,
-                        },
-                      }}
-                    >
-                      <ControlledLocationAutocomplete
-                        name="emergencyContact.address.city"
-                        options={cities}
-                        disabled={!emergencyContact?.address?.region}
-                      />
-                    </DataDisplayRow>
+                      name="emergencyContact.address.city"
+                      options={cities}
+                      disabled={!emergencyContact?.address?.region}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <DataDisplayRow
+                    <ControlledLocationAutocomplete
                       label="Barangay *"
-                      config={{
-                        row: {
-                          flexDirection: 'column',
-                          gap: 1,
-                        },
+                      name="emergencyContact.address.barangay"
+                      options={barangays}
+                      disabled={!emergencyContact?.address?.city}
+                      onChange={(value) => {
+                        setValue(
+                          'emergencyContact.address.postalCode',
+                          value?.zipCode ?? ''
+                        );
                       }}
-                    >
-                      <ControlledLocationAutocomplete
-                        name="emergencyContact.address.barangay"
-                        options={barangays}
-                        disabled={!emergencyContact?.address?.city}
-                        onChange={(value) => {
-                          setValue(
-                            'emergencyContact.address.postalCode',
-                            value?.zipCode ?? ''
-                          );
-                        }}
-                      />
-                    </DataDisplayRow>
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <DataDisplayRow
+                    <ControlledTextField
                       label="Postal Code *"
-                      config={{
-                        row: {
-                          flexDirection: 'column',
-                          gap: 1,
+                      name="emergencyContact.address.postalCode"
+                      variant="outlined"
+                      slotProps={{
+                        input: {
+                          readOnly: Boolean(
+                            emergencyContact.address?.postalCode
+                          ),
                         },
                       }}
-                    >
-                      <ControlledTextField
-                        name="emergencyContact.address.postalCode"
-                        variant="outlined"
-                        slotProps={{
-                          input: {
-                            readOnly: Boolean(
-                              emergencyContact.address?.postalCode
-                            ),
-                          },
-                        }}
-                      />
-                    </DataDisplayRow>
+                    />
                   </Grid>
                 </Grid>
               )}
