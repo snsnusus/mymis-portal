@@ -16,7 +16,7 @@ import Drawer from './drawer';
 import DrawerContent from './content';
 import MenuItem from './menu-item';
 
-import { MENU_ITEMS } from './menu.constants';
+import { SIDEBAR_MENU_ITEMS } from '~/config/sidebar-menu-items';
 
 const Logo = styled('img')(({ theme }) => ({
   transition: theme.transitions.create('all', {
@@ -168,7 +168,7 @@ const Sidebar = (): ReactElement => {
           }}
         >
           <List sx={{ overflowX: 'hidden' }}>
-            {MENU_ITEMS.map((item) => (
+            {SIDEBAR_MENU_ITEMS.map((item) => (
               <MenuItem key={item.label} open={open} {...item} />
             ))}
           </List>

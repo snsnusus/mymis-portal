@@ -1,9 +1,8 @@
-import type { MenuItems } from '~/models/sidebar.model';
+import type { MenuItem } from '~/models/sidebar.model';
 
 import { useState, useEffect, type ReactElement, type MouseEvent } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { styled } from '@mui/material';
-
 import List from '@mui/material/List';
 import MuiListItem, { type ListItemProps } from '@mui/material/ListItem';
 import MuiListItemButton, {
@@ -21,21 +20,21 @@ import Collapse from '@mui/material/Collapse';
 import Menu from '@mui/material/Menu';
 import Divider from '@mui/material/Divider';
 import ListSubheader from '@mui/material/ListSubheader';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { getActiveMenuPath, isMenuItemActive } from './menu.utils';
-import { MENU_ITEMS } from './menu.constants';
 
-interface PopoverLinkProps {
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+
+import { SIDEBAR_MENU_ITEMS } from '~/config/sidebar-menu-items';
+import { getActiveMenuPath, isMenuItemActive } from './utils';
+
+interface PopoverLinkProps extends Omit<MenuItem, 'path' | 'children'> {
   path: string;
-  label: string;
-  icon?: MenuItems['icon'];
   isActive: boolean;
   depth: number;
 }
 
-interface MenuItemProps extends MenuItems {
-  open: boolean; // is the sidebar drawer expanded?
-  depth?: number; // 0 = top level, 1 = child, 2 = grandchild...
+interface MenuItemProps extends MenuItem {
+  open: boolean;
+  depth?: number;
 }
 
 const NavigationLink = styled(Link)({
@@ -125,7 +124,7 @@ const PopoverLink = ({
 );
 
 const renderPopoverItems = (
-  items: MenuItems[],
+  items: MenuItem[],
   activePath: string | null,
   depth = 0
 ): ReactElement[] =>
@@ -174,7 +173,7 @@ const renderPopoverItems = (
     ];
   });
 
-const MenuItem = ({
+const SidebarMenuItem = ({
   open,
   depth = 0,
   path,
@@ -185,7 +184,7 @@ const MenuItem = ({
   const location = useLocation();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
-  const activePath = getActiveMenuPath(MENU_ITEMS, location.pathname);
+  const activePath = getActiveMenuPath(SIDEBAR_MENU_ITEMS, location.pathname);
   const isLinkActive = path !== undefined && path === activePath;
   const isGroupActive =
     !path && isMenuItemActive({ label, children }, activePath);
@@ -270,7 +269,7 @@ const MenuItem = ({
         <Collapse in={expanded} unmountOnExit>
           <List disablePadding>
             {children?.map((child) => (
-              <MenuItem
+              <SidebarMenuItem
                 key={child.path ?? child.label}
                 open
                 depth={depth + 1}
@@ -296,4 +295,4 @@ const MenuItem = ({
   );
 };
 
-export default MenuItem;
+export default SidebarMenuItem;

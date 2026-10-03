@@ -159,7 +159,7 @@ const Layout = (props: PropsWithChildren): ReactElement => {
                     }}
                   >
                     <AppBreadcrumbs />
-                    {children}
+                    <Stack sx={{ pt: 2 }}>{children}</Stack>
                   </Stack>
                 </Box>
               </Content>

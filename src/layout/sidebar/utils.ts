@@ -1,8 +1,8 @@
+import type { MenuItem } from '~/models/sidebar.model';
 import { matchPath } from 'react-router-dom';
-import type { MenuItems } from '~/models/sidebar.model';
 
 // Every link path in the menu tree, at any depth.
-const collectPaths = (items: MenuItems[]): string[] =>
+const collectPaths = (items: MenuItem[]): string[] =>
   items.flatMap((item) => [
     ...(item.path ? [item.path] : []),
     ...collectPaths(item.children ?? []),
@@ -12,7 +12,7 @@ const collectPaths = (items: MenuItems[]): string[] =>
 // path the URL is at or below. '/' only counts on an exact match, since
 // every URL starts with '/'.
 export const getActiveMenuPath = (
-  items: MenuItems[],
+  items: MenuItem[],
   pathname: string
 ): string | null => {
   const matching = collectPaths(items).filter(
@@ -29,7 +29,7 @@ export const getActiveMenuPath = (
 // A link is active if it IS the active path.
 // A group is active if ANY descendant is, at any depth.
 export const isMenuItemActive = (
-  item: MenuItems,
+  item: MenuItem,
   activePath: string | null
 ): boolean => {
   if (item.path) {

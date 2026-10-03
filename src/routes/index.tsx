@@ -6,6 +6,7 @@ import {
 } from 'react-router-dom';
 import { ProtectedRoute } from '~/routes/protected-route';
 import { loadable } from '~/utils/loadable';
+import { RouteError } from '~/routes/route-error';
 
 const App = loadable(() => import('~/App'));
 const Dashboard = loadable(() => import('~/pages/dashboard'));
@@ -15,7 +16,7 @@ const Profile = loadable(() => import('~/pages/profile'));
 
 import { routes as departmentsRoutes } from '~/pages/departments/routes';
 import { routes as employeesRoutes } from '~/pages/employees/routes';
-import { routes as hMORoutes } from '~/pages/hmo/routes';
+import { routes as hMORoutes } from '~/pages/hmo-providers/routes';
 import { routes as locationRoutes } from '~/pages/locations/routes';
 
 const routesConfig: RouteObject[] = [
@@ -29,7 +30,7 @@ const routesConfig: RouteObject[] = [
     handle: { crumb: 'Dashboard' },
     children: [
       {
-        errorElement: <NotFound />,
+        errorElement: <RouteError />,
         children: [
           { index: true, element: <Dashboard /> },
           {
