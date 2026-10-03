@@ -11,7 +11,7 @@ import { SnackbarProvider, type SnackbarOrigin } from 'notistack';
 import { WebSocketProvider } from './contexts/websocket.context';
 import { AuthProvider } from './contexts/auth.context';
 import AppRouter from './routes';
-import { queryClient } from './queries/query-client';
+import { queryClient } from './config/query-client';
 
 import { theme } from './theme';
 

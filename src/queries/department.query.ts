@@ -1,20 +1,20 @@
 import type {
-  DepartmentFormValues,
-  DepartmentNew,
-} from '~/models/department.models';
+  Department,
+  DepartmentDetail,
+  // DepartmentFormValues,
+} from '~/models/department.model';
 import type { RawPosition } from '~/models/position.models';
 import {
   useQuery,
-  useMutation,
-  useQueryClient,
+  // useMutation,
+  // useQueryClient,
   type UseQueryResult,
-  type UseMutationResult,
+  // type UseMutationResult,
 } from '@tanstack/react-query';
 import { departmentService } from '~/services/department.service';
-import type { DepartmentDetail } from '~/models/department.model';
 import { isNotFoundError } from '~/utils/http.util';
 
-export const useGetDepartment = (
+export const useGetById = (
   id: number | undefined
 ): UseQueryResult<DepartmentDetail> =>
   useQuery({
@@ -24,30 +24,30 @@ export const useGetDepartment = (
     retry: (failureCount, error) => !isNotFoundError(error) && failureCount < 3,
   });
 
-export const useGetDepartments = (): UseQueryResult<DepartmentNew[]> =>
+export const useGetAll = (): UseQueryResult<Department[]> =>
   useQuery({
-    queryKey: ['departments', 'new'],
+    queryKey: ['departments'],
     queryFn: departmentService.getDepartments,
   });
 
-export const useCreateDepartment = (): UseMutationResult<
-  string,
-  unknown,
-  DepartmentFormValues,
-  unknown
-> => {
-  const queryClient = useQueryClient();
+// export const useCreate = (): UseMutationResult<
+//   string,
+//   unknown,
+//   DepartmentFormValues,
+//   unknown
+// > => {
+//   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: departmentService.createDepartment,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['departments'] });
-    },
-    onError: (error) => {
-      console.error('Error adding department to json-server:', error);
-    },
-  });
-};
+//   return useMutation({
+//     mutationFn: departmentService.createDepartment,
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ['departments'] });
+//     },
+//     onError: (error) => {
+//       console.error('Error adding department to json-server:', error);
+//     },
+//   });
+// };
 
 export const useGetPositionsByDepartment = (
   departmentId: string
