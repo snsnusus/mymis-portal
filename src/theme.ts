@@ -37,40 +37,11 @@ export const theme = createTheme({
     },
   },
   components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          fontSize: '0.775rem',
-        },
-      },
-    },
-    MuiInputBase: {
-      styleOverrides: {
-        input: {
-          fontSize: '0.875rem',
-        },
-      },
-    },
-    MuiFormLabel: {
-      styleOverrides: {
-        root: {
-          fontSize: '0.875rem',
-        },
-      },
-    },
     MuiAutocomplete: {
       styleOverrides: {
         option: {
-          fontSize: '0.875rem',
           paddingTop: '6px !important',
           paddingBottom: '6px !important',
-        },
-      },
-    },
-    MuiMenuItem: {
-      styleOverrides: {
-        root: {
-          fontSize: '0.875rem',
         },
       },
     },
