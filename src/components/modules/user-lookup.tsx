@@ -1,16 +1,13 @@
 import type { EmployeeOption } from '~/models/employee.model';
-import { type ReactElement } from 'react';
+import { useState, type ReactElement } from 'react';
 import { useController } from 'react-hook-form';
 import { useGetEmployeeOptions } from '~/queries/employee.query';
+import { useDebouncedValue } from '~/hooks/use-debounced-value';
 import { Avatar, Box, Typography } from '@mui/material';
 import {
   Autocomplete,
   type AutocompleteProps,
 } from '~/components/form/inputs/base/autocomplete';
-
-// ==========================================
-// 1. Uncontrolled User Lookup Component
-// ==========================================
 
 export type UncontrolledUserLookupProps<
   Multiple extends boolean | undefined = false,
@@ -28,16 +25,51 @@ export const UncontrolledUserLookup = <
 >(
   props: UncontrolledUserLookupProps<Multiple, DisableClearable, FreeSolo>
 ): ReactElement => {
-  const { data: employeeOptions = [], isLoading } = useGetEmployeeOptions();
+  // What the user has typed. Only used to drive the server search;
+  // MUI still manages the input's displayed text itself.
+  const [inputValue, setInputValue] = useState('');
+  const debouncedSearch = useDebouncedValue(inputValue.trim(), 300);
+
+  const { data: results = [], isFetching } =
+    useGetEmployeeOptions(debouncedSearch);
+
+  // MUI warns if the selected value isn't among the options. With server
+  // search, the selected employee may not be in the current page of results,
+  // so it is always merged in (without duplicating it).
+  const { value } = props;
+  let selected: EmployeeOption[] = [];
+  if (Array.isArray(value)) {
+    selected = value as EmployeeOption[];
+  } else if (value) {
+    selected = [value as EmployeeOption];
+  }
+  const options = [
+    ...selected,
+    ...results.filter(
+      (result) => !selected.some((employee) => employee.id === result.id)
+    ),
+  ];
 
   return (
     <Autocomplete
-      loading={isLoading}
-      options={employeeOptions}
-      isOptionEqualToValue={(option, value) => {
+      loading={isFetching}
+      options={options}
+      // The server already filtered by the search text, so MUI must not
+      // filter again. Consumers can still override this (e.g. to exclude
+      // already-picked employees).
+      filterOptions={(opts) => opts}
+      onInputChange={(_event, newInputValue, reason) => {
+        // 'reset' is MUI writing the selected option's label into the input,
+        // not the user typing, so it shouldn't trigger a search.
+        if (reason !== 'reset') {
+          setInputValue(newInputValue);
+        }
+      }}
+      noOptionsText="No employees found"
+      isOptionEqualToValue={(option, val) => {
         const opt = option as EmployeeOption;
-        const val = value as EmployeeOption;
-        return opt?.id === val?.id;
+        const v = val as EmployeeOption;
+        return opt?.id === v?.id;
       }}
       getOptionLabel={(option) => {
         const employee = option as EmployeeOption;
@@ -74,10 +106,6 @@ export const UncontrolledUserLookup = <
     />
   );
 };
-
-// ==========================================
-// 2. Controlled User Lookup Component
-// ==========================================
 
 export type ControlledUserLookupProps<
   Multiple extends boolean | undefined = false,

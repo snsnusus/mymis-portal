@@ -1,22 +1,11 @@
 import type { EmployeeOption } from '~/models/employee.model';
 import { useState, type ReactElement } from 'react';
 
-import {
-  createFilterOptions,
-  Card,
-  CardContent,
-  Grid,
-  Typography,
-  Stack,
-} from '@mui/material';
+import { Card, CardContent, Grid, Typography, Stack } from '@mui/material';
 
 import { ControlledUserLookup } from '~/components/modules/user-lookup';
 import { AlertDialog } from '~/components/ui/alert-dialog';
 import { useFormContext } from 'react-hook-form';
-
-const defaultFilter = createFilterOptions<EmployeeOption>({
-  stringify: (option) => option.formattedName,
-});
 
 export const Leadership = (): ReactElement => {
   const { setValue, watch } = useFormContext();
@@ -81,12 +70,9 @@ export const Leadership = (): ReactElement => {
               <ControlledUserLookup
                 label="Primary Contact"
                 name="primaryContact"
-                filterOptions={(options, state) => {
-                  const filtered = defaultFilter(options, state);
-                  return filtered.filter(
-                    (user) => user.id !== secondaryContact?.id
-                  );
-                }}
+                filterOptions={(options) =>
+                  options.filter((user) => user.id !== secondaryContact?.id)
+                }
                 onChange={(_, newValue) =>
                   handleInterceptSelection(
                     'primaryContact',
@@ -101,12 +87,9 @@ export const Leadership = (): ReactElement => {
               <ControlledUserLookup
                 label="Secondary Contact"
                 name="secondaryContact"
-                filterOptions={(options, state) => {
-                  const filtered = defaultFilter(options, state);
-                  return filtered.filter(
-                    (user) => user.id !== primaryContact?.id
-                  );
-                }}
+                filterOptions={(options) =>
+                  options.filter((user) => user.id !== primaryContact?.id)
+                }
                 onChange={(_, newValue) =>
                   handleInterceptSelection(
                     'secondaryContact',

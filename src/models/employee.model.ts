@@ -37,3 +37,12 @@ export type EmployeeOption = {
   avatarUrl: string | null;
   departmentId: number | null;
 };
+
+export type EmployeeLookupModel = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  positionTitle: string | null;
+  avatarUrl: string | null;
+  departmentId: number | null;
+};

@@ -16,6 +16,8 @@ interface UpdateEmployeeDepartmentParams {
 
 const employeeKeys = {
   all: ['employees'] as const,
+  options: (search: string) =>
+    [...employeeKeys.all, 'options', { search }] as const,
 };
 
 export const useGetEmployeesWithFullDetails = (): UseQueryResult<
@@ -27,13 +29,13 @@ export const useGetEmployeesWithFullDetails = (): UseQueryResult<
     queryFn: () => employeeService.getEmployeesWithFullDetails(),
   });
 
-export const useGetEmployeeOptions = (): UseQueryResult<
-  EmployeeOption[],
-  Error
-> =>
+export const useGetEmployeeOptions = (
+  search = ''
+): UseQueryResult<EmployeeOption[], Error> =>
   useQuery({
-    queryKey: [employeeKeys.all, 'options'],
-    queryFn: () => employeeService.getEmployeeOptions(),
+    queryKey: employeeKeys.options(search),
+    queryFn: () => employeeService.getEmployeeOptions(search),
+    keepPreviousData: true,
   });
 
 export const useUpdateEmployeeDepartment = (): UseMutationResult<

@@ -2,6 +2,7 @@ import type {
   Employee,
   EmployeeModel,
   EmployeeOption,
+  EmployeeLookupModel,
 } from '~/models/employee.model';
 import { apiClient, mockClient } from '~/api/client';
 
@@ -32,19 +33,22 @@ export const employeeService = {
       username: employee.username,
     }));
   },
-  getEmployeeOptions: async (): Promise<EmployeeOption[]> => {
-    const { data: employees } = await apiClient.get<EmployeeModel[]>(BASE_URL);
+
+  getEmployeeOptions: async (search?: string): Promise<EmployeeOption[]> => {
+    const { data: employees } = await apiClient.get<EmployeeLookupModel[]>(
+      `${BASE_URL}/lookup`,
+      { params: { search: search || undefined } }
+    );
 
     return employees.map((employee) => ({
       id: employee.id,
       formattedName: `${employee.firstName} ${employee.lastName}`,
-      // Positions aren't modeled in the backend yet (Week 11-12) - hardcoded
-      // placeholder until that module exists.
-      position: 'No Position',
+      position: employee.positionTitle ?? '',
       avatarUrl: employee.avatarUrl,
       departmentId: employee.departmentId,
     }));
   },
+
   // NOT YET MIGRATED. MyMIS.Api has no partial-update endpoint - PUT
   // /api/Employees/{id} requires the full EmployeeUpdateDto on every call.
   // Left pointed at mockClient (old shape, string IDs) until a

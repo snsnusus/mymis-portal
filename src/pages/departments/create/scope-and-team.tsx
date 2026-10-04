@@ -184,34 +184,14 @@ export const ScopeAndTeam = (): ReactElement => {
                   handleAddMember(newValue as EmployeeOption);
                 }
               }}
-              filterOptions={(options, state) => {
-                const inputValue = state.inputValue.toLowerCase();
-
-                return options.filter((user) => {
-                  // 1. Match search input text
-                  const matchesSearch = user.formattedName
-                    .toLowerCase()
-                    .includes(inputValue);
-
-                  // 2. Exclude if already in the selected team members list
-                  const isNotSelected = !watchedMembers.some(
-                    (member) => member.id === user.id
-                  );
-
-                  // 3. Exclude if currently set as Primary or Secondary Contact
-                  const isNotPrimaryContact =
-                    user.id !== watchedPrimaryContact?.id;
-                  const isNotSecondaryContact =
-                    user.id !== watchedSecondaryContact?.id;
-
-                  return (
-                    matchesSearch &&
-                    isNotSelected &&
-                    isNotPrimaryContact &&
-                    isNotSecondaryContact
-                  );
-                });
-              }}
+              filterOptions={(options) =>
+                options.filter(
+                  (user) =>
+                    !watchedMembers.some((member) => member.id === user.id) &&
+                    user.id !== watchedPrimaryContact?.id &&
+                    user.id !== watchedSecondaryContact?.id
+                )
+              }
               renderValue={() => null}
             />
             {members.length > 0 ? (
