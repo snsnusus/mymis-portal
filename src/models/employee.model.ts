@@ -74,3 +74,12 @@ export type EmployeePageParams = {
 // DiceBear style for an employee's generated default avatar.
 // The values match the API's JSON exactly ("avataaars", "bottts", "constellation").
 export type AvatarStyle = 'avataaars' | 'bottts' | 'constellation';
+
+export type EmployeeDetailModel = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
+  avatarThumbnailUrl: string | null;
+  avatarStyle: AvatarStyle | null;
+};

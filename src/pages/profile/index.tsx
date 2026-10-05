@@ -17,6 +17,7 @@ import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import CallIcon from '@mui/icons-material/Call';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import AvatarStyleSettings from './avatar-style-settings';
 
 import { FormProvider } from '~/components/form/form-provider';
 import Tab from '~/components/tab';
@@ -344,6 +345,10 @@ const Profile = (): ReactElement => {
             {
               label: 'Government',
               content: <Government />,
+            },
+            {
+              label: 'Avatar',
+              content: <AvatarStyleSettings />,
             },
           ]}
         />

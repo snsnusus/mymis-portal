@@ -1,4 +1,6 @@
 import type {
+  AvatarStyle,
+  EmployeeDetailModel,
   EmployeeLookupModel,
   EmployeeOption,
   EmployeePageParams,
@@ -61,5 +63,17 @@ export const employeeService = {
 
     const responses = await Promise.all(patchPromises);
     return responses.map((res) => res.data);
+  },
+
+  getById: async (id: number): Promise<EmployeeDetailModel> => {
+    const { data: employee } = await apiClient.get<EmployeeDetailModel>(
+      `${BASE_URL}/${id}`
+    );
+
+    return employee;
+  },
+
+  updateMyAvatarStyle: async (avatarStyle: AvatarStyle): Promise<void> => {
+    await apiClient.put(`${BASE_URL}/me/avatar-style`, { avatarStyle });
   },
 };

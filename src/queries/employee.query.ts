@@ -1,4 +1,6 @@
 import type {
+  AvatarStyle,
+  EmployeeDetailModel,
   EmployeeOption,
   EmployeePageParams,
   EmployeeSummaryModel,
@@ -25,6 +27,8 @@ const employeeKeys = {
     [...employeeKeys.all, 'options', { search }] as const,
   paged: (params: EmployeePageParams) =>
     [...employeeKeys.all, 'paged', params] as const,
+  detail: (id: number | undefined) =>
+    [...employeeKeys.all, 'detail', id] as const,
 };
 
 export const useGetEmployeesPaged = (
@@ -64,6 +68,34 @@ export const useUpdateEmployeeDepartment = (): UseMutationResult<
       queryClient.invalidateQueries({
         queryKey: [employeeKeys.all, 'update'],
       });
+    },
+  });
+};
+
+export const useGetEmployee = (
+  id: number | undefined
+): UseQueryResult<EmployeeDetailModel, Error> =>
+  useQuery({
+    queryKey: employeeKeys.detail(id),
+    queryFn: () => employeeService.getById(id as number),
+    enabled: id !== undefined, // wait until we know whose record to load
+  });
+
+export const useUpdateMyAvatarStyle = (): UseMutationResult<
+  void,
+  Error,
+  AvatarStyle
+> => {
+  const queryClient = useQueryClient();
+
+  return useMutation<void, Error, AvatarStyle>({
+    mutationFn: (avatarStyle) =>
+      employeeService.updateMyAvatarStyle(avatarStyle),
+
+    onSuccess: () => {
+      // Every employee query starts with 'employees', so this refreshes the
+      // list, the dropdown options and the detail record in one go.
+      queryClient.invalidateQueries({ queryKey: employeeKeys.all });
     },
   });
 };
