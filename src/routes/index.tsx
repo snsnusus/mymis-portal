@@ -8,16 +8,17 @@ import { ProtectedRoute } from '~/routes/protected-route';
 import { loadable } from '~/utils/loadable';
 import { RouteError } from '~/routes/route-error';
 
-const App = loadable(() => import('~/App'));
-const Dashboard = loadable(() => import('~/pages/dashboard'));
-const Login = loadable(() => import('~/pages/login'));
-const NotFound = loadable(() => import('~/pages/not-found'));
-const Profile = loadable(() => import('~/pages/profile'));
+import NotFound from '~/pages/not-found';
 
 import { routes as departmentsRoutes } from '~/pages/departments/routes';
 import { routes as employeesRoutes } from '~/pages/employees/routes';
 import { routes as hMORoutes } from '~/pages/hmo-providers/routes';
 import { routes as locationRoutes } from '~/pages/locations/routes';
+
+const App = loadable(() => import('~/App'));
+const Dashboard = loadable(() => import('~/pages/dashboard'));
+const Login = loadable(() => import('~/pages/login'));
+const Profile = loadable(() => import('~/pages/profile'));
 
 const routesConfig: RouteObject[] = [
   {
