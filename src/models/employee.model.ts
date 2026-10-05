@@ -46,3 +46,24 @@ export type EmployeeLookupModel = {
   avatarUrl: string | null;
   departmentId: number | null;
 };
+
+export type EmployeeSummaryModel = {
+  id: number;
+  firstName: string;
+  middleName: string; // never null: the API stores "" when there's none
+  lastName: string;
+  suffix: string | null;
+  employeeCode: string;
+  departmentName: string | null;
+  avatarUrl: string | null;
+  avatarThumbnailUrl: string | null;
+  positionTitle: string | null;
+};
+
+// What the list page asks for. pageIndex is 0-based, like MUI and TanStack Table;
+// the service converts it to the API's 1-based page.
+export type EmployeePageParams = {
+  pageIndex: number;
+  pageSize: number;
+  search: string;
+};

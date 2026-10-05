@@ -1,4 +1,9 @@
-import type { Employee, EmployeeOption } from '~/models/employee.model';
+import type {
+  EmployeeOption,
+  EmployeePageParams,
+  EmployeeSummaryModel,
+} from '~/models/employee.model';
+import type { PagedResult } from '~/models/paged-result.model';
 
 import { employeeService } from '~/services/employee.service';
 import {
@@ -18,15 +23,17 @@ const employeeKeys = {
   all: ['employees'] as const,
   options: (search: string) =>
     [...employeeKeys.all, 'options', { search }] as const,
+  paged: (params: EmployeePageParams) =>
+    [...employeeKeys.all, 'paged', params] as const,
 };
 
-export const useGetEmployeesWithFullDetails = (): UseQueryResult<
-  Employee[],
-  Error
-> =>
+export const useGetEmployeesPaged = (
+  params: EmployeePageParams
+): UseQueryResult<PagedResult<EmployeeSummaryModel>, Error> =>
   useQuery({
-    queryKey: [employeeKeys.all],
-    queryFn: () => employeeService.getEmployeesWithFullDetails(),
+    queryKey: employeeKeys.paged(params),
+    queryFn: () => employeeService.getPaged(params),
+    keepPreviousData: true,
   });
 
 export const useGetEmployeeOptions = (

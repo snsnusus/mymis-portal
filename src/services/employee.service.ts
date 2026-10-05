@@ -1,37 +1,31 @@
 import type {
-  Employee,
-  EmployeeModel,
-  EmployeeOption,
   EmployeeLookupModel,
+  EmployeeOption,
+  EmployeePageParams,
+  EmployeeSummaryModel,
 } from '~/models/employee.model';
+import type { PagedResult } from '~/models/paged-result.model';
 import { apiClient, mockClient } from '~/api/client';
 
 const BASE_URL = '/employees';
 
 export const employeeService = {
-  getEmployeesWithFullDetails: async (): Promise<Employee[]> => {
-    const { data: employees } = await apiClient.get<EmployeeModel[]>(BASE_URL);
+  getPaged: async ({
+    pageIndex,
+    pageSize,
+    search,
+  }: EmployeePageParams): Promise<PagedResult<EmployeeSummaryModel>> => {
+    const { data: result } = await apiClient.get<
+      PagedResult<EmployeeSummaryModel>
+    >(BASE_URL, {
+      params: {
+        page: pageIndex + 1, // API pages are 1-based
+        pageSize,
+        search: search || undefined,
+      },
+    });
 
-    return employees.map((employee) => ({
-      id: employee.id,
-      firstName: employee.firstName,
-      middleName: employee.middleName,
-      lastName: employee.lastName,
-      suffix: employee.suffix,
-      formattedName: `${employee.firstName} ${employee.lastName}`,
-      nickname: employee.nickname,
-      gender: employee.gender,
-      birthdate: employee.birthdate,
-      birthplace: employee.birthplace,
-      maritalStatus: employee.maritalStatus,
-      nationality: employee.nationality,
-      avatarUrl: employee.avatarUrl,
-      employeeCode: employee.employeeCode,
-      department: employee.departmentName ?? '',
-      officeLocation: employee.officeLocation,
-      workSchedule: employee.workSchedule,
-      username: employee.username,
-    }));
+    return result;
   },
 
   getEmployeeOptions: async (search?: string): Promise<EmployeeOption[]> => {
