@@ -1,6 +1,7 @@
 import { type RouteObject } from 'react-router-dom';
 import { loadable } from '~/utils/loadable';
 
+const EmployeeList = loadable(() => import('~/pages/employees/list'));
 const EmployeesCreate = loadable(() => import('~/pages/employees/create'));
 
 export const routes: RouteObject = {
@@ -9,7 +10,7 @@ export const routes: RouteObject = {
   children: [
     {
       index: true,
-      element: <>THE LIST IS HERE...</>,
+      element: <EmployeeList />,
     },
     {
       path: 'create',
