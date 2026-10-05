@@ -30,6 +30,7 @@ import { AuthCredentials } from './auth-credentials';
 import { ContactDetails } from './contact-details';
 import { EmploymentDetails } from './employment-details';
 import { PersonalInfo } from './personal-info';
+import type { AvatarStyle } from '~/models/employee.model';
 
 type AddressValues = {
   addressLine1: string;
@@ -60,6 +61,7 @@ export type FormValues = {
   birthplace?: string;
   nationality?: string;
   avatar: File | null;
+  avatarStyle: AvatarStyle | null;
   addresses: AddressValues[];
   phoneNumbers: PhoneValues[];
   emails: Array<{ value: string }>;
@@ -99,6 +101,7 @@ const STEPS: WizardStep[] = [
       'birthplace',
       'nationality',
       'avatar',
+      'avatarStyle',
     ],
   },
   {
@@ -144,6 +147,7 @@ const DEFAULT_VALUES: FormValues = {
   birthplace: '',
   nationality: '',
   avatar: null,
+  avatarStyle: null,
   addresses: [],
   phoneNumbers: [],
   emails: [],
