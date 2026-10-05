@@ -35,6 +35,7 @@ export type EmployeeOption = {
   formattedName: string;
   position: string;
   avatarUrl: string | null;
+  avatarStyle: AvatarStyle | null;
   departmentId: number | null;
 };
 
@@ -44,6 +45,7 @@ export type EmployeeLookupModel = {
   lastName: string;
   positionTitle: string | null;
   avatarUrl: string | null;
+  avatarStyle: AvatarStyle | null;
   departmentId: number | null;
 };
 
@@ -57,6 +59,7 @@ export type EmployeeSummaryModel = {
   departmentName: string | null;
   avatarUrl: string | null;
   avatarThumbnailUrl: string | null;
+  avatarStyle: AvatarStyle | null;
   positionTitle: string | null;
 };
 
@@ -67,3 +70,7 @@ export type EmployeePageParams = {
   pageSize: number;
   search: string;
 };
+
+// DiceBear style for an employee's generated default avatar.
+// The values match the API's JSON exactly ("avataaars", "bottts", "constellation").
+export type AvatarStyle = 'avataaars' | 'bottts' | 'constellation';

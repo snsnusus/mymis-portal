@@ -3,7 +3,8 @@ import { useState, type ReactElement } from 'react';
 import { useController } from 'react-hook-form';
 import { useGetEmployeeOptions } from '~/queries/employee.query';
 import { useDebouncedValue } from '~/hooks/use-debounced-value';
-import { Avatar, Box, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
+import { EmployeeAvatar } from '~/components/modules/employee-avatar';
 import {
   Autocomplete,
   type AutocompleteProps,
@@ -86,10 +87,11 @@ export const UncontrolledUserLookup = <
             {...optionProps}
             sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 1 }}
           >
-            <Avatar
-              src={employee.avatarUrl ?? undefined}
-              alt={employee.formattedName}
-              sx={{ width: 32, height: 32 }}
+            <EmployeeAvatar
+              id={employee.id}
+              name={employee.formattedName}
+              avatarUrl={employee.avatarUrl}
+              avatarStyle={employee.avatarStyle}
             />
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <Typography variant="body2" sx={{ fontWeight: 600 }}>

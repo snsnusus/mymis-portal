@@ -1,9 +1,9 @@
 import type { ReactElement } from 'react';
 import type { EmployeeSummaryModel } from '~/models/employee.model';
 import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
-import { Avatar, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
+import { EmployeeAvatar } from '~/components/modules/employee-avatar';
 
-// "Juan Santos Dela Cruz Jr." - skips any part that's empty or null.
 const getFullName = (employee: EmployeeSummaryModel): string =>
   [employee.firstName, employee.middleName, employee.lastName, employee.suffix]
     .filter(Boolean)
@@ -18,14 +18,12 @@ const EmployeeCell = ({
 
   return (
     <Stack direction="row" sx={{ alignItems: 'center', gap: 1.5 }}>
-      <Avatar
-        src={employee.avatarThumbnailUrl ?? employee.avatarUrl ?? undefined}
-        alt={fullName}
-        sx={{ width: 32, height: 32, fontSize: 14 }}
-      >
-        {employee.firstName.charAt(0)}
-        {employee.lastName.charAt(0)}
-      </Avatar>
+      <EmployeeAvatar
+        id={employee.id}
+        name={fullName}
+        avatarUrl={employee.avatarThumbnailUrl ?? employee.avatarUrl}
+        avatarStyle={employee.avatarStyle}
+      />
       <Typography variant="body2" sx={{ fontWeight: 600 }}>
         {fullName}
       </Typography>

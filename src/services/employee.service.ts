@@ -39,6 +39,7 @@ export const employeeService = {
       formattedName: `${employee.firstName} ${employee.lastName}`,
       position: employee.positionTitle ?? '',
       avatarUrl: employee.avatarUrl,
+      avatarStyle: employee.avatarStyle,
       departmentId: employee.departmentId,
     }));
   },
