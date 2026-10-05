@@ -1,31 +1,14 @@
 import type { ReactElement } from 'react';
-import type { AvatarStyle } from '~/models/employee.model';
-import {
-  Alert,
-  Box,
-  CircularProgress,
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from '@mui/material';
+import { Alert, Box, CircularProgress, Stack, Typography } from '@mui/material';
+import { AvatarStylePicker } from '~/components/modules/avatar-style-picker';
 import { useAuth } from '~/contexts/auth.context';
 import {
   useGetEmployee,
   useUpdateMyAvatarStyle,
 } from '~/queries/employee.query';
-import {
-  AVATAR_STYLES,
-  DEFAULT_AVATAR_STYLE,
-  getDefaultAvatarUri,
-} from '~/utils/default-avatar';
 
-const STYLE_LABELS: Record<AvatarStyle, string> = {
-  avataaars: 'Avatars',
-  bottts: 'Bots',
-  constellation: 'Constellation',
-};
-
+// Profile's Avatar tab: loads the logged-in employee and saves a new style
+// as soon as one is picked. The tiles themselves come from AvatarStylePicker.
 const AvatarStyleSettings = (): ReactElement => {
   const { user } = useAuth();
   // The JWT's sub claim is a string; the API's ids are numbers.
@@ -54,18 +37,7 @@ const AvatarStyleSettings = (): ReactElement => {
     );
   }
 
-  const currentStyle = employee.avatarStyle ?? DEFAULT_AVATAR_STYLE;
   const hasPhoto = Boolean(employee.avatarThumbnailUrl ?? employee.avatarUrl);
-
-  const handleChange = (
-    _event: React.MouseEvent<HTMLElement>,
-    newStyle: AvatarStyle | null
-  ): void => {
-    // Clicking the already-selected button gives null; ignore it.
-    if (newStyle && newStyle !== currentStyle) {
-      updateStyle.mutate(newStyle);
-    }
-  };
 
   return (
     <Stack spacing={2} sx={{ p: 2 }}>
@@ -80,36 +52,12 @@ const AvatarStyleSettings = (): ReactElement => {
         </Typography>
       </Box>
 
-      <ToggleButtonGroup
-        exclusive
-        value={currentStyle}
-        onChange={handleChange}
+      <AvatarStylePicker
+        value={employee.avatarStyle}
+        seed={employee.id}
         disabled={updateStyle.isPending}
-        aria-label="Default avatar style"
-      >
-        {AVATAR_STYLES.map((style) => (
-          <ToggleButton
-            key={style}
-            value={style}
-            sx={{ flexDirection: 'column', gap: 1, px: 3, py: 1.5 }}
-          >
-            <Box
-              component="img"
-              src={getDefaultAvatarUri(style, employee.id)}
-              alt=""
-              sx={{
-                width: 72,
-                height: 72,
-                borderRadius: '50%',
-                bgcolor: 'action.hover',
-              }}
-            />
-            <Typography variant="body2" sx={{ textTransform: 'none' }}>
-              {STYLE_LABELS[style]}
-            </Typography>
-          </ToggleButton>
-        ))}
-      </ToggleButtonGroup>
+        onChange={(style) => updateStyle.mutate(style)}
+      />
 
       {updateStyle.isError && (
         <Alert severity="error">
