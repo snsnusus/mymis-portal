@@ -91,3 +91,7 @@ export type EmploymentStatus =
   | 'Regular'
   | 'Contractual'
   | 'ProjectBased';
+
+export interface UsernameAvailability {
+  available: boolean;
+}

@@ -5,6 +5,7 @@ import type {
   EmployeeOption,
   EmployeePageParams,
   EmployeeSummaryModel,
+  UsernameAvailability,
 } from '~/models/employee.model';
 import type { PagedResult } from '~/models/paged-result.model';
 import { apiClient, mockClient } from '~/api/client';
@@ -75,5 +76,14 @@ export const employeeService = {
 
   updateMyAvatarStyle: async (avatarStyle: AvatarStyle): Promise<void> => {
     await apiClient.put(`${BASE_URL}/me/avatar-style`, { avatarStyle });
+  },
+
+  isUsernameAvailable: async (username: string): Promise<boolean> => {
+    const { data } = await apiClient.get<UsernameAvailability>(
+      `${BASE_URL}/availability`,
+      { params: { username } }
+    );
+
+    return data.available;
   },
 };

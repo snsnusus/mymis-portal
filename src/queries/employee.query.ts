@@ -29,6 +29,8 @@ const employeeKeys = {
     [...employeeKeys.all, 'paged', params] as const,
   detail: (id: number | undefined) =>
     [...employeeKeys.all, 'detail', id] as const,
+  availability: (username: string) =>
+    [...employeeKeys.all, 'availability', username] as const,
 };
 
 export const useGetEmployeesPaged = (
@@ -98,4 +100,20 @@ export const useUpdateMyAvatarStyle = (): UseMutationResult<
       queryClient.invalidateQueries({ queryKey: employeeKeys.all });
     },
   });
+};
+
+// Returns a function that checks a username, reusing a cached answer for the
+// same username for 30 seconds. Used inside a form validation rule, where a
+// regular useQuery doesn't fit: the check runs on demand, not on render.
+export const useCheckUsernameAvailability = (): ((
+  username: string
+) => Promise<boolean>) => {
+  const queryClient = useQueryClient();
+
+  return (username) =>
+    queryClient.fetchQuery({
+      queryKey: employeeKeys.availability(username),
+      queryFn: () => employeeService.isUsernameAvailable(username),
+      staleTime: 30_000,
+    });
 };
