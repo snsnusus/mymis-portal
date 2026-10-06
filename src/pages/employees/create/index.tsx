@@ -83,6 +83,8 @@ export type FormValues = {
   departmentId: number | null;
   positionId: number | null;
   joiningDate: Date | null;
+  username: string;
+  password: string;
 };
 
 type WizardStep = {
@@ -128,7 +130,7 @@ const STEPS: WizardStep[] = [
   {
     label: 'Auth Credentials',
     component: AuthCredentials,
-    fields: [],
+    fields: ['username', 'password'],
   },
 ];
 
@@ -168,6 +170,8 @@ const DEFAULT_VALUES: FormValues = {
   positionId: null,
   employmentStatus: '',
   joiningDate: null,
+  username: '',
+  password: '',
 };
 
 const StyledStepper = styled(Stepper)(({ theme }) => ({
