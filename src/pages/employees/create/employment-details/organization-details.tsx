@@ -53,6 +53,7 @@ export const OrganizationDetails = (): ReactElement => {
                 size="small"
                 select
                 fullWidth
+                rules={{ required: 'Employee type is required.' }}
               >
                 <MenuItem value="Client">Client</MenuItem>
                 <MenuItem value="Management">Management</MenuItem>
@@ -61,6 +62,7 @@ export const OrganizationDetails = (): ReactElement => {
                 label="Department *"
                 name="departmentId"
                 valueKey="id"
+                rules={{ required: 'Department is required.' }}
                 options={departments}
                 getOptionLabel={(option) => {
                   if (typeof option === 'string') return option;
@@ -78,6 +80,7 @@ export const OrganizationDetails = (): ReactElement => {
                 label="Position *"
                 name="positionId"
                 valueKey="id"
+                rules={{ required: 'Position is required.' }}
                 options={positions}
                 getOptionLabel={(option) => {
                   if (typeof option === 'string') return option;
@@ -96,13 +99,18 @@ export const OrganizationDetails = (): ReactElement => {
                 size="small"
                 select
                 fullWidth
+                rules={{ required: 'Employment status is required.' }}
               >
                 <MenuItem value="Probationary">Probationary</MenuItem>
                 <MenuItem value="Regular">Regular</MenuItem>
                 <MenuItem value="Contractual">Contractual</MenuItem>
                 <MenuItem value="ProjectBased">Project-based</MenuItem>
               </ControlledTextField>
-              <ControlledDatePicker label="Joining Date *" name="joiningDate" />
+              <ControlledDatePicker
+                label="Joining Date *"
+                name="joiningDate"
+                rules={{ required: 'Joining date is required.' }}
+              />
             </Stack>
           </Grid>
         </Grid>
