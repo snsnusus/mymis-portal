@@ -45,6 +45,33 @@ export const theme = createTheme({
         },
       },
     },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: ({ theme: muiTheme }) => ({
+          '&.Mui-disabled.Mui-error': {
+            color: muiTheme.palette.error.main,
+          },
+        }),
+      },
+    },
+    MuiFormHelperText: {
+      styleOverrides: {
+        root: ({ theme: muiTheme }) => ({
+          '&.Mui-disabled.Mui-error': {
+            color: muiTheme.palette.error.main,
+          },
+        }),
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: ({ theme: muiTheme }) => ({
+          '&.Mui-disabled.Mui-error .MuiOutlinedInput-notchedOutline': {
+            borderColor: muiTheme.palette.error.main,
+          },
+        }),
+      },
+    },
   },
   custom: {
     drawer: {
