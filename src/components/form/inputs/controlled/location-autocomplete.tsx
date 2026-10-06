@@ -1,5 +1,5 @@
 import { type ReactElement } from 'react';
-import { useController } from 'react-hook-form';
+import { useController, type UseControllerProps } from 'react-hook-form';
 import {
   LocationAutocomplete,
   type LocationOption,
@@ -11,6 +11,7 @@ export type ControlledLocationAutocompleteProps<T extends LocationOption> = {
   options: T[];
   disabled?: boolean;
   defaultValue?: T | null;
+  rules?: UseControllerProps['rules'];
   onChange?: (value: T | null) => void;
 };
 
@@ -20,13 +21,16 @@ export const ControlledLocationAutocomplete = <T extends LocationOption>({
   options,
   disabled,
   defaultValue = null,
+  rules,
   onChange,
 }: ControlledLocationAutocompleteProps<T>): ReactElement => {
   const {
     field: { value, onChange: formOnChange },
+    fieldState: { error },
   } = useController({
     name,
     defaultValue,
+    rules,
   });
 
   return (
@@ -39,6 +43,8 @@ export const ControlledLocationAutocomplete = <T extends LocationOption>({
       }}
       options={options}
       disabled={disabled}
+      error={!!error}
+      helperText={error?.message}
     />
   );
 };

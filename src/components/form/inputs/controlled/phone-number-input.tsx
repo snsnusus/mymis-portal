@@ -1,4 +1,8 @@
-import { useController, useFormContext } from 'react-hook-form';
+import {
+  useController,
+  useFormContext,
+  type UseControllerProps,
+} from 'react-hook-form';
 import { type MuiTelInputInfo } from 'mui-tel-input';
 import { PhoneNumberInput } from '../base/phone-number-input';
 
@@ -16,11 +20,13 @@ type PhoneNumberValue = {
 type ControlledPhoneNumberProps = {
   name: string;
   label?: string;
+  rules?: UseControllerProps['rules'];
 };
 
 export const ControlledPhoneNumberInput = ({
   name,
   label,
+  rules,
 }: ControlledPhoneNumberProps): ReactElement => {
   const { control } = useFormContext();
 
@@ -31,6 +37,7 @@ export const ControlledPhoneNumberInput = ({
     name,
     control,
     defaultValue: null,
+    rules,
   });
 
   const handleChange = (raw: string, info: MuiTelInputInfo): void => {

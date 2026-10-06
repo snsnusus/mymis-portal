@@ -10,6 +10,8 @@ type LocationAutocompleteProps<T extends LocationOption> = {
   options: T[];
   disabled?: boolean;
   size?: TextFieldProps['size'];
+  error?: boolean;
+  helperText?: string;
 };
 
 export const LocationAutocomplete = <T extends LocationOption>({
@@ -19,6 +21,8 @@ export const LocationAutocomplete = <T extends LocationOption>({
   options,
   disabled,
   size,
+  error,
+  helperText,
 }: LocationAutocompleteProps<T>): ReactElement => (
   <Autocomplete
     size={size ?? 'small'}
@@ -29,7 +33,13 @@ export const LocationAutocomplete = <T extends LocationOption>({
     value={value}
     onChange={(_, newValue) => onChange(newValue)}
     renderInput={(params) => (
-      <TextField {...params} label={label} size={size ?? 'small'} />
+      <TextField
+        {...params}
+        label={label}
+        size={size ?? 'small'}
+        error={error}
+        helperText={helperText}
+      />
     )}
   />
 );
