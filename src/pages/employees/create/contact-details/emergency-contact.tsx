@@ -1,14 +1,15 @@
 import type { Region } from '~/models/region.model';
 import type { City } from '~/models/city.model';
 import type { Barangay } from '~/models/barangay.model';
+import type { EmergencyContactRelationship } from '~/models/employee.model';
 import type { FormValues } from '..';
 import { useState, type ReactElement } from 'react';
 import { useFormContext } from 'react-hook-form';
+import { matchIsValidTel } from 'mui-tel-input';
 import { useGetAll as useGetBarangaysByCity } from '~/queries/barangay.query';
 import { useGetAll as useGetCitiesByRegion } from '~/queries/city.query';
 import { useGetAll as useGetRegions } from '~/queries/region.query';
 import {
-  Box,
   Button,
   Card,
   CardContent,
@@ -16,17 +17,16 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Divider,
   Grid,
   List,
   ListItemButton,
   ListItemText,
+  MenuItem,
   Stack,
   Typography,
 } from '@mui/material';
-import { DataDisplayRow } from '~/components/ui/data-display-row';
+import { ContentCopy as ContentCopyIcon } from '@mui/icons-material';
 import { SectionLabel } from '~/components/section-label';
-import { Switch } from '~/components/form/inputs/base/switch';
 import { ControlledLocationAutocomplete } from '~/components/form/inputs/controlled/location-autocomplete';
 import { ControlledTextField } from '~/components/form/inputs/controlled/textfield';
 import { ControlledPhoneNumberInput } from '~/components/form/inputs/controlled/phone-number-input';
@@ -41,36 +41,41 @@ type AddressFormValues = {
   formattedAddress: string;
 };
 
+const RELATIONSHIP_OPTIONS: {
+  value: EmergencyContactRelationship;
+  label: string;
+}[] = [
+  { value: 'Spouse', label: 'Spouse' },
+  { value: 'Partner', label: 'Partner' },
+  { value: 'Parent', label: 'Parent' },
+  { value: 'Guardian', label: 'Guardian' },
+  { value: 'Sibling', label: 'Sibling' },
+  { value: 'Child', label: 'Child' },
+  { value: 'Relative', label: 'Relative' },
+  { value: 'Friend', label: 'Friend' },
+  { value: 'Other', label: 'Other' },
+];
+
 export const EmergencyContact = (): ReactElement => {
   const { watch, setValue } = useFormContext<FormValues>();
 
   const addresses = watch('addresses');
-  const emergencyContact = watch('emergencyContact');
+  const address = watch('emergencyContact.address');
 
-  const [useSameAddress, setUseSameAddress] = useState(false);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
 
   const { data: regions = [] } = useGetRegions();
-  const { data: cities = [] } = useGetCitiesByRegion(
-    emergencyContact?.address?.region?.id
-  );
-  const { data: barangays = [] } = useGetBarangaysByCity(
-    emergencyContact?.address?.city?.id ?? 0
-  );
+  const { data: cities = [] } = useGetCitiesByRegion(address.region?.id);
+  const { data: barangays = [] } = useGetBarangaysByCity(address.city?.id ?? 0);
 
-  const handleToggleSameAddress = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ): void => {
-    const checked = event.target.checked;
-    setUseSameAddress(checked);
-
-    if (!checked) {
-      setValue('emergencyContact.address', null);
-    }
-  };
-
-  const handleSelectExistingAddress = (address: AddressFormValues): void => {
-    setValue('emergencyContact.address', address);
+  // Copies the chosen address into the contact's own fields. It's a copy:
+  // editing or removing the employee's address later doesn't affect it.
+  const handleSelectExistingAddress = (selected: AddressFormValues): void => {
+    setValue(
+      'emergencyContact.address',
+      { ...selected, addressLine2: selected.addressLine2 ?? '' },
+      { shouldValidate: true, shouldDirty: true }
+    );
     setIsAddressModalOpen(false);
   };
 
@@ -98,11 +103,12 @@ export const EmergencyContact = (): ReactElement => {
                   <ControlledTextField
                     label="First Name *"
                     name="emergencyContact.firstName"
+                    rules={{ required: 'First name is required.' }}
                   />
                 </Grid>
                 <Grid size={6}>
                   <ControlledTextField
-                    label="Middle Name *"
+                    label="Middle Name"
                     name="emergencyContact.middleName"
                   />
                 </Grid>
@@ -110,6 +116,7 @@ export const EmergencyContact = (): ReactElement => {
                   <ControlledTextField
                     label="Last Name *"
                     name="emergencyContact.lastName"
+                    rules={{ required: 'Last name is required.' }}
                   />
                 </Grid>
                 <Grid size={4}>
@@ -122,164 +129,124 @@ export const EmergencyContact = (): ReactElement => {
                   <ControlledTextField
                     label="Relationship *"
                     name="emergencyContact.relationship"
-                  />
+                    select
+                    rules={{ required: 'Relationship is required.' }}
+                  >
+                    {RELATIONSHIP_OPTIONS.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </ControlledTextField>
                 </Grid>
                 <Grid size={12}>
                   <ControlledPhoneNumberInput
                     label="Contact Number *"
                     name="emergencyContact.contactNumber"
+                    rules={{
+                      validate: (value: { international?: string } | null) => {
+                        if (!value?.international) {
+                          return 'Contact number is required.';
+                        }
+                        return (
+                          matchIsValidTel(value.international) ||
+                          'Enter a valid phone number for the selected country.'
+                        );
+                      },
+                    }}
                   />
                 </Grid>
               </Grid>
             </Stack>
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
-            <SectionLabel title="Address" />
-            <Stack sx={{ gap: 2 }}>
-              <DataDisplayRow
-                label="Reuse an existing address?"
-                config={{
-                  row: {
-                    alignItems: 'center',
-                  },
-                  labelBox: {
-                    width: 250,
-                  },
-                  label: {
-                    variant: 'body2',
-                    sx: {
-                      fontWeight: 'fontWeightMedium',
-                      textTransform: 'uppercase',
-                    },
-                  },
-                }}
+            <Stack
+              direction="row"
+              sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+            >
+              <SectionLabel title="Address" />
+              <Button
+                size="small"
+                startIcon={<ContentCopyIcon fontSize="small" />}
+                disabled={addresses.length === 0}
+                onClick={() => setIsAddressModalOpen(true)}
               >
-                <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
-                  <Switch
-                    checked={useSameAddress}
-                    onChange={handleToggleSameAddress}
-                  />
-                </Stack>
-              </DataDisplayRow>
-              <Divider />
-              {useSameAddress ? (
-                <Box
-                  sx={{
-                    p: 2,
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    borderRadius: 2,
-                    bgcolor: 'grey.50',
-                  }}
-                >
-                  <Stack spacing={1.5}>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontWeight: 'fontWeightMedium',
-                      }}
-                    >
-                      Choose an existing address
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Pick one of the user&apos;s available addresses to reuse
-                      for this emergency contact.
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={() => setIsAddressModalOpen(true)}
-                    >
-                      {emergencyContact.address
-                        ? 'Change address'
-                        : 'Select address'}
-                    </Button>
-                    {emergencyContact.address && (
-                      <Box
-                        sx={{
-                          p: 1.5,
-                          borderRadius: 1.5,
-                          bgcolor: 'background.paper',
-                        }}
-                      >
-                        <Typography
-                          variant="subtitle2"
-                          sx={{ fontWeight: 600 }}
-                        >
-                          {emergencyContact.address?.formattedAddress}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {emergencyContact.address?.formattedAddress}
-                        </Typography>
-                      </Box>
-                    )}
-                  </Stack>
-                </Box>
-              ) : (
-                <Grid container spacing={2}>
-                  <Grid size={12}>
-                    <ControlledTextField
-                      label="Address Line 1 *"
-                      name="emergencyContact.address.addressLine1"
-                      size="small"
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid size={12}>
-                    <ControlledTextField
-                      label="Address Line 2"
-                      name="emergencyContact.address.addressLine2"
-                      size="small"
-                      fullWidth
-                    />
-                  </Grid>
-
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <ControlledLocationAutocomplete
-                      label="Region *"
-                      name="emergencyContact.address.region"
-                      options={regions}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <ControlledLocationAutocomplete
-                      label="City *"
-                      name="emergencyContact.address.city"
-                      options={cities}
-                      disabled={!emergencyContact?.address?.region}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <ControlledLocationAutocomplete
-                      label="Barangay *"
-                      name="emergencyContact.address.barangay"
-                      options={barangays}
-                      disabled={!emergencyContact?.address?.city}
-                      onChange={(value) => {
-                        setValue(
-                          'emergencyContact.address.postalCode',
-                          value?.zipCode ?? ''
-                        );
-                      }}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <ControlledTextField
-                      label="Postal Code *"
-                      name="emergencyContact.address.postalCode"
-                      variant="outlined"
-                      slotProps={{
-                        input: {
-                          readOnly: Boolean(
-                            emergencyContact.address?.postalCode
-                          ),
-                        },
-                      }}
-                    />
-                  </Grid>
-                </Grid>
-              )}
+                Copy from employee&apos;s address
+              </Button>
             </Stack>
+            <Grid container spacing={2}>
+              <Grid size={12}>
+                <ControlledTextField
+                  label="Address Line 1 *"
+                  name="emergencyContact.address.addressLine1"
+                  size="small"
+                  fullWidth
+                  rules={{ required: 'Address line 1 is required.' }}
+                />
+              </Grid>
+              <Grid size={12}>
+                <ControlledTextField
+                  label="Address Line 2"
+                  name="emergencyContact.address.addressLine2"
+                  size="small"
+                  fullWidth
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <ControlledLocationAutocomplete
+                  label="Region *"
+                  name="emergencyContact.address.region"
+                  options={regions}
+                  rules={{ required: 'Region is required.' }}
+                  onChange={() => {
+                    setValue('emergencyContact.address.city', null);
+                    setValue('emergencyContact.address.barangay', null);
+                    setValue('emergencyContact.address.postalCode', '');
+                  }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <ControlledLocationAutocomplete
+                  label="City *"
+                  name="emergencyContact.address.city"
+                  options={cities}
+                  disabled={!address.region}
+                  rules={{ required: 'City is required.' }}
+                  onChange={() => {
+                    setValue('emergencyContact.address.barangay', null);
+                    setValue('emergencyContact.address.postalCode', '');
+                  }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <ControlledLocationAutocomplete
+                  label="Barangay *"
+                  name="emergencyContact.address.barangay"
+                  options={barangays}
+                  disabled={!address.city}
+                  rules={{ required: 'Barangay is required.' }}
+                  onChange={(value) => {
+                    setValue(
+                      'emergencyContact.address.postalCode',
+                      value?.zipCode ?? ''
+                    );
+                  }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <ControlledTextField
+                  label="Postal Code *"
+                  name="emergencyContact.address.postalCode"
+                  variant="outlined"
+                  rules={{ required: 'Postal code is required.' }}
+                  slotProps={{
+                    input: {
+                      readOnly: Boolean(address.postalCode),
+                    },
+                  }}
+                />
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
       </CardContent>
@@ -290,22 +257,15 @@ export const EmergencyContact = (): ReactElement => {
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle>Select an existing address</DialogTitle>
+        <DialogTitle>Copy one of the employee&apos;s addresses</DialogTitle>
         <DialogContent dividers>
           <List disablePadding>
-            {addresses.map((address) => (
+            {addresses.map((employeeAddress) => (
               <ListItemButton
-                key={address.formattedAddress}
-                selected={
-                  emergencyContact.address?.formattedAddress ===
-                  address.formattedAddress
-                }
-                onClick={() => handleSelectExistingAddress(address)}
+                key={employeeAddress.formattedAddress}
+                onClick={() => handleSelectExistingAddress(employeeAddress)}
               >
-                <ListItemText
-                  primary={address.formattedAddress}
-                  secondary={address.formattedAddress}
-                />
+                <ListItemText primary={employeeAddress.formattedAddress} />
               </ListItemButton>
             ))}
           </List>

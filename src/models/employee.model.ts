@@ -95,3 +95,14 @@ export type EmploymentStatus =
 export interface UsernameAvailability {
   available: boolean;
 }
+
+export type EmergencyContactRelationship =
+  | 'Spouse'
+  | 'Partner'
+  | 'Parent'
+  | 'Guardian'
+  | 'Sibling'
+  | 'Child'
+  | 'Relative'
+  | 'Friend'
+  | 'Other';

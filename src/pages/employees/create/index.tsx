@@ -33,6 +33,7 @@ import { PersonalInfo } from './personal-info';
 import type {
   AvatarStyle,
   EmployeeType,
+  EmergencyContactRelationship,
   EmploymentStatus,
 } from '~/models/employee.model';
 
@@ -60,7 +61,7 @@ export type FormValues = {
   lastName: string;
   suffix?: string;
   gender: string;
-  maritalStatus?: string;
+  maritalStatus: string;
   birthdate: Date | null;
   birthplace?: string;
   nationality?: string;
@@ -71,12 +72,12 @@ export type FormValues = {
   emails: Array<{ value: string }>;
   emergencyContact: {
     firstName: string;
-    middleName: string;
+    middleName?: string;
     lastName: string;
     suffix?: string;
-    relationship: string;
+    relationship: EmergencyContactRelationship | '';
     contactNumber: PhoneValues;
-    address: AddressValues | null;
+    address: AddressValues;
   };
   employeeType: EmployeeType | '';
   employmentStatus: EmploymentStatus | '';
@@ -134,6 +135,16 @@ const STEPS: WizardStep[] = [
   },
 ];
 
+const EMPTY_ADDRESS: AddressValues = {
+  addressLine1: '',
+  addressLine2: '',
+  region: null,
+  city: null,
+  barangay: null,
+  postalCode: '',
+  formattedAddress: '',
+};
+
 const EMPTY_PHONE: PhoneValues = {
   countryCode: '',
   dialCode: '',
@@ -161,9 +172,10 @@ const DEFAULT_VALUES: FormValues = {
     firstName: '',
     middleName: '',
     lastName: '',
+    suffix: '',
     relationship: '',
     contactNumber: EMPTY_PHONE,
-    address: null,
+    address: EMPTY_ADDRESS,
   },
   employeeType: '',
   departmentId: null,

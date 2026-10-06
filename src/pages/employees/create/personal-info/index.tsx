@@ -1,4 +1,5 @@
 import { useState, type ReactElement } from 'react';
+import type { FormValues } from '..';
 import {
   Card,
   CardContent,
@@ -26,7 +27,7 @@ const FILE_CONFIG = {
 };
 
 export const PersonalInfo = (): ReactElement => {
-  const { watch, setValue } = useFormContext();
+  const { watch, setValue } = useFormContext<FormValues>();
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isOpenCropperDialog, setIsOpenCropperDialog] = useState(false);
 
@@ -99,16 +100,22 @@ export const PersonalInfo = (): ReactElement => {
                     <ControlledTextField
                       label="First Name *"
                       name="firstName"
+                      rules={{ required: 'First name is required.' }}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, md: 6 }}>
                     <ControlledTextField
                       label="Middle Name *"
                       name="middleName"
+                      rules={{ required: 'Middle name is required.' }}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, md: 8 }}>
-                    <ControlledTextField label="Last Name *" name="lastName" />
+                    <ControlledTextField
+                      label="Last Name *"
+                      name="lastName"
+                      rules={{ required: 'Last name is required.' }}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, md: 4 }}>
                     <ControlledTextField label="Suffix" name="suffix" />
@@ -120,7 +127,12 @@ export const PersonalInfo = (): ReactElement => {
                 <SectionLabel title="Demographics" />
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, md: 6 }}>
-                    <ControlledTextField label="Gender *" name="gender" select>
+                    <ControlledTextField
+                      label="Gender *"
+                      name="gender"
+                      select
+                      rules={{ required: 'Gender is required.' }}
+                    >
                       <MenuItem value="MALE">Male</MenuItem>
                       <MenuItem value="FEMALE">Female</MenuItem>
                     </ControlledTextField>
@@ -130,6 +142,7 @@ export const PersonalInfo = (): ReactElement => {
                       label="Marital Status *"
                       name="maritalStatus"
                       select
+                      rules={{ required: 'Marital status is required.' }}
                     >
                       <MenuItem value="SINGLE">Single</MenuItem>
                       <MenuItem value="MARRIED">Married</MenuItem>
