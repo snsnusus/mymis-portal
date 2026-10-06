@@ -1,5 +1,5 @@
 import { useMemo, type ReactElement } from 'react';
-import { useController } from 'react-hook-form';
+import { useController, type UseControllerProps } from 'react-hook-form';
 import { Autocomplete, type AutocompleteProps } from '../base/autocomplete';
 
 export type ControlledAutocompleteProps<
@@ -10,6 +10,7 @@ export type ControlledAutocompleteProps<
 > = AutocompleteProps<T, Multiple, DisableClearable, FreeSolo> & {
   name: string;
   valueKey?: keyof T;
+  rules?: UseControllerProps['rules'];
 };
 
 export const ControlledAutocomplete = <
@@ -25,12 +26,15 @@ export const ControlledAutocomplete = <
     defaultValue,
     valueKey,
     options,
+    rules,
+    helperText,
     onChange: customOnChange,
     ...rest
   } = props;
   const {
     field: { ref, value, onChange, ...field },
-  } = useController({ name, defaultValue });
+    fieldState: { error },
+  } = useController({ name, defaultValue, rules });
 
   const selectedValue = useMemo(() => {
     if (!valueKey || value === undefined || value === null || value === '') {
@@ -73,6 +77,8 @@ export const ControlledAutocomplete = <
       options={options}
       value={selectedValue}
       onChange={handleChange}
+      error={!!error}
+      helperText={error?.message ?? helperText}
       isOptionEqualToValue={(option, val) => {
         if (valueKey && option && val) {
           const optionVal = (option as T)[valueKey];

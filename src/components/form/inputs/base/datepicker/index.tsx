@@ -18,6 +18,8 @@ export interface DatePickerProps
   label?: string;
   defaultValue?: Date | [Date | null, Date | null] | null;
   dateFormat?: 'MM/dd/yyyy';
+  error?: boolean;
+  helperText?: string;
   onChange: (date: Date | [Date | null, Date | null] | null) => void;
 }
 
@@ -55,6 +57,8 @@ const CustomDatePicker = (props: DatePickerProps): ReactElement => {
     name,
     value,
     label,
+    error,
+    helperText,
     showPopperArrow = false,
     dateFormat = 'MM/dd/yyyy',
     onChange,
@@ -95,7 +99,14 @@ const CustomDatePicker = (props: DatePickerProps): ReactElement => {
       renderCustomHeader={(
         customHeaderProps: ReactDatePickerCustomHeaderProps
       ) => <DatePickerHeader {...customHeaderProps} />}
-      customInput={<MuiDatePickerInput label={label} name={name} />}
+      customInput={
+        <MuiDatePickerInput
+          label={label}
+          name={name}
+          error={error}
+          helperText={helperText}
+        />
+      }
       onChange={onChange}
       {...rest}
     />

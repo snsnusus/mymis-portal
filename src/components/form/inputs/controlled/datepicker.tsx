@@ -1,21 +1,25 @@
 import type { ReactElement } from 'react';
 
-import { useController } from 'react-hook-form';
+import { useController, type UseControllerProps } from 'react-hook-form';
 
 import DatePicker, { type DatePickerProps } from '../base/datepicker';
 
-type ControlledDatePickerProps = Omit<DatePickerProps, 'value' | 'onChange'>;
+type ControlledDatePickerProps = Omit<DatePickerProps, 'value' | 'onChange'> & {
+  rules?: UseControllerProps['rules'];
+};
 
 export const ControlledDatePicker = (
   props: ControlledDatePickerProps
 ): ReactElement => {
-  const { name, type, ...rest } = props;
+  const { name, type, rules, helperText, ...rest } = props;
 
   const {
     field: { value, onChange, onBlur },
+    fieldState: { error },
   } = useController({
     name,
     defaultValue: type === 'default' ? new Date() : [],
+    rules,
   });
 
   return (
@@ -26,6 +30,8 @@ export const ControlledDatePicker = (
       value={value}
       onChange={onChange}
       onBlur={onBlur}
+      error={!!error}
+      helperText={error?.message ?? helperText}
     />
   );
 };
