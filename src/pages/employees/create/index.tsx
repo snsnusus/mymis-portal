@@ -277,21 +277,27 @@ const ActionBar = styled(Stack)(({ theme }) => ({
 
 const CreateEmployee = (): ReactElement => {
   const [activeStep, setActiveStep] = useState(0);
+  const [errorScrollRequest, setErrorScrollRequest] = useState(0);
+
   const topRef = useRef<HTMLDivElement>(null);
-  const methods = useForm<FormValues>({ defaultValues: DEFAULT_VALUES });
+  const stepRef = useRef<HTMLDivElement>(null);
+
+  const methods = useForm<FormValues>({
+    defaultValues: DEFAULT_VALUES,
+    mode: 'onChange',
+  });
 
   const { component: StepComponent, fields } = STEPS[activeStep];
   const isLastStep = activeStep === STEPS.length - 1;
-
-  useEffect(() => {
-    topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, [activeStep]);
 
   const handleNext = async (): Promise<void> => {
     const isStepValid = await methods.trigger(fields);
     if (isStepValid) {
       setActiveStep((step) => step + 1);
+      return;
     }
+
+    setErrorScrollRequest((count) => count + 1);
   };
 
   const handleBack = (): void => {
@@ -299,6 +305,24 @@ const CreateEmployee = (): ReactElement => {
   };
 
   const handleSubmit: SubmitHandler<FormValues> = (data) => console.log(data);
+
+  useEffect(() => {
+    topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [activeStep]);
+
+  useEffect(() => {
+    if (errorScrollRequest === 0) return;
+
+    const firstError =
+      stepRef.current?.querySelector<HTMLElement>('.Mui-error');
+    if (!firstError) return;
+
+    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    firstError
+      .closest('.MuiFormControl-root')
+      ?.querySelector<HTMLInputElement>('input:not([disabled])')
+      ?.focus({ preventScroll: true });
+  }, [errorScrollRequest]);
 
   return (
     <FormProvider {...methods} onSubmit={handleSubmit}>
@@ -321,7 +345,9 @@ const CreateEmployee = (): ReactElement => {
             </Step>
           ))}
         </StyledStepper>
-        <StepComponent />
+        <Box ref={stepRef}>
+          <StepComponent />
+        </Box>
         <ActionBar>
           <Button
             variant="contained"
