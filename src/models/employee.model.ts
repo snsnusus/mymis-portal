@@ -83,3 +83,11 @@ export type EmployeeDetailModel = {
   avatarThumbnailUrl: string | null;
   avatarStyle: AvatarStyle | null;
 };
+
+export type EmployeeType = 'Management' | 'Client';
+
+export type EmploymentStatus =
+  | 'Probationary'
+  | 'Regular'
+  | 'Contractual'
+  | 'ProjectBased';

@@ -1,3 +1,4 @@
+import type { FormValues } from '..';
 import { type ReactElement } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useGetAll as useGetDepartments } from '~/queries/department.query';
@@ -14,10 +15,9 @@ import {
 import { ControlledAutocomplete } from '~/components/form/inputs/controlled/autocomplete';
 import { ControlledDatePicker } from '~/components/form/inputs/controlled/datepicker';
 import { ControlledTextField } from '~/components/form/inputs/controlled/textfield';
-import { generateMockEmployeeId } from '~/utils';
 
 export const OrganizationDetails = (): ReactElement => {
-  const { watch, setValue } = useFormContext<any>();
+  const { watch, setValue } = useFormContext<FormValues>();
 
   const departmentId = watch('departmentId');
   const selectedDepartmentId =
@@ -27,24 +27,6 @@ export const OrganizationDetails = (): ReactElement => {
   const { data: allPositions = [] } =
     useGetPositionsByDepartment(selectedDepartmentId);
   const positions = allPositions.filter((position) => position.isActive);
-
-  const handleEmployeeTypeChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ): void => {
-    const selectedType = event.target.value;
-
-    setValue('type', selectedType);
-
-    if (!selectedType) {
-      return;
-    }
-
-    const generatedId = generateMockEmployeeId(
-      selectedType.charAt(0).toUpperCase()
-    );
-
-    setValue('employeeId', generatedId);
-  };
 
   return (
     <Card variant="outlined">
@@ -67,14 +49,13 @@ export const OrganizationDetails = (): ReactElement => {
             <Stack sx={{ gap: 2 }}>
               <ControlledTextField
                 label="Employee Type *"
-                name="type"
+                name="employeeType"
                 size="small"
                 select
                 fullWidth
-                onChange={handleEmployeeTypeChange}
               >
-                <MenuItem value="CLIENT">Client</MenuItem>
-                <MenuItem value="MANAGEMENT">Management</MenuItem>
+                <MenuItem value="Client">Client</MenuItem>
+                <MenuItem value="Management">Management</MenuItem>
               </ControlledTextField>
               <ControlledAutocomplete
                 label="Department *"
@@ -88,9 +69,9 @@ export const OrganizationDetails = (): ReactElement => {
                 onChange={(_, newValue) => {
                   setValue(
                     'departmentId',
-                    Array.isArray(newValue) ? '' : newValue?.id ?? ''
+                    Array.isArray(newValue) ? null : newValue?.id ?? null
                   );
-                  setValue('positionId', '');
+                  setValue('positionId', null);
                 }}
               />
               <ControlledAutocomplete
@@ -110,15 +91,17 @@ export const OrganizationDetails = (): ReactElement => {
           <Grid size={{ xs: 12, md: 6 }}>
             <Stack sx={{ gap: 2 }}>
               <ControlledTextField
-                label="Employee ID *"
-                name="employeeId"
-                slotProps={{
-                  input: {
-                    readOnly: true,
-                  },
-                }}
-              />
-              <ControlledTextField label="Status *" name="status" />
+                label="Employment Status *"
+                name="employmentStatus"
+                size="small"
+                select
+                fullWidth
+              >
+                <MenuItem value="Probationary">Probationary</MenuItem>
+                <MenuItem value="Regular">Regular</MenuItem>
+                <MenuItem value="Contractual">Contractual</MenuItem>
+                <MenuItem value="ProjectBased">Project-based</MenuItem>
+              </ControlledTextField>
               <ControlledDatePicker label="Joining Date *" name="joiningDate" />
             </Stack>
           </Grid>

@@ -30,7 +30,11 @@ import { AuthCredentials } from './auth-credentials';
 import { ContactDetails } from './contact-details';
 import { EmploymentDetails } from './employment-details';
 import { PersonalInfo } from './personal-info';
-import type { AvatarStyle } from '~/models/employee.model';
+import type {
+  AvatarStyle,
+  EmployeeType,
+  EmploymentStatus,
+} from '~/models/employee.model';
 
 type AddressValues = {
   addressLine1: string;
@@ -67,16 +71,17 @@ export type FormValues = {
   emails: Array<{ value: string }>;
   emergencyContact: {
     firstName: string;
+    middleName: string;
     lastName: string;
+    suffix?: string;
     relationship: string;
     contactNumber: PhoneValues;
     address: AddressValues | null;
   };
-  employeeType: string;
-  employeeId: string;
+  employeeType: EmployeeType | '';
+  employmentStatus: EmploymentStatus | '';
   departmentId: number | null;
   positionId: number | null;
-  employmentStatus: string;
   joiningDate: Date | null;
 };
 
@@ -114,7 +119,6 @@ const STEPS: WizardStep[] = [
     component: EmploymentDetails,
     fields: [
       'employeeType',
-      'employeeId',
       'departmentId',
       'positionId',
       'employmentStatus',
@@ -153,13 +157,13 @@ const DEFAULT_VALUES: FormValues = {
   emails: [],
   emergencyContact: {
     firstName: '',
+    middleName: '',
     lastName: '',
     relationship: '',
     contactNumber: EMPTY_PHONE,
     address: null,
   },
   employeeType: '',
-  employeeId: '',
   departmentId: null,
   positionId: null,
   employmentStatus: '',
