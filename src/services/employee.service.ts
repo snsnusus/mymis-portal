@@ -31,10 +31,13 @@ export const employeeService = {
     return result;
   },
 
-  getEmployeeOptions: async (search?: string): Promise<EmployeeOption[]> => {
+  getEmployeeOptions: async (
+    search?: string,
+    limit?: number
+  ): Promise<EmployeeOption[]> => {
     const { data: employees } = await apiClient.get<EmployeeLookupModel[]>(
       `${BASE_URL}/lookup`,
-      { params: { search: search || undefined } }
+      { params: { search: search || undefined, limit } }
     );
 
     return employees.map((employee) => ({

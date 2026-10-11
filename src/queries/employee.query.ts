@@ -23,8 +23,8 @@ interface UpdateEmployeeDepartmentParams {
 
 const employeeKeys = {
   all: ['employees'] as const,
-  options: (search: string) =>
-    [...employeeKeys.all, 'options', { search }] as const,
+  options: (search: string, limit?: number) =>
+    [...employeeKeys.all, 'options', { search, limit }] as const,
   paged: (params: EmployeePageParams) =>
     [...employeeKeys.all, 'paged', params] as const,
   detail: (id: number | undefined) =>
@@ -43,11 +43,12 @@ export const useGetEmployeesPaged = (
   });
 
 export const useGetEmployeeOptions = (
-  search = ''
+  search = '',
+  limit?: number
 ): UseQueryResult<EmployeeOption[], Error> =>
   useQuery({
-    queryKey: employeeKeys.options(search),
-    queryFn: () => employeeService.getEmployeeOptions(search),
+    queryKey: employeeKeys.options(search, limit),
+    queryFn: () => employeeService.getEmployeeOptions(search, limit),
     keepPreviousData: true,
   });
 

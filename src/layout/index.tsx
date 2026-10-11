@@ -26,6 +26,8 @@ import Footer from './footer';
 
 import ChatWidget from '~/components/chat-widget';
 import UserDirectory from '~/components/user-directory';
+import { EmployeeAvatar } from '~/components/modules/employee-avatar';
+import type { EmployeeOption } from '~/models/employee.model';
 
 const AppWrapper = styled('div')({
   display: 'flex',
@@ -52,8 +54,11 @@ const TopOffset = styled('div')(({ theme }) => ({
 
 const Layout = (props: PropsWithChildren): ReactElement => {
   const [isDirectoryOpen, setIsDirectoryOpen] = useState(false);
-  const [activeChatSessions, setActiveChatSessions] = useState<any[]>([]);
-  const [activeChatTarget, setActiveChatTarget] = useState<any | null>(null);
+  const [activeChatSessions, setActiveChatSessions] = useState<
+    EmployeeOption[]
+  >([]);
+  const [activeChatTarget, setActiveChatTarget] =
+    useState<EmployeeOption | null>(null);
 
   const [badgeMenuAnchor, setBadgeMenuAnchor] = useState<null | HTMLElement>(
     null
@@ -67,7 +72,7 @@ const Layout = (props: PropsWithChildren): ReactElement => {
 
   const { children } = props;
 
-  const handleSelectUserChat = (selectedUser: any): void => {
+  const handleSelectUserChat = (selectedUser: EmployeeOption): void => {
     // 1. Set the last clicked user as the active maximized target
     setActiveChatTarget(selectedUser);
 
@@ -82,7 +87,7 @@ const Layout = (props: PropsWithChildren): ReactElement => {
     });
   };
 
-  const handleCloseSession = (userIdToClose: string): void => {
+  const handleCloseSession = (userIdToClose: number): void => {
     setActiveChatSessions((prev) =>
       prev.filter((user) => user.id !== userIdToClose)
     );
@@ -92,7 +97,7 @@ const Layout = (props: PropsWithChildren): ReactElement => {
         const remaining = activeChatSessions.filter(
           (user) => user.id !== userIdToClose
         );
-        return remaining.length > 0 ? remaining[remaining.length - 1] : null;
+        return remaining.at(-1) ?? null; // the most recently opened remaining chat, or none
       });
     }
   };
@@ -105,7 +110,7 @@ const Layout = (props: PropsWithChildren): ReactElement => {
     setBadgeMenuAnchor(null);
   };
 
-  const handleSwitchActiveChat = (selectedUser: any): void => {
+  const handleSwitchActiveChat = (selectedUser: EmployeeOption): void => {
     setActiveChatTarget(selectedUser);
     handleCloseBadgeMenu();
   };
@@ -277,15 +282,16 @@ const Layout = (props: PropsWithChildren): ReactElement => {
                     sx={{ gap: 1.5 }}
                   >
                     <ListItemAvatar sx={{ minWidth: 'auto' }}>
-                      <Avatar
-                        sx={{ width: 32, height: 32 }}
-                        src={sessionUser.avatar}
-                      >
-                        {sessionUser.name?.charAt(0)}
-                      </Avatar>
+                      <EmployeeAvatar
+                        id={sessionUser.id}
+                        name={sessionUser.formattedName}
+                        avatarUrl={sessionUser.avatarUrl}
+                        avatarStyle={sessionUser.avatarStyle}
+                        size={32}
+                      />
                     </ListItemAvatar>
                     <ListItemText
-                      primary={`${sessionUser.firstName} ${sessionUser.lastName}`}
+                      primary={sessionUser.formattedName}
                       slotProps={{
                         primary: {
                           variant: 'body2',
@@ -303,7 +309,9 @@ const Layout = (props: PropsWithChildren): ReactElement => {
         )}
         <ChatWidget
           recipient={activeChatTarget}
-          onClose={() => handleCloseSession(activeChatTarget.id)}
+          onClose={() => {
+            if (activeChatTarget) handleCloseSession(activeChatTarget.id);
+          }}
           directoryOffsetWidth={currentChatWidth}
         />
         <Footer />

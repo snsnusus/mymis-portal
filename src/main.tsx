@@ -29,11 +29,11 @@ createRoot(container).render(
         <CssBaseline />
         <SnackbarProvider anchorOrigin={anchorOrigin} maxSnack={3}>
           <ModalProvider>
-            <WebSocketProvider>
-              <AuthProvider>
+            <AuthProvider>
+              <WebSocketProvider>
                 <AppRouter />
-              </AuthProvider>
-            </WebSocketProvider>
+              </WebSocketProvider>
+            </AuthProvider>
           </ModalProvider>
         </SnackbarProvider>
       </ThemeProvider>
