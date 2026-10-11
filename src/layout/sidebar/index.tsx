@@ -18,6 +18,11 @@ import MenuItem from './menu-item';
 
 import { SIDEBAR_MENU_ITEMS } from '~/config/sidebar-menu-items';
 
+// Imported (not referenced by a URL string), so Vite includes them in the build
+// and gives back their final, hashed URLs.
+import logoLong from '../../../assets/logo-long.png';
+import logoShort from '../../../assets/logo-short.png';
+
 const Logo = styled('img')(({ theme }) => ({
   transition: theme.transitions.create('all', {
     easing: theme.transitions.easing.sharp,
@@ -91,7 +96,7 @@ const Sidebar = (): ReactElement => {
       >
         <Logo
           alt="Logo"
-          src={open ? '/assets/logo-long.png' : '/assets/logo-short.png'}
+          src={open ? logoLong : logoShort}
           height={52}
           width={open ? 252 : 56}
         />
