@@ -1,6 +1,9 @@
 // Wire types of mymis-chat-service (mirrors src/ws/protocol.ts and src/chat/chat.model.ts
 // in that repo). If the service's protocol changes, update this file too.
 
+// Longest message the service accepts (MAX_MESSAGE_LENGTH in the service's chat.model.ts).
+export const CHAT_MAX_MESSAGE_LENGTH = 2000;
+
 // A saved message, as the service sends it (WebSocket MESSAGE and REST history).
 // id and createdAt are strings because JSON has no ObjectId or Date.
 export interface ChatMessage {

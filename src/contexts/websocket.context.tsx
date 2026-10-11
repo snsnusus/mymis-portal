@@ -22,6 +22,9 @@ import {
 } from '~/models/chat.model';
 import { isTokenExpired } from '~/utils/token.util';
 
+import { useQueryClient } from '@tanstack/react-query';
+import { chatKeys } from '~/queries/chat.query';
+
 // disabled: chat not configured, or nobody logged in
 // connecting: socket opening or waiting for AUTH_OK
 // ready: authenticated; messages can be sent
@@ -57,6 +60,7 @@ export const WebSocketProvider = ({
 }: PropsWithChildren): ReactElement => {
   const { user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
 
   const [status, setStatus] = useState<ChatStatus>('disabled');
   const [onlineIds, setOnlineIds] = useState<ReadonlySet<string>>(new Set());
@@ -86,6 +90,8 @@ export const WebSocketProvider = ({
         case 'AUTH_OK': {
           attempt = 0; // a successful login resets the backoff
           setStatus('ready');
+          // Anything sent while we were disconnected only exists in history: refetch it.
+          void queryClient.invalidateQueries({ queryKey: chatKeys.all });
           const request: ChatClientMessage = { type: 'GET_INITIAL_PRESENCE' };
           ws.send(JSON.stringify(request));
           break;
@@ -187,7 +193,7 @@ export const WebSocketProvider = ({
       setMessages([]);
       setOnlineIds(new Set());
     };
-  }, [userId, enqueueSnackbar]);
+  }, [userId, enqueueSnackbar, queryClient]);
 
   const sendMessage = useCallback(
     (recipientId: string, text: string): boolean => {
