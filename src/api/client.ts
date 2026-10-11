@@ -1,11 +1,19 @@
-import { type InternalAxiosRequestConfig } from 'axios';
+import axios, {
+  type AxiosInstance,
+  type InternalAxiosRequestConfig,
+} from 'axios';
 import { createAxiosInstance } from './config';
 
 interface RetryableRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
 
-// Express.js/Nest.js Client
+interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+}
+
+// Express.js server in server/ (OTP only). Cleaned up in M5 step 6.
 export const nodeClient = createAxiosInstance({
   baseURL: 'http://localhost:4000',
 });
@@ -23,6 +31,12 @@ export const apiClient = createAxiosInstance({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
+// Chat service (mymis-chat-service). Undefined URL = chat not configured (e.g. production
+// until the service is deployed); callers check isChatEnabled before using it.
+export const chatClient = createAxiosInstance({
+  baseURL: import.meta.env.VITE_CHAT_API_URL,
+});
+
 // A second, interceptor-free instance used only for the refresh call itself -
 // this is what prevents a failed refresh from re-triggering the response
 // interceptor below and looping back into itself.
@@ -30,75 +44,89 @@ export const refreshClient = createAxiosInstance({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
-let isRefreshing = false;
-let pendingRequests: Array<(token: string) => void> = [];
-
 const forceLogout = (): void => {
   localStorage.removeItem('access_token');
   localStorage.removeItem('refresh_token');
   window.location.href = '/login';
 };
 
-apiClient.interceptors.request.use((config) => {
-  const accessToken = localStorage.getItem('access_token');
+// The refresh currently in flight, shared by every caller (single-flight).
+let refreshPromise: Promise<string> | null = null;
 
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
+// Gets a new access token using the stored refresh token, saves both tokens, and returns
+// the new access token. Concurrent callers (several 401s, or a 401 and a WebSocket 4002
+// at the same moment) all receive the SAME promise, so the API is called only once.
+export const refreshAccessToken = (): Promise<string> => {
+  if (refreshPromise) {
+    return refreshPromise;
   }
 
-  return config;
-});
-
-apiClient.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config as RetryableRequestConfig;
-
-    if (error.response?.status !== 401 || originalRequest._retry) {
-      return Promise.reject(error);
-    }
-
+  refreshPromise = (async () => {
     const refreshToken = localStorage.getItem('refresh_token');
-
     if (!refreshToken) {
-      forceLogout();
-      return Promise.reject(error);
+      throw new Error('No refresh token');
     }
 
-    originalRequest._retry = true;
+    const { data } = await refreshClient.post<AuthTokens>('/Auth/refresh', {
+      refreshToken,
+    });
 
-    if (isRefreshing) {
-      return new Promise((resolve) => {
-        pendingRequests.push((newAccessToken: string) => {
-          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-          resolve(apiClient(originalRequest));
-        });
-      });
+    localStorage.setItem('access_token', data.accessToken);
+    localStorage.setItem('refresh_token', data.refreshToken);
+    return data.accessToken;
+  })().finally(() => {
+    // Success or failure, the next caller after this one starts a fresh refresh.
+    refreshPromise = null;
+  });
+
+  return refreshPromise;
+};
+
+// Adds "Authorization: Bearer <token>" to every request of `instance`, and on a 401
+// refreshes the token once and retries the request. Used by every client that calls
+// an API trusting mymis-api's tokens.
+const attachAuthInterceptors = (instance: AxiosInstance): void => {
+  instance.interceptors.request.use((config) => {
+    const accessToken = localStorage.getItem('access_token');
+
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
 
-    isRefreshing = true;
+    return config;
+  });
 
-    try {
-      const { data } = await refreshClient.post('/Auth/refresh', {
-        refreshToken,
-      });
+  instance.interceptors.response.use(
+    (response) => response,
+    async (error: unknown) => {
+      // Only handle a 401 from a request we can retry; anything else passes through.
+      if (
+        !axios.isAxiosError(error) ||
+        error.response?.status !== 401 ||
+        !error.config
+      ) {
+        return Promise.reject(error);
+      }
 
-      localStorage.setItem('access_token', data.accessToken);
-      localStorage.setItem('refresh_token', data.refreshToken);
+      const originalRequest = error.config as RetryableRequestConfig;
 
-      pendingRequests.forEach((retryCallback) =>
-        retryCallback(data.accessToken)
-      );
-      pendingRequests = [];
+      // Already retried once with a fresh token and still 401: give up.
+      if (originalRequest._retry) {
+        return Promise.reject(error);
+      }
+      originalRequest._retry = true;
 
-      originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
-      return apiClient(originalRequest);
-    } catch (refreshError) {
-      pendingRequests = [];
-      forceLogout();
-      return Promise.reject(refreshError);
-    } finally {
-      isRefreshing = false;
+      try {
+        const newAccessToken = await refreshAccessToken();
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return instance(originalRequest); // retry on the SAME instance it came from
+      } catch (refreshError) {
+        forceLogout();
+        return Promise.reject(refreshError);
+      }
     }
-  }
-);
+  );
+};
+
+attachAuthInterceptors(apiClient);
+attachAuthInterceptors(chatClient);
