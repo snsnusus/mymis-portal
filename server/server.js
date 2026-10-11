@@ -1,13 +1,11 @@
-// server.js
-const http = require('http');
+// server.js: OTP endpoints only (ADR-0008, until OTP is rebuilt in mymis-api).
+// Chat and presence moved to mymis-chat-service.
 const express = require('express');
 const cors = require('cors');
-const { WebSocketServer } = require('ws');
-
-// 🚀 Import the shared client instance
-const redisClient = require('./redisClient');
 const { sendOtp, verifyOtp } = require('./contactController');
-const { initSocketServer } = require('./socketHandler');
+
+// 4100, not 4000: port 4000 belongs to mymis-chat-service.
+const PORT = 4100;
 
 const app = express();
 app.use(express.json());
@@ -16,16 +14,6 @@ app.use(cors());
 app.post('/api/contacts/send-otp', sendOtp);
 app.post('/api/contacts/verify-otp', verifyOtp);
 
-const server = http.createServer(app);
-const wss = new WebSocketServer({ server });
-
-async function startServer() {
-  // Initialize socket orchestration logic using the imported client
-  initSocketServer(wss, redisClient);
-
-  server.listen(4000, () => {
-    console.log('🚀 Unified Server running on http://localhost:4000');
-  });
-}
-
-startServer();
+app.listen(PORT, () => {
+  console.log(`OTP server running on http://localhost:${PORT}`);
+});

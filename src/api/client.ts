@@ -13,9 +13,9 @@ interface AuthTokens {
   refreshToken: string;
 }
 
-// Express.js server in server/ (OTP only). Cleaned up in M5 step 6.
-export const nodeClient = createAxiosInstance({
-  baseURL: 'http://localhost:4000',
+// OTP endpoints in server/ (temporary, ADR-0008: until OTP is rebuilt in mymis-api).
+export const otpClient = createAxiosInstance({
+  baseURL: 'http://localhost:4100',
 });
 
 // Json-server Client

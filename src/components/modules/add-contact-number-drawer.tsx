@@ -7,7 +7,7 @@ import { DataDisplayRow } from '~/components/ui/data-display-row';
 import { Switch } from '~/components/form/inputs/base/switch';
 import OtpVerificationDialog from '../../pages/profile/tabs/contact/contact-number/otp-verification-dialog';
 
-import { nodeClient } from '~/api/client';
+import { otpClient } from '~/api/client';
 
 export interface PhoneNumberDetails {
   // Database ID or reference link
@@ -97,7 +97,7 @@ const AddContactNumberDrawer = ({
     setIsSendingOtp(true);
 
     try {
-      const response = await nodeClient.post('/api/contacts/send-otp', {
+      const response = await otpClient.post('/api/contacts/send-otp', {
         name: 'Test',
         email: 'test@test.com',
         phoneNumber: phoneNumberDetails.international,

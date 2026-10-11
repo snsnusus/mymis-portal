@@ -1136,17 +1136,5 @@
       "name": "Tondo II (Barangay 151)",
       "zipCode": "1013"
     }
-  ],
-  "messages": [
-    {
-      "text": "test",
-      "userId": "1",
-      "senderName": "Pea Daphne Vargas",
-      "recipientId": "3",
-      "roomId": "1-3",
-      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Alex",
-      "timestamp": "02:04 PM",
-      "id": "IWWfhl1ssbM"
-    }
   ]
 }
