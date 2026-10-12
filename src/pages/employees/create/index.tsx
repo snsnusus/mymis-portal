@@ -19,13 +19,13 @@ import {
   Stack,
   stepConnectorClasses,
   Box,
-  Typography,
 } from '@mui/material';
 import {
   KeyboardDoubleArrowRight as KeyboardDoubleArrowRightIcon,
   KeyboardDoubleArrowLeft as KeyboardDoubleArrowLeftIcon,
 } from '@mui/icons-material';
 import { FormProvider } from '~/components/form/form-provider';
+import { SectionHeader } from '~/components/section-header';
 import { AuthCredentials } from './auth-credentials';
 import { ContactDetails } from './contact-details';
 import { EmploymentDetails } from './employment-details';
@@ -191,7 +191,7 @@ const StyledStepper = styled(Stepper)(({ theme }) => ({
   flexShrink: 0,
   backgroundColor: theme.palette.grey[100],
   borderRadius: 50,
-  padding: theme.spacing(1),
+  padding: theme.spacing(1.5, 1.5, 1, 1.5),
   '& .MuiStep-root': {
     flex: 1,
   },
@@ -246,7 +246,6 @@ const StyledConnector = styled(StepConnector)(({ theme }) => ({
 
 const StyledStepLabel = styled(StepLabel)(({ theme }) => ({
   '& .MuiStepLabel-label': {
-    fontSize: theme.typography.body1.fontSize,
     color: theme.palette.text.primary,
     '&.Mui-active': {
       color: theme.palette.primary.main,
@@ -327,13 +326,11 @@ const CreateEmployee = (): ReactElement => {
   return (
     <FormProvider {...methods} onSubmit={handleSubmit}>
       <Stack spacing={2} ref={topRef}>
-        <Box>
-          <Typography variant="h6">Create Employee</Typography>
-          <Typography variant="subtitle1" color="text.secondary">
-            Set up a new employee profile, access permission, and organization
-            assignment.
-          </Typography>
-        </Box>
+        <SectionHeader
+          header="Create Employee"
+          subheader="Set up a new employee profile, access permission, and organization
+            assignment."
+        />
         <StyledStepper
           activeStep={activeStep}
           connector={<StyledConnector />}
