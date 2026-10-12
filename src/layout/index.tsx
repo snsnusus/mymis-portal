@@ -1,6 +1,6 @@
 import type { EmployeeOption } from '~/models/employee.model';
 import { useCallback, useMemo, Suspense, type ReactElement } from 'react';
-import { useGetEmployeeOptions } from '~/queries/employee.query';
+import { useGetEmployeesByIds } from '~/queries/employee.query';
 import { useChatDockStore } from '~/stores/chat-dock.store';
 
 import { Box, type BoxProps, Stack, styled } from '@mui/material';
@@ -11,8 +11,6 @@ import ChatWidget from '~/components/chat-widget';
 import Navbar from './navbar';
 import Sidebar from './sidebar';
 import Footer from './footer';
-
-import { CHAT_DIRECTORY_LIMIT } from '~/components/chat-menu';
 
 const AppWrapper = styled('div')({
   display: 'flex',
@@ -46,11 +44,12 @@ const Layout = (props: PropsWithChildren): ReactElement => {
   const closeChat = useChatDockStore((state) => state.closeChat);
   const closeAll = useChatDockStore((state) => state.closeAll);
 
-  // Same query (same key) as UserDirectory, so it comes from the cache.
-  const { data: employees = [] } = useGetEmployeeOptions(
-    '',
-    CHAT_DIRECTORY_LIMIT
+  // Every id in the dock, open or minimized: exactly the people we need names for.
+  const dockIds = useMemo(
+    () => [...openIds, ...minimizedIds],
+    [openIds, minimizedIds]
   );
+  const { data: employees = [] } = useGetEmployeesByIds(dockIds);
 
   // id -> employee, so the stored ids can be turned back into names and avatars.
   const employeesById = useMemo(
@@ -137,15 +136,11 @@ const Layout = (props: PropsWithChildren): ReactElement => {
           sx={{
             position: 'fixed',
             bottom: '56px', // clears the footer (the widget used to do this itself)
+            right: (sxTheme) => sxTheme.spacing(2), // 16px from the right edge
             display: 'flex', // children side by side, in a row
             alignItems: 'flex-end', // lined up along the bottom edge
             gap: 2,
             zIndex: (sxTheme) => sxTheme.zIndex.drawer + 1,
-            transition: (sxTheme) =>
-              sxTheme.transitions.create('right', {
-                easing: sxTheme.transitions.easing.sharp,
-                duration: sxTheme.transitions.duration.enteringScreen,
-              }),
           }}
         >
           {openChats.map((employee) => (
