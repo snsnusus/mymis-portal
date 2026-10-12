@@ -16,6 +16,7 @@ import { CHAT_WS_URL, isChatEnabled } from '~/config/chat.config';
 import { useAuth } from '~/contexts/auth.context';
 import {
   ChatCloseCode,
+  type ConversationSummary,
   type ChatClientMessage,
   type ChatMessage,
   type ChatServerMessage,
@@ -23,7 +24,7 @@ import {
 import { isTokenExpired } from '~/utils/token.util';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { chatKeys } from '~/queries/chat.query';
+import { chatKeys, upsertConversation } from '~/queries/chat.query';
 
 // disabled: chat not configured, or nobody logged in
 // connecting: socket opening or waiting for AUTH_OK
@@ -108,6 +109,11 @@ export const WebSocketProvider = ({
           });
           break;
         case 'MESSAGE':
+          // Move this conversation to the top of the menu with the new preview.
+          queryClient.setQueryData<ConversationSummary[]>(
+            chatKeys.conversations(),
+            (old) => upsertConversation(old, data.message, userId)
+          );
           setMessages((prev) =>
             prev.some((m) => m.id === data.message.id)
               ? prev // already have it

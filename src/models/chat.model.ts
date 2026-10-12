@@ -35,6 +35,18 @@ export interface ChatHistoryPage {
   nextCursor: string | null; // null = no older messages
 }
 
+// One row of GET /conversations (ConversationSummary in the service's chat.model.ts).
+export interface ConversationSummary {
+  roomId: string;
+  otherUserId: string;
+  lastMessage: ChatMessage;
+}
+
+// The body of GET /conversations.
+export interface ChatConversationsResponse {
+  conversations: ConversationSummary[]; // newest conversation first
+}
+
 // Application close codes the service uses (ADR-0005).
 export const ChatCloseCode = {
   UNAUTHORIZED: 4001,
