@@ -3,6 +3,7 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from 'axios';
 import { createAxiosInstance } from './config';
+import { useChatDockStore } from '~/stores/chat-dock.store';
 
 interface RetryableRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
@@ -47,6 +48,7 @@ export const refreshClient = createAxiosInstance({
 const forceLogout = (): void => {
   localStorage.removeItem('access_token');
   localStorage.removeItem('refresh_token');
+  useChatDockStore.getState().closeAll();
   window.location.href = '/login';
 };
 

@@ -14,12 +14,6 @@ declare module '@mui/material/styles' {
             close: number;
           };
         };
-        chatDirectory: {
-          width: {
-            open: number;
-            close: number;
-          };
-        };
       };
     };
   }
@@ -28,12 +22,6 @@ declare module '@mui/material/styles' {
     custom?: {
       drawer?: {
         sidebar?: {
-          width?: {
-            open?: number;
-            close?: number;
-          };
-        };
-        chatDirectory?: {
           width?: {
             open?: number;
             close?: number;

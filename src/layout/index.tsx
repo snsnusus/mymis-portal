@@ -1,33 +1,18 @@
-import { type MouseEvent, Suspense, useState, type ReactElement } from 'react';
+import type { EmployeeOption } from '~/models/employee.model';
+import { useCallback, useMemo, Suspense, type ReactElement } from 'react';
+import { useGetEmployeeOptions } from '~/queries/employee.query';
+import { useChatDockStore } from '~/stores/chat-dock.store';
 
-import {
-  Avatar,
-  Badge,
-  Box,
-  type BoxProps,
-  IconButton,
-  ListItemAvatar,
-  ListItemText,
-  Menu,
-  MenuItem,
-  Stack,
-  styled,
-  useTheme,
-} from '@mui/material';
-
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ForumIcon from '@mui/icons-material/Forum';
+import { Box, type BoxProps, Stack, styled } from '@mui/material';
 
 import { AppBreadcrumbs } from '../components/breadcrumb';
+import ChatBubbles from '~/components/chat-bubbles';
+import ChatWidget from '~/components/chat-widget';
 import Navbar from './navbar';
 import Sidebar from './sidebar';
 import Footer from './footer';
 
-import ChatWidget from '~/components/chat-widget';
-import UserDirectory from '~/components/user-directory';
-import { EmployeeAvatar } from '~/components/modules/employee-avatar';
-import type { EmployeeOption } from '~/models/employee.model';
+import { CHAT_DIRECTORY_LIMIT } from '~/components/chat-menu';
 
 const AppWrapper = styled('div')({
   display: 'flex',
@@ -53,67 +38,42 @@ const TopOffset = styled('div')(({ theme }) => ({
 }));
 
 const Layout = (props: PropsWithChildren): ReactElement => {
-  const [isDirectoryOpen, setIsDirectoryOpen] = useState(false);
-  const [activeChatSessions, setActiveChatSessions] = useState<
-    EmployeeOption[]
-  >([]);
-  const [activeChatTarget, setActiveChatTarget] =
-    useState<EmployeeOption | null>(null);
+  // Each line subscribes to one piece of the store.
+  const openIds = useChatDockStore((state) => state.openIds);
+  const minimizedIds = useChatDockStore((state) => state.minimizedIds);
+  const openChat = useChatDockStore((state) => state.openChat);
+  const minimizeChat = useChatDockStore((state) => state.minimizeChat);
+  const closeChat = useChatDockStore((state) => state.closeChat);
+  const closeAll = useChatDockStore((state) => state.closeAll);
 
-  const [badgeMenuAnchor, setBadgeMenuAnchor] = useState<null | HTMLElement>(
-    null
+  // Same query (same key) as UserDirectory, so it comes from the cache.
+  const { data: employees = [] } = useGetEmployeeOptions(
+    '',
+    CHAT_DIRECTORY_LIMIT
   );
 
-  const theme = useTheme();
+  // id -> employee, so the stored ids can be turned back into names and avatars.
+  const employeesById = useMemo(
+    () => new Map(employees.map((employee) => [employee.id, employee])),
+    [employees]
+  );
 
-  const currentChatWidth = isDirectoryOpen
-    ? theme.custom.drawer.chatDirectory.width.open
-    : theme.custom.drawer.chatDirectory.width.close;
+  // Turns stored ids back into employees, skipping any not loaded (yet).
+  const toEmployees = useCallback(
+    (ids: number[]): EmployeeOption[] =>
+      ids
+        .map((id) => employeesById.get(id))
+        .filter(
+          (employee): employee is EmployeeOption => employee !== undefined
+        ),
+    [employeesById]
+  );
 
-  const { children } = props;
-
-  const handleSelectUserChat = (selectedUser: EmployeeOption): void => {
-    // 1. Set the last clicked user as the active maximized target
-    setActiveChatTarget(selectedUser);
-
-    // 2. Add them to the session tray if they aren't already in it
-    setActiveChatSessions((prevSessions) => {
-      const isAlreadyOpen = prevSessions.some(
-        (user) => user.id === selectedUser.id
-      );
-      if (isAlreadyOpen) return prevSessions;
-
-      return [...prevSessions, selectedUser];
-    });
-  };
-
-  const handleCloseSession = (userIdToClose: number): void => {
-    setActiveChatSessions((prev) =>
-      prev.filter((user) => user.id !== userIdToClose)
-    );
-
-    if (activeChatTarget?.id === userIdToClose) {
-      setActiveChatTarget(() => {
-        const remaining = activeChatSessions.filter(
-          (user) => user.id !== userIdToClose
-        );
-        return remaining.at(-1) ?? null; // the most recently opened remaining chat, or none
-      });
-    }
-  };
-
-  const handleOpenBadgeMenu = (event: MouseEvent<HTMLElement>): void => {
-    setBadgeMenuAnchor(event.currentTarget);
-  };
-
-  const handleCloseBadgeMenu = (): void => {
-    setBadgeMenuAnchor(null);
-  };
-
-  const handleSwitchActiveChat = (selectedUser: EmployeeOption): void => {
-    setActiveChatTarget(selectedUser);
-    handleCloseBadgeMenu();
-  };
+  const openChats = useMemo(() => toEmployees(openIds), [openIds, toEmployees]);
+  const minimizedChats = useMemo(
+    () => toEmployees(minimizedIds),
+    [toEmployees, minimizedIds]
+  );
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
@@ -164,156 +124,45 @@ const Layout = (props: PropsWithChildren): ReactElement => {
                     }}
                   >
                     <AppBreadcrumbs />
-                    <Stack sx={{ pt: 2 }}>{children}</Stack>
+                    <Stack sx={{ pt: 2 }}>{props.children}</Stack>
                   </Stack>
                 </Box>
               </Content>
-              <UserDirectory
-                isOpen={isDirectoryOpen}
-                onSelectUser={handleSelectUserChat}
-                activeRecipientId={activeChatTarget?.id}
-              />
             </Box>
-            <IconButton
-              onClick={() => setIsDirectoryOpen(!isDirectoryOpen)}
-              size="small"
-              sx={{
-                position: 'fixed',
-                top: '140px',
-                right: (sxTheme) =>
-                  `${
-                    isDirectoryOpen
-                      ? sxTheme.custom.drawer.chatDirectory.width.open
-                      : sxTheme.custom.drawer.chatDirectory.width.close
-                  }px`,
-                transform: 'translateX(50%)',
-                transition: (sxTheme) =>
-                  sxTheme.transitions.create('right', {
-                    easing: sxTheme.transitions.easing.sharp,
-                    duration: sxTheme.transitions.duration.enteringScreen,
-                  }),
-                backgroundColor: 'background.paper',
-                border: '1px solid',
-                borderColor: 'divider',
-                boxShadow: '0px 3px 6px rgba(0,0,0,0.15)',
-                zIndex: (sxTheme) => sxTheme.zIndex.drawer,
-                '&:hover': {
-                  backgroundColor: 'grey.100',
-                },
-              }}
-            >
-              {isDirectoryOpen ? (
-                <ChevronRightIcon fontSize="small" />
-              ) : (
-                <ChevronLeftIcon fontSize="small" />
-              )}
-            </IconButton>
           </Box>
         </MainSection>
-        {activeChatSessions.length > 1 && (
-          <Box
-            sx={{
-              position: 'fixed',
-              bottom: '66px',
-              right: `calc(${currentChatWidth}px + 340px + 16px)`,
-              transition: (sxTheme) =>
-                sxTheme.transitions.create('right', {
-                  easing: sxTheme.transitions.easing.sharp,
-                  duration: sxTheme.transitions.duration.enteringScreen,
-                }),
-              zIndex: 1301,
-            }}
-          >
-            <Badge
-              badgeContent={activeChatSessions.length - 1}
-              color="primary"
-              max={99}
-            >
-              <Avatar
-                onClick={handleOpenBadgeMenu}
-                sx={{
-                  bgcolor: 'background.paper',
-                  color: 'text.secondary',
-                  boxShadow: 3,
-                  cursor: 'pointer',
-                  width: 45,
-                  height: 45,
-                }}
-              >
-                <ForumIcon />
-              </Avatar>
-            </Badge>
 
-            <Menu
-              anchorEl={badgeMenuAnchor}
-              open={Boolean(badgeMenuAnchor)}
-              onClose={handleCloseBadgeMenu}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              transformOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
-              }}
-              slotProps={{
-                paper: {
-                  sx: {
-                    minWidth: 200,
-                    maxHeight: 300,
-                    marginBottom: '12px',
-                  },
-                  style: {
-                    transform: 'translateY(-18px)',
-                  },
-                },
-              }}
-            >
-              {activeChatSessions.map((sessionUser) => {
-                const isCurrentlyActive =
-                  sessionUser.id === activeChatTarget?.id;
-
-                if (isCurrentlyActive) return null;
-
-                return (
-                  <MenuItem
-                    key={sessionUser.id}
-                    onClick={() => handleSwitchActiveChat(sessionUser)}
-                    sx={{ gap: 1.5 }}
-                  >
-                    <ListItemAvatar sx={{ minWidth: 'auto' }}>
-                      <EmployeeAvatar
-                        id={sessionUser.id}
-                        name={sessionUser.formattedName}
-                        avatarUrl={sessionUser.avatarUrl}
-                        avatarStyle={sessionUser.avatarStyle}
-                        size={32}
-                      />
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={sessionUser.formattedName}
-                      slotProps={{
-                        primary: {
-                          variant: 'body2',
-                          sx: {
-                            fontWeight: isCurrentlyActive ? 'bold' : 'normal',
-                          },
-                        },
-                      }}
-                    />
-                  </MenuItem>
-                );
-              })}
-            </Menu>
-          </Box>
-        )}
-        <ChatWidget
-          recipient={activeChatTarget}
-          onClose={() => {
-            if (activeChatTarget) handleCloseSession(activeChatTarget.id);
+        {/* The dock: one fixed box at the bottom right that lays out the chat windows. */}
+        <Box
+          sx={{
+            position: 'fixed',
+            bottom: '56px', // clears the footer (the widget used to do this itself)
+            display: 'flex', // children side by side, in a row
+            alignItems: 'flex-end', // lined up along the bottom edge
+            gap: 2,
+            zIndex: (sxTheme) => sxTheme.zIndex.drawer + 1,
+            transition: (sxTheme) =>
+              sxTheme.transitions.create('right', {
+                easing: sxTheme.transitions.easing.sharp,
+                duration: sxTheme.transitions.duration.enteringScreen,
+              }),
           }}
-          directoryOffsetWidth={currentChatWidth}
-        />
+        >
+          {openChats.map((employee) => (
+            <ChatWidget
+              key={employee.id}
+              recipient={employee}
+              onClose={() => closeChat(employee.id)}
+              onMinimize={() => minimizeChat(employee.id)}
+            />
+          ))}
+          <ChatBubbles
+            chats={minimizedChats}
+            onOpen={openChat}
+            onClose={closeChat}
+            onCloseAll={closeAll}
+          />
+        </Box>
         <Footer />
       </AppWrapper>
     </Suspense>

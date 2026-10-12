@@ -81,12 +81,6 @@ export const theme = createTheme({
           close: 120,
         },
       },
-      chatDirectory: {
-        width: {
-          open: 260,
-          close: 75,
-        },
-      },
     },
   },
   mixins: {

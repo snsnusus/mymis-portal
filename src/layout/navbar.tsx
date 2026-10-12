@@ -29,6 +29,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 import { ProgressBar } from '~/components/ui/progress-bar';
+import ChatMenu from '~/components/chat-menu';
 
 const AppBar = styled(MuiAppBar)<AppBarProps>(({ theme }) => ({
   padding: theme.spacing(1, 2),
@@ -152,15 +153,7 @@ const Navbar = (): ReactElement => {
           >
             {!isMobile && (
               <Box>
-                <IconButton
-                  size="large"
-                  aria-label="show 4 new mails"
-                  color="inherit"
-                >
-                  <Badge badgeContent={4} color="error">
-                    <MailIcon />
-                  </Badge>
-                </IconButton>
+                <ChatMenu />
                 <IconButton
                   size="large"
                   aria-label="show 17 new notifications"

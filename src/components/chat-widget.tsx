@@ -16,12 +16,10 @@ import {
   IconButton,
   InputBase,
   Divider,
-  Collapse,
 } from '@mui/material';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SendIcon from '@mui/icons-material/Send';
 import CloseIcon from '@mui/icons-material/Close';
+import RemoveIcon from '@mui/icons-material/Remove';
 
 import { EmployeeAvatar } from '~/components/modules/employee-avatar';
 import { useAuth } from '~/contexts/auth.context';
@@ -34,7 +32,7 @@ import { getPrivateRoomId } from '~/utils';
 interface ChatWidgetProps {
   recipient: EmployeeOption | null;
   onClose: () => void;
-  directoryOffsetWidth: number;
+  onMinimize: () => void;
 }
 
 const PLACEHOLDER_BY_STATUS: Record<ChatStatus, string> = {
@@ -56,7 +54,7 @@ const byCreatedAt = (a: ChatMessage, b: ChatMessage): number =>
 const ChatWidget = ({
   recipient,
   onClose,
-  directoryOffsetWidth,
+  onMinimize,
 }: ChatWidgetProps): ReactElement | null => {
   const { user } = useAuth();
   const {
@@ -67,7 +65,6 @@ const ChatWidget = ({
   } = useWebSocket();
   const { enqueueSnackbar } = useSnackbar();
 
-  const [isOpen, setIsOpen] = useState(true);
   const [text, setText] = useState('');
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -92,16 +89,12 @@ const ChatWidget = ({
     return [...byId.values()].sort(byCreatedAt);
   }, [history.data, liveMessages, roomId]);
 
-  // Scroll to the bottom only when the NEWEST message changes (or the panel opens),
+  // Scroll to the bottom only when the NEWEST message changes (or the widget mounts),
   // so loading older messages at the top doesn't jump the view.
   const lastMessageId = roomMessages.at(-1)?.id;
   useEffect(() => {
-    if (isOpen) chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [lastMessageId, isOpen]);
-
-  const handleToggleChat = (): void => {
-    setIsOpen((prev) => !prev);
-  };
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [lastMessageId]);
 
   const handleSubmit = (e: FormEvent): void => {
     e.preventDefault();
@@ -128,15 +121,6 @@ const ChatWidget = ({
     <Paper
       elevation={0}
       sx={{
-        position: 'fixed',
-        bottom: 0,
-        right: `${directoryOffsetWidth}px`,
-        transition: (theme) =>
-          theme.transitions.create('right', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-          }),
-        marginBottom: { xs: '56px', sm: '56px' },
         width: 340,
         borderRadius: '8px 8px 0 0',
         borderTop: '1px solid',
@@ -146,10 +130,10 @@ const ChatWidget = ({
         display: 'flex',
         flexDirection: 'column',
         backgroundColor: 'background.paper',
-        zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
     >
       <Box
+        onClick={() => onMinimize()}
         sx={{
           backgroundColor: 'primary.main',
           color: 'primary.contrastText',
@@ -160,8 +144,6 @@ const ChatWidget = ({
           justifyContent: 'space-between',
           cursor: 'pointer',
           userSelect: 'none',
-          borderBottom: !isOpen ? '1px solid' : 0,
-          borderBottomColor: 'rgba(255, 255, 255, 0.2)',
         }}
       >
         <Box
@@ -191,181 +173,176 @@ const ChatWidget = ({
             </Typography>
           </Box>
         </Box>
-
         <IconButton
           size="small"
           color="inherit"
           onClick={(e) => {
             e.stopPropagation();
-
-            onClose();
-            setIsOpen(true); // Reset to open when closed, so it opens in expanded state next time
+            onMinimize();
           }}
         >
-          <CloseIcon fontSize="small" />
+          <RemoveIcon fontSize="small" />
         </IconButton>
         <IconButton
           size="small"
           color="inherit"
-          sx={{ p: 0.25 }}
-          onClick={handleToggleChat}
-        >
-          {isOpen ? <KeyboardArrowDownIcon /> : <KeyboardArrowUpIcon />}
-        </IconButton>
-      </Box>
-      <Collapse in={isOpen} timeout="auto">
-        <Box
-          sx={{
-            height: 280,
-            backgroundColor: 'grey.50',
-            overflowY: 'auto',
-            p: 2,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 1.5,
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
           }}
         >
-          {history.hasNextPage && (
-            <Button
-              size="small"
-              onClick={() => void history.fetchNextPage()}
-              disabled={history.isFetchingNextPage}
-              sx={{ alignSelf: 'center' }}
-            >
-              {history.isFetchingNextPage
-                ? 'Loading...'
-                : 'Load older messages'}
-            </Button>
-          )}
-          {history.isError && (
-            <Typography
-              variant="caption"
-              color="error"
-              sx={{ alignSelf: 'center' }}
-            >
-              Could not load earlier messages.
-            </Typography>
-          )}
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-            {roomMessages.map((msg, idx) => {
-              const isMe = msg.senderId === user.id;
-              const isFirstInSequence =
-                idx === 0 || roomMessages[idx - 1]?.senderId !== msg.senderId;
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      </Box>
+      <Box
+        sx={{
+          height: 280,
+          backgroundColor: 'grey.50',
+          overflowY: 'auto',
+          p: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1.5,
+        }}
+      >
+        {history.hasNextPage && (
+          <Button
+            size="small"
+            onClick={() => void history.fetchNextPage()}
+            disabled={history.isFetchingNextPage}
+            sx={{ alignSelf: 'center' }}
+          >
+            {history.isFetchingNextPage ? 'Loading...' : 'Load older messages'}
+          </Button>
+        )}
+        {history.isError && (
+          <Typography
+            variant="caption"
+            color="error"
+            sx={{ alignSelf: 'center' }}
+          >
+            Could not load earlier messages.
+          </Typography>
+        )}
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+          {roomMessages.map((msg, idx) => {
+            const isMe = msg.senderId === user.id;
+            const isFirstInSequence =
+              idx === 0 || roomMessages[idx - 1]?.senderId !== msg.senderId;
 
-              return (
+            return (
+              <Box
+                key={msg.id}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: isMe ? 'flex-end' : 'flex-start',
+                  width: '100%',
+                  mt: isFirstInSequence && idx !== 0 ? 1.5 : 0,
+                }}
+              >
+                {!isMe && isFirstInSequence && (
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      pl: 1,
+                      mb: 0.25,
+                      fontWeight: 600,
+                      color: 'primary.main',
+                      fontSize: '0.75rem',
+                    }}
+                  >
+                    {recipient.formattedName}
+                  </Typography>
+                )}
                 <Box
-                  key={msg.id}
                   sx={{
+                    maxWidth: '80%',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: isMe ? 'flex-end' : 'flex-start',
-                    width: '100%',
-                    mt: isFirstInSequence && idx !== 0 ? 1.5 : 0,
                   }}
                 >
-                  {!isMe && isFirstInSequence && (
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        pl: 1,
-                        mb: 0.25,
-                        fontWeight: 600,
-                        color: 'primary.main',
-                        fontSize: '0.75rem',
-                      }}
-                    >
-                      {recipient.formattedName}
-                    </Typography>
-                  )}
                   <Box
                     sx={{
-                      maxWidth: '80%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: isMe ? 'flex-end' : 'flex-start',
+                      backgroundColor: isMe
+                        ? 'primary.main'
+                        : 'background.paper',
+                      color: isMe ? 'primary.contrastText' : 'text.primary',
+                      px: 1.75,
+                      py: 1,
+                      fontSize: '0.875rem',
+                      lineHeight: 1.4,
+                      boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.06)',
+                      border: isMe ? 'none' : '1px solid',
+                      borderColor: 'grey.200',
+                      borderRadius: 4,
                     }}
                   >
-                    <Box
-                      sx={{
-                        backgroundColor: isMe
-                          ? 'primary.main'
-                          : 'background.paper',
-                        color: isMe ? 'primary.contrastText' : 'text.primary',
-                        px: 1.75,
-                        py: 1,
-                        fontSize: '0.875rem',
-                        lineHeight: 1.4,
-                        boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.06)',
-                        border: isMe ? 'none' : '1px solid',
-                        borderColor: 'grey.200',
-                        borderRadius: 4,
-                      }}
-                    >
-                      <Typography
-                        variant="body2"
-                        sx={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}
-                      >
-                        {msg.text}
-                      </Typography>
-                    </Box>
                     <Typography
-                      variant="caption"
-                      title={new Date(msg.createdAt).toLocaleString()}
-                      sx={{
-                        color: 'text.disabled',
-                        fontSize: '0.625rem',
-                        mt: 0.25,
-                        px: 0.5,
-                        display: 'block',
-                      }}
+                      variant="body2"
+                      sx={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}
                     >
-                      {formatTime(msg.createdAt)}
+                      {msg.text}
                     </Typography>
                   </Box>
+                  <Typography
+                    variant="caption"
+                    title={new Date(msg.createdAt).toLocaleString()}
+                    sx={{
+                      color: 'text.disabled',
+                      fontSize: '0.625rem',
+                      mt: 0.25,
+                      px: 0.5,
+                      display: 'block',
+                    }}
+                  >
+                    {formatTime(msg.createdAt)}
+                  </Typography>
                 </Box>
-              );
-            })}
-          </Box>
-          <div ref={chatEndRef} />
+              </Box>
+            );
+          })}
         </Box>
-        <Divider />
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
+        <div ref={chatEndRef} />
+      </Box>
+      <Divider />
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{
+          p: 1,
+          backgroundColor: 'background.paper',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+        }}
+      >
+        <InputBase
+          size="small"
+          placeholder={PLACEHOLDER_BY_STATUS[status]}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          disabled={!isReady}
+          inputProps={{ maxLength: CHAT_MAX_MESSAGE_LENGTH }}
           sx={{
-            p: 1,
-            backgroundColor: 'background.paper',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
+            flex: 1,
+            bgcolor: 'grey.100',
+            px: 2,
+            py: 0.5,
+            borderRadius: 5,
+            fontSize: '0.875rem',
           }}
+        />
+        <IconButton
+          type="submit"
+          color="primary"
+          disabled={!isReady || !text.trim()}
+          sx={{ p: 1 }}
         >
-          <InputBase
-            size="small"
-            placeholder={PLACEHOLDER_BY_STATUS[status]}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            disabled={!isReady}
-            inputProps={{ maxLength: CHAT_MAX_MESSAGE_LENGTH }}
-            sx={{
-              flex: 1,
-              bgcolor: 'grey.100',
-              px: 2,
-              py: 0.5,
-              borderRadius: 5,
-              fontSize: '0.875rem',
-            }}
-          />
-          <IconButton
-            type="submit"
-            color="primary"
-            disabled={!isReady || !text.trim()}
-            sx={{ p: 1 }}
-          >
-            <SendIcon sx={{ fontSize: 16 }} />
-          </IconButton>
-        </Box>
-      </Collapse>
+          <SendIcon sx={{ fontSize: 16 }} />
+        </IconButton>
+      </Box>
     </Paper>
   );
 };

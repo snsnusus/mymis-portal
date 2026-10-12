@@ -9,6 +9,7 @@ import {
   useRef,
 } from 'react';
 import { authService } from '~/services/auth.service';
+import { useChatDockStore } from '~/stores/chat-dock.store';
 import { isTokenExpired } from '~/utils/token.util';
 
 interface AuthUser {
@@ -55,6 +56,7 @@ const clearStoredTokens = (): void => {
 export const AuthProvider = ({ children }: PropsWithChildren): ReactElement => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
+  const closeAll = useChatDockStore((state) => state.closeAll);
 
   const hasInitialized = useRef(false);
 
@@ -138,6 +140,8 @@ export const AuthProvider = ({ children }: PropsWithChildren): ReactElement => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     setUser(null);
+
+    closeAll();
   };
 
   return (
