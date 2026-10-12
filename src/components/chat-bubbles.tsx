@@ -42,23 +42,25 @@ const ChatBubbles = ({
         },
       }}
     >
-      <Tooltip title="Close all chats" placement="left" arrow>
-        <IconButton
-          className="bubbles-close-all"
-          size="small"
-          aria-label="Close all chats"
-          onClick={onCloseAll}
-          sx={{
-            opacity: 0, // hidden until the Stack's hover rule shows it
-            transition: (theme) => theme.transitions.create('opacity'),
-            bgcolor: 'background.paper',
-            boxShadow: 1,
-            '&:hover': { bgcolor: 'grey.100' },
-          }}
-        >
-          <CloseIcon fontSize="small" />
-        </IconButton>
-      </Tooltip>
+      {hidden.length > 0 && (
+        <Tooltip title="Close all chats" placement="left" arrow>
+          <IconButton
+            className="bubbles-close-all"
+            size="small"
+            aria-label="Close all chats"
+            onClick={onCloseAll}
+            sx={{
+              opacity: 0, // hidden until the Stack's hover rule shows it
+              transition: (theme) => theme.transitions.create('opacity'),
+              bgcolor: 'background.paper',
+              boxShadow: 1,
+              '&:hover': { bgcolor: 'grey.100' },
+            }}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      )}
       {hidden.length > 0 && (
         <IconButton
           onClick={(e) => setMenuAnchor(e.currentTarget)}
