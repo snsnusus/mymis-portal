@@ -44,12 +44,15 @@ export const useGetEmployeesPaged = (
 
 export const useGetEmployeeOptions = (
   search = '',
-  limit?: number
+  limit?: number,
+  // Optional settings; only `enabled` for now. Defaults to running, as before.
+  { enabled = true }: { enabled?: boolean } = {}
 ): UseQueryResult<EmployeeOption[], Error> =>
   useQuery({
     queryKey: employeeKeys.options(search, limit),
     queryFn: () => employeeService.getEmployeeOptions(search, limit),
     keepPreviousData: true,
+    enabled,
   });
 
 export const useUpdateEmployeeDepartment = (): UseMutationResult<
@@ -118,3 +121,14 @@ export const useCheckUsernameAvailability = (): ((
       staleTime: 30_000,
     });
 };
+
+export const useGetEmployeesByIds = (
+  ids: number[]
+): UseQueryResult<EmployeeOption[]> =>
+  useQuery({
+    queryKey: ['employees', 'options', 'byIds', [...ids].sort((a, b) => a - b)],
+    queryFn: () => employeeService.getEmployeesByIds(ids),
+    enabled: ids.length > 0,
+    // While a new set of ids loads, keep showing the previous result instead of nothing.
+    keepPreviousData: true,
+  });

@@ -9,6 +9,7 @@ import type {
 } from '~/models/employee.model';
 import type { PagedResult } from '~/models/paged-result.model';
 import { apiClient, mockClient } from '~/api/client';
+import { toEmployeeOption } from '~/mappers/employee.mapper';
 
 const BASE_URL = '/employees';
 
@@ -40,14 +41,7 @@ export const employeeService = {
       { params: { search: search || undefined, limit } }
     );
 
-    return employees.map((employee) => ({
-      id: employee.id,
-      formattedName: `${employee.firstName} ${employee.lastName}`,
-      position: employee.positionTitle ?? '',
-      avatarUrl: employee.avatarUrl,
-      avatarStyle: employee.avatarStyle,
-      departmentId: employee.departmentId,
-    }));
+    return employees.map(toEmployeeOption);
   },
 
   // NOT YET MIGRATED. MyMIS.Api has no partial-update endpoint - PUT
@@ -88,5 +82,18 @@ export const employeeService = {
     );
 
     return data.available;
+  },
+
+  getEmployeesByIds: async (ids: number[]): Promise<EmployeeOption[]> => {
+    const { data: employees } = await apiClient.get<EmployeeLookupModel[]>(
+      `${BASE_URL}/lookup`,
+      {
+        params: { ids, limit: ids.length },
+        // Repeated keys (ids=3&ids=12), the format ASP.NET Core binds to int[].
+        paramsSerializer: { indexes: null },
+      }
+    );
+
+    return employees.map(toEmployeeOption);
   },
 };
