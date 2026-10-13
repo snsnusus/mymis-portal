@@ -37,6 +37,13 @@ export const theme = createTheme({
     },
   },
   components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          minWidth: 150,
+        },
+      },
+    },
     MuiTypography: {
       defaultProps: {
         variantMapping: {
@@ -78,6 +85,11 @@ export const theme = createTheme({
             borderColor: muiTheme.palette.error.main,
           },
         }),
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        root: { fontSize: '0.875rem' },
       },
     },
   },
