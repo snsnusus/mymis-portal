@@ -19,6 +19,7 @@ import { PhoneNumberInput } from '~/components/form/inputs/base/phone-number-inp
 import { formatPhoneNumber } from '~/utils/phone-number.utils';
 import { z } from 'zod';
 import { isValidPhoneNumber } from 'libphonenumber-js';
+import { SectionLabel } from '~/components/section-label';
 
 type PhoneNumberValue = {
   countryCode: string;
@@ -114,115 +115,105 @@ export const PhoneNumber = (): ReactElement => {
   };
 
   return (
-    <Grid container spacing={2} sx={{ padding: 2 }}>
-      <Grid size={{ xs: 12, md: 6 }}>
-        <Stack sx={{ gap: 2 }}>
-          <Typography variant="body1" sx={{ fontWeight: 'fontWeightMedium' }}>
-            Phone Numbers
-          </Typography>
-          {hasPhoneNumber ? (
-            <Stack
-              spacing={1}
-              sx={{
-                flexWrap: 'wrap',
-                overflowY: 'auto',
-                maxHeight: 200,
-                scrollbarGutter: 'stable',
-                paddingRight: 1,
-              }}
-            >
-              {phoneNumbers.map((phone, index) => (
-                <Paper
-                  key={phone.id}
-                  variant="outlined"
-                  sx={{
-                    p: 1.5,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1.5,
-                    width: '100%',
-                  }}
-                >
-                  <SmartphoneIcon
-                    color="primary"
-                    fontSize="large"
-                    sx={{ mt: 0.25 }}
-                  />
-                  <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      Phone Number {index + 1}
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{ overflowWrap: 'anywhere' }}
-                    >
-                      {phone.international}
-                    </Typography>
-                  </Box>
-                  <Tooltip title="Remove Phone Number">
-                    <IconButton
-                      aria-label={`Remove address ${index + 1}`}
-                      sx={{ '&:hover': { color: 'error.main' } }}
-                      onClick={() => remove(index)}
-                    >
-                      <DeleteIcon fontSize="medium" />
-                    </IconButton>
-                  </Tooltip>
-                </Paper>
-              ))}
-            </Stack>
-          ) : (
-            <Typography color="text.secondary">
-              No phone number added yet.
-            </Typography>
-          )}
-        </Stack>
-      </Grid>
-      <Grid size={{ xs: 12, md: 6 }}>
-        <Stack spacing={2}>
-          <Stack spacing={1}>
-            <PhoneNumberInput
-              label="Phone Number *"
-              value={formValues.international}
-              onChange={handleChange}
-            />
-            {errorMessage && (
-              <Typography variant="caption" color="error">
-                {errorMessage}
+    <Stack sx={{ gap: 1 }}>
+      <SectionLabel title="Phone Numbers" />
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Stack sx={{ gap: 2 }}>
+            {hasPhoneNumber ? (
+              <Stack
+                spacing={1}
+                sx={{
+                  flexWrap: 'wrap',
+                  overflowY: 'auto',
+                  maxHeight: 200,
+                  scrollbarGutter: 'stable',
+                  paddingRight: 1,
+                }}
+              >
+                {phoneNumbers.map((phone, index) => (
+                  <Paper
+                    key={phone.id}
+                    variant="outlined"
+                    sx={{
+                      p: 1.5,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1.5,
+                      width: '100%',
+                    }}
+                  >
+                    <SmartphoneIcon
+                      color="primary"
+                      fontSize="large"
+                      sx={{ mt: 0.25 }}
+                    />
+                    <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Phone Number {index + 1}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{ overflowWrap: 'anywhere' }}
+                      >
+                        {phone.international}
+                      </Typography>
+                    </Box>
+                    <Tooltip title="Remove Phone Number">
+                      <IconButton
+                        aria-label={`Remove address ${index + 1}`}
+                        sx={{ '&:hover': { color: 'error.main' } }}
+                        onClick={() => remove(index)}
+                      >
+                        <DeleteIcon fontSize="medium" />
+                      </IconButton>
+                    </Tooltip>
+                  </Paper>
+                ))}
+              </Stack>
+            ) : (
+              <Typography color="text.secondary">
+                No phone number added yet.
               </Typography>
             )}
           </Stack>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              gap: 1,
-            }}
-          >
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={handleClear}
+        </Grid>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Stack spacing={2}>
+            <Stack spacing={1}>
+              <PhoneNumberInput
+                label="Phone Number *"
+                value={formValues.international}
+                onChange={handleChange}
+              />
+              {errorMessage && (
+                <Typography variant="caption" color="error">
+                  {errorMessage}
+                </Typography>
+              )}
+            </Stack>
+            <Stack
+              direction="row"
               sx={{
-                minWidth: 150,
+                justifyContent: 'flex-end',
+                gap: 1,
               }}
             >
-              Clear
-            </Button>
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<AddIcon />}
-              sx={{
-                minWidth: 150,
-              }}
-              onClick={handleAddPhoneNumber}
-            >
-              Add Phone Number
-            </Button>
-          </Box>
-        </Stack>
+              <Button variant="outlined" size="small" onClick={handleClear}>
+                Clear
+              </Button>
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={<AddIcon />}
+                onClick={handleAddPhoneNumber}
+              >
+                Add Phone Number
+              </Button>
+            </Stack>
+          </Stack>
+        </Grid>
       </Grid>
-    </Grid>
+    </Stack>
   );
 };

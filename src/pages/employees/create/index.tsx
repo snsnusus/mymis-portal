@@ -246,7 +246,8 @@ const StyledConnector = styled(StepConnector)(({ theme }) => ({
 
 const StyledStepLabel = styled(StepLabel)(({ theme }) => ({
   '& .MuiStepLabel-label': {
-    color: theme.palette.text.primary,
+    fontSize: theme.typography.body1.fontSize,
+    letterSpacing: 0.5,
     '&.Mui-active': {
       color: theme.palette.primary.main,
     },
@@ -275,7 +276,7 @@ const ActionBar = styled(Stack)(({ theme }) => ({
 }));
 
 const CreateEmployee = (): ReactElement => {
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(2);
   const [errorScrollRequest, setErrorScrollRequest] = useState(0);
 
   const topRef = useRef<HTMLDivElement>(null);

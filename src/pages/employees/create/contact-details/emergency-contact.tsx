@@ -11,8 +11,6 @@ import { useGetAll as useGetCitiesByRegion } from '~/queries/city.query';
 import { useGetAll as useGetRegions } from '~/queries/region.query';
 import {
   Button,
-  Card,
-  CardContent,
   Dialog,
   DialogActions,
   DialogContent,
@@ -23,13 +21,14 @@ import {
   ListItemText,
   MenuItem,
   Stack,
-  Typography,
 } from '@mui/material';
 import { ContentCopy as ContentCopyIcon } from '@mui/icons-material';
 import { SectionLabel } from '~/components/section-label';
 import { ControlledLocationAutocomplete } from '~/components/form/inputs/controlled/location-autocomplete';
 import { ControlledTextField } from '~/components/form/inputs/controlled/textfield';
 import { ControlledPhoneNumberInput } from '~/components/form/inputs/controlled/phone-number-input';
+import { Card } from '~/components/ui/card';
+import { SectionHeader } from '~/components/section-header';
 
 type AddressFormValues = {
   addressLine1: string;
@@ -62,7 +61,7 @@ export const EmergencyContact = (): ReactElement => {
   const addresses = watch('addresses');
   const address = watch('emergencyContact.address');
 
-  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const { data: regions = [] } = useGetRegions();
   const { data: cities = [] } = useGetCitiesByRegion(address.region?.id);
@@ -76,104 +75,102 @@ export const EmergencyContact = (): ReactElement => {
       { ...selected, addressLine2: selected.addressLine2 ?? '' },
       { shouldValidate: true, shouldDirty: true }
     );
-    setIsAddressModalOpen(false);
+    setOpen(false);
   };
 
   return (
-    <Card variant="outlined">
-      <Stack
-        sx={{
-          p: 2,
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-        }}
-      >
-        <Typography variant="h6">Emergency Contact</Typography>
-        <Typography variant="subtitle1" color="text.secondary">
-          Provide primary contact details to reach in case of an emergency.
-        </Typography>
-      </Stack>
-      <CardContent>
-        <Grid container columnSpacing={6}>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Stack spacing={2}>
-              <SectionLabel title="Identity" />
-              <Grid container spacing={2}>
-                <Grid size={6}>
-                  <ControlledTextField
-                    label="First Name *"
-                    name="emergencyContact.firstName"
-                    rules={{ required: 'First name is required.' }}
-                  />
-                </Grid>
-                <Grid size={6}>
-                  <ControlledTextField
-                    label="Middle Name"
-                    name="emergencyContact.middleName"
-                  />
-                </Grid>
-                <Grid size={8}>
-                  <ControlledTextField
-                    label="Last Name *"
-                    name="emergencyContact.lastName"
-                    rules={{ required: 'Last name is required.' }}
-                  />
-                </Grid>
-                <Grid size={4}>
-                  <ControlledTextField
-                    label="Suffix"
-                    name="emergencyContact.suffix"
-                  />
-                </Grid>
-                <Grid size={12}>
-                  <ControlledTextField
-                    label="Relationship *"
-                    name="emergencyContact.relationship"
-                    select
-                    rules={{ required: 'Relationship is required.' }}
-                  >
-                    {RELATIONSHIP_OPTIONS.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </ControlledTextField>
-                </Grid>
-                <Grid size={12}>
-                  <ControlledPhoneNumberInput
-                    label="Contact Number *"
-                    name="emergencyContact.contactNumber"
-                    rules={{
-                      validate: (value: { international?: string } | null) => {
-                        if (!value?.international) {
-                          return 'Contact number is required.';
-                        }
-                        return (
-                          matchIsValidTel(value.international) ||
-                          'Enter a valid phone number for the selected country.'
-                        );
-                      },
-                    }}
-                  />
-                </Grid>
+    <Card
+      header={
+        <SectionHeader
+          header="Emergency Contact"
+          subheader="Provide primary contact details to reach in case of an emergency."
+        />
+      }
+    >
+      <Grid container columnSpacing={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Stack spacing={2}>
+            <SectionLabel title="Identity" />
+            <Grid container spacing={2}>
+              <Grid size={12}>
+                <ControlledTextField
+                  label="First Name *"
+                  name="emergencyContact.firstName"
+                  rules={{ required: 'First name is required.' }}
+                />
               </Grid>
-            </Stack>
-          </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
+              <Grid size={12}>
+                <ControlledTextField
+                  label="Middle Name"
+                  name="emergencyContact.middleName"
+                />
+              </Grid>
+              <Grid size={12}>
+                <ControlledTextField
+                  label="Last Name *"
+                  name="emergencyContact.lastName"
+                  rules={{ required: 'Last name is required.' }}
+                />
+              </Grid>
+              <Grid size={6}>
+                <ControlledTextField
+                  label="Suffix"
+                  name="emergencyContact.suffix"
+                />
+              </Grid>
+              <Grid size={12}>
+                <ControlledTextField
+                  label="Relationship *"
+                  name="emergencyContact.relationship"
+                  select
+                  rules={{ required: 'Relationship is required.' }}
+                >
+                  {RELATIONSHIP_OPTIONS.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </ControlledTextField>
+              </Grid>
+              <Grid size={12}>
+                <ControlledPhoneNumberInput
+                  label="Contact Number *"
+                  name="emergencyContact.contactNumber"
+                  rules={{
+                    validate: (value: { international?: string } | null) => {
+                      if (!value?.international) {
+                        return 'Contact number is required.';
+                      }
+                      return (
+                        matchIsValidTel(value.international) ||
+                        'Enter a valid phone number for the selected country.'
+                      );
+                    },
+                  }}
+                />
+              </Grid>
+            </Grid>
+          </Stack>
+        </Grid>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <SectionLabel title="Address" />
+          <Stack sx={{ gap: 1 }}>
             <Stack
               direction="row"
-              sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+              sx={{
+                justifyContent: 'flex-end',
+              }}
             >
-              <SectionLabel title="Address" />
               <Button
                 size="small"
-                startIcon={<ContentCopyIcon fontSize="small" />}
+                startIcon={<ContentCopyIcon />}
                 disabled={addresses.length === 0}
-                onClick={() => setIsAddressModalOpen(true)}
+                onClick={() => setOpen(true)}
               >
                 Copy from employee&apos;s address
               </Button>
             </Stack>
+
             <Grid container spacing={2}>
               <Grid size={12}>
                 <ControlledTextField
@@ -247,13 +244,13 @@ export const EmergencyContact = (): ReactElement => {
                 />
               </Grid>
             </Grid>
-          </Grid>
+          </Stack>
         </Grid>
-      </CardContent>
+      </Grid>
 
       <Dialog
-        open={isAddressModalOpen}
-        onClose={() => setIsAddressModalOpen(false)}
+        open={open}
+        onClose={() => setOpen(false)}
         fullWidth
         maxWidth="sm"
       >
@@ -271,7 +268,7 @@ export const EmergencyContact = (): ReactElement => {
           </List>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsAddressModalOpen(false)}>Cancel</Button>
+          <Button onClick={() => setOpen(false)}>Cancel</Button>
         </DialogActions>
       </Dialog>
     </Card>

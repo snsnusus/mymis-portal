@@ -3,18 +3,13 @@ import { type ReactElement } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useGetAll as useGetDepartments } from '~/queries/department.query';
 import { useGetAll as useGetPositionsByDepartment } from '~/queries/position.query';
-import {
-  Card,
-  CardContent,
-  Grid,
-  MenuItem,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Grid, MenuItem, Stack } from '@mui/material';
 
 import { ControlledAutocomplete } from '~/components/form/inputs/controlled/autocomplete';
 import { ControlledDatePicker } from '~/components/form/inputs/controlled/datepicker';
 import { ControlledTextField } from '~/components/form/inputs/controlled/textfield';
+import { Card } from '~/components/ui/card';
+import { SectionHeader } from '~/components/section-header';
 
 export const OrganizationDetails = (): ReactElement => {
   const { watch, setValue } = useFormContext<FormValues>();
@@ -29,92 +24,84 @@ export const OrganizationDetails = (): ReactElement => {
   const positions = allPositions.filter((position) => position.isActive);
 
   return (
-    <Card variant="outlined">
-      <Stack
-        sx={{
-          p: 2,
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-        }}
-      >
-        <Typography variant="h6">Role & Organization</Typography>
-        <Typography variant="subtitle1" color="text.secondary">
-          Assign the user’s department, team, and organizational role.
-        </Typography>
-      </Stack>
-
-      <CardContent>
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Stack sx={{ gap: 2 }}>
-              <ControlledTextField
-                label="Employee Type *"
-                name="employeeType"
-                size="small"
-                select
-                fullWidth
-                rules={{ required: 'Employee type is required.' }}
-              >
-                <MenuItem value="Client">Client</MenuItem>
-                <MenuItem value="Management">Management</MenuItem>
-              </ControlledTextField>
-              <ControlledAutocomplete
-                label="Department *"
-                name="departmentId"
-                valueKey="id"
-                rules={{ required: 'Department is required.' }}
-                options={departments}
-                getOptionLabel={(option) => {
-                  if (typeof option === 'string') return option;
-                  return option?.name ?? '';
-                }}
-                onChange={(_, newValue) => {
-                  setValue(
-                    'departmentId',
-                    Array.isArray(newValue) ? null : newValue?.id ?? null
-                  );
-                  setValue('positionId', null);
-                }}
-              />
-              <ControlledAutocomplete
-                label="Position *"
-                name="positionId"
-                valueKey="id"
-                rules={{ required: 'Position is required.' }}
-                options={positions}
-                getOptionLabel={(option) => {
-                  if (typeof option === 'string') return option;
-                  return option?.title ?? '';
-                }}
-                disabled={!departmentId}
-                placeholder="Select position"
-              />
-            </Stack>
-          </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Stack sx={{ gap: 2 }}>
-              <ControlledTextField
-                label="Employment Status *"
-                name="employmentStatus"
-                size="small"
-                select
-                fullWidth
-                rules={{ required: 'Employment status is required.' }}
-              >
-                <MenuItem value="Probationary">Probationary</MenuItem>
-                <MenuItem value="Regular">Regular</MenuItem>
-                <MenuItem value="Contractual">Contractual</MenuItem>
-                <MenuItem value="ProjectBased">Project-based</MenuItem>
-              </ControlledTextField>
-              <ControlledDatePicker
-                label="Joining Date *"
-                name="joiningDate"
-                rules={{ required: 'Joining date is required.' }}
-              />
-            </Stack>
-          </Grid>
+    <Card
+      header={
+        <SectionHeader
+          header="Role & Organization"
+          subheader="Assign the user's department, team, and organizational role."
+        />
+      }
+    >
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Stack sx={{ gap: 2 }}>
+            <ControlledTextField
+              label="Employee Type *"
+              name="employeeType"
+              size="small"
+              select
+              fullWidth
+              rules={{ required: 'Employee type is required.' }}
+            >
+              <MenuItem value="Client">Client</MenuItem>
+              <MenuItem value="Management">Management</MenuItem>
+            </ControlledTextField>
+            <ControlledAutocomplete
+              label="Department *"
+              name="departmentId"
+              valueKey="id"
+              rules={{ required: 'Department is required.' }}
+              options={departments}
+              getOptionLabel={(option) => {
+                if (typeof option === 'string') return option;
+                return option?.name ?? '';
+              }}
+              onChange={(_, newValue) => {
+                setValue(
+                  'departmentId',
+                  Array.isArray(newValue) ? null : newValue?.id ?? null
+                );
+                setValue('positionId', null);
+              }}
+            />
+            <ControlledAutocomplete
+              label="Position *"
+              name="positionId"
+              valueKey="id"
+              rules={{ required: 'Position is required.' }}
+              options={positions}
+              getOptionLabel={(option) => {
+                if (typeof option === 'string') return option;
+                return option?.title ?? '';
+              }}
+              disabled={!departmentId}
+              placeholder="Select position"
+            />
+          </Stack>
         </Grid>
-      </CardContent>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Stack sx={{ gap: 2 }}>
+            <ControlledTextField
+              label="Employment Status *"
+              name="employmentStatus"
+              size="small"
+              select
+              fullWidth
+              rules={{ required: 'Employment status is required.' }}
+            >
+              <MenuItem value="Probationary">Probationary</MenuItem>
+              <MenuItem value="Regular">Regular</MenuItem>
+              <MenuItem value="Contractual">Contractual</MenuItem>
+              <MenuItem value="ProjectBased">Project-based</MenuItem>
+            </ControlledTextField>
+            <ControlledDatePicker
+              label="Joining Date *"
+              name="joiningDate"
+              rules={{ required: 'Joining date is required.' }}
+            />
+          </Stack>
+        </Grid>
+      </Grid>
     </Card>
   );
 };

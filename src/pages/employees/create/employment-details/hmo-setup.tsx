@@ -2,9 +2,6 @@ import { type ReactElement } from 'react';
 import {
   Box,
   Button,
-  Card,
-  CardContent,
-  Divider,
   Grid,
   IconButton,
   Paper,
@@ -12,29 +9,27 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import PersonIcon from '@mui/icons-material/Person';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ControlledTextField } from '~/components/form/inputs/controlled/textfield';
+import { SectionHeader } from '~/components/section-header';
+import { Card } from '~/components/ui/card';
+import { SectionLabel } from '~/components/section-label';
 
 export const HMOSetup = (): ReactElement => (
-  <Card variant="outlined">
-    <Stack
-      sx={{
-        p: 2,
-        borderBottom: '1px solid',
-        borderColor: 'divider',
-      }}
-    >
-      <Typography variant="h6">HMO & Coverage Setup</Typography>
-      <Typography variant="subtitle1" color="text.secondary">
-        Record healthcare plans, policy numbers, and dependent coverage for this
-        user.
-      </Typography>
-    </Stack>
-
-    <CardContent>
-      <Stack sx={{ gap: 2 }}>
+  <Card
+    header={
+      <SectionHeader
+        header="HMO & Coverage Setup"
+        subheader="Record healthcare plans, policy numbers, and dependent coverage for this
+        user."
+      />
+    }
+  >
+    <Stack sx={{ gap: 2 }}>
+      <Stack sx={{ gap: 1 }}>
+        <SectionLabel title="Primary" />
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 6 }}>
             <ControlledTextField label="Provider *" name="hMO.provider" />
@@ -58,7 +53,9 @@ export const HMOSetup = (): ReactElement => (
             <ControlledTextField label="End Date *" name="hMO.endDate" />
           </Grid>
         </Grid>
-        <Divider />
+      </Stack>
+      <Stack sx={{ gap: 1 }}>
+        <SectionLabel title="Dependents" />
         <Stack sx={{ gap: 2 }}>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, md: 6 }}>
@@ -67,12 +64,6 @@ export const HMOSetup = (): ReactElement => (
                   gap: 2,
                 }}
               >
-                <Typography
-                  variant="body1"
-                  sx={{ fontWeight: 'fontWeightMedium' }}
-                >
-                  Dependents
-                </Typography>
                 {[].length > 0 ? (
                   <Stack
                     spacing={1}
@@ -157,35 +148,26 @@ export const HMOSetup = (): ReactElement => (
               </Grid>
             </Grid>
           </Grid>
-          <Box
+          <Stack
+            direction="row"
             sx={{
-              display: 'flex',
               justifyContent: 'flex-end',
               gap: 1,
             }}
           >
-            <Button
-              variant="outlined"
-              size="small"
-              sx={{
-                minWidth: 150,
-              }}
-            >
+            <Button variant="outlined" size="small">
               Clear
             </Button>
             <Button
               variant="contained"
               size="small"
-              sx={{
-                minWidth: 150,
-              }}
-              startIcon={<AddIcon />}
+              startIcon={<GroupAddIcon />}
             >
               Add Dependent
             </Button>
-          </Box>
+          </Stack>
         </Stack>
       </Stack>
-    </CardContent>
+    </Stack>
   </Card>
 );
