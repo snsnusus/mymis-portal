@@ -1,6 +1,6 @@
-import type { AddressFormValues } from '~/pages/employees/create/contact-details/address';
+import type { AddAddressFormValues } from '~/pages/employees/create/contact-details/addresses/add-address-form';
 
-export const formatAddress = (values: AddressFormValues): string =>
+export const formatAddress = (values: AddAddressFormValues): string =>
   [
     values.addressLine1,
     values.addressLine2,
