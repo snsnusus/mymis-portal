@@ -6,8 +6,7 @@ import { Card } from '~/components/ui/card';
 import { SectionHeader } from '~/components/section-header';
 
 import { RoleAndOrgFields } from '../components/form/employee/role-and-org-fields';
-
-import { HMOSetup } from './employment-details/hmo-setup';
+import { HmoEnrollmentForm } from '../components/form/employee/hmo-enrollment-form';
 import { GovernmentIdentifiers } from './employment-details/government-identifiers';
 
 export const EmploymentDetails = (): ReactElement => (
@@ -22,7 +21,18 @@ export const EmploymentDetails = (): ReactElement => (
     >
       <RoleAndOrgFields />
     </Card>
-    <HMOSetup />
+
+    <Card
+      header={
+        <SectionHeader
+          header="HMO & Coverage"
+          subheader="Optional. Enroll the employee and their dependents now, or later from their profile."
+        />
+      }
+    >
+      <HmoEnrollmentForm />
+    </Card>
+
     <GovernmentIdentifiers />
   </Stack>
 );
