@@ -14,11 +14,7 @@ import { LocationAutocomplete } from '~/components/form/inputs/base/location-aut
 
 import { formatAddress } from '~/utils/address.utils';
 
-interface AddAddressFormProps {
-  handleSubmit: (values: AddAddressFormValues) => void;
-}
-
-export type AddAddressFormValues = {
+export type Address = {
   addressLine1: string;
   addressLine2?: string;
   region: Region | null;
@@ -28,7 +24,7 @@ export type AddAddressFormValues = {
   formattedAddress: string;
 };
 
-const defaultValues: AddAddressFormValues = {
+const defaultValues: Address = {
   addressLine1: '',
   addressLine2: '',
   region: null,
@@ -38,11 +34,12 @@ const defaultValues: AddAddressFormValues = {
   formattedAddress: '',
 };
 
-export const AddAddressForm = ({
-  handleSubmit,
-}: AddAddressFormProps): ReactElement => {
-  const [formValues, setFormValues] =
-    useState<AddAddressFormValues>(defaultValues);
+export const AddressAddForm = ({
+  onSave,
+}: {
+  onSave: (values: Address) => void;
+}): ReactElement => {
+  const [formValues, setFormValues] = useState<Address>(defaultValues);
 
   const { data: regions = [] } = useGetRegions();
   const { data: cities = [] } = useGetCitiesByRegion(
@@ -64,8 +61,8 @@ export const AddAddressForm = ({
     }));
   };
 
-  const handleAddAddress = (): void => {
-    handleSubmit({
+  const handleSave = (): void => {
+    onSave({
       ...formValues,
       formattedAddress: formatAddress(formValues),
     });
@@ -176,7 +173,7 @@ export const AddAddressForm = ({
           variant="contained"
           size="small"
           startIcon={<AddLocationAltIcon />}
-          onClick={handleAddAddress}
+          onClick={handleSave}
         >
           Add Address
         </Button>

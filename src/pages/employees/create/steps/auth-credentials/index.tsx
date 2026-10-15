@@ -1,4 +1,4 @@
-import type { FormValues } from '..';
+import type { EmployeeCreateFormValues } from '../../types';
 import { useState, type MouseEvent, type ReactElement } from 'react';
 import { useFormContext } from 'react-hook-form';
 import {
@@ -35,7 +35,7 @@ const USERNAME_RULE_MESSAGE =
 
 export const AuthCredentials = (): ReactElement => {
   const { getValues, setValue, trigger, clearErrors } =
-    useFormContext<FormValues>();
+    useFormContext<EmployeeCreateFormValues>();
   const checkUsernameAvailability = useCheckUsernameAvailability();
 
   const [passwordMode, setPasswordMode] = useState<PasswordMode>('manual');
