@@ -1,5 +1,6 @@
+// File: src/components/form/inputs/controlled/date-only-picker.tsx
 import type { ReactElement } from 'react';
-import { useController } from 'react-hook-form';
+import { useController, type UseControllerProps } from 'react-hook-form';
 
 import { dateOnlyToDate, dateToDateOnly } from '~/utils/date.util';
 
@@ -8,15 +9,18 @@ import DatePicker, { type DatePickerProps } from '../base/datepicker';
 type ControlledDateOnlyPickerProps = Omit<
   DatePickerProps,
   'value' | 'onChange' | 'type'
->;
+> & {
+  rules?: UseControllerProps['rules'];
+};
 
 const ControlledDateOnlyPicker = (
   props: ControlledDateOnlyPickerProps
 ): ReactElement => {
-  const { name, ...rest } = props;
+  const { name, rules, helperText, ...rest } = props;
   const {
     field: { value, onChange, onBlur },
-  } = useController({ name, defaultValue: '' });
+    fieldState: { error },
+  } = useController({ name, defaultValue: '', rules });
 
   return (
     <DatePicker
@@ -26,6 +30,8 @@ const ControlledDateOnlyPicker = (
       value={dateOnlyToDate(value as string)}
       onChange={(date) => onChange(dateToDateOnly(date as Date | null))}
       onBlur={onBlur}
+      error={!!error}
+      helperText={error?.message ?? helperText}
     />
   );
 };
