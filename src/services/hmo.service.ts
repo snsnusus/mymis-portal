@@ -6,6 +6,8 @@ import type {
   HmoPlanSummary,
   HmoProvider,
   HmoProviderPayload,
+  HmoProviderLookup,
+  HmoPlanLookup,
 } from '~/models/hmo.model';
 
 const PROVIDERS_URL = '/hmoproviders';
@@ -61,6 +63,21 @@ export const hmoService = {
     const { data } = await apiClient.put<HmoPlan>(
       `${PLANS_URL}/${id}`,
       payload
+    );
+    return data;
+  },
+
+  getProviderLookup: async (): Promise<HmoProviderLookup[]> => {
+    const { data } = await apiClient.get<HmoProviderLookup[]>(
+      `${PROVIDERS_URL}/lookup`
+    );
+    return data;
+  },
+
+  getPlanLookup: async (providerId: number): Promise<HmoPlanLookup[]> => {
+    const { data } = await apiClient.get<HmoPlanLookup[]>(
+      `${PLANS_URL}/lookup`,
+      { params: { providerId } }
     );
     return data;
   },

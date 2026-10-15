@@ -12,6 +12,8 @@ import type {
   HmoPlanSummary,
   HmoProvider,
   HmoProviderPayload,
+  HmoProviderLookup,
+  HmoPlanLookup,
 } from '~/models/hmo.model';
 import { hmoService } from '~/services/hmo.service';
 import { isNotFoundError } from '~/utils/http.util';
@@ -27,6 +29,9 @@ export const hmoKeys = {
     [...hmoKeys.plans(), 'list', { providerId }] as const,
   planDetail: (id: number | undefined) =>
     [...hmoKeys.plans(), 'detail', id] as const,
+  providerLookup: () => [...hmoKeys.providers(), 'lookup'] as const,
+  planLookup: (providerId: number | null) =>
+    [...hmoKeys.plans(), 'lookup', { providerId }] as const,
 };
 
 const MAX_RETRIES = 3;
@@ -123,3 +128,23 @@ export const useSaveHmoPlan = (): UseMutationResult<
       queryClient.invalidateQueries({ queryKey: hmoKeys.plans() }),
   });
 };
+
+// ---------- Lookups (employee HMO dropdowns) ----------
+
+export const useGetHmoProviderLookup = (): UseQueryResult<
+  HmoProviderLookup[],
+  Error
+> =>
+  useQuery<HmoProviderLookup[], Error>({
+    queryKey: hmoKeys.providerLookup(),
+    queryFn: () => hmoService.getProviderLookup(),
+  });
+
+export const useGetHmoPlanLookup = (
+  providerId: number | null
+): UseQueryResult<HmoPlanLookup[], Error> =>
+  useQuery<HmoPlanLookup[], Error>({
+    queryKey: hmoKeys.planLookup(providerId),
+    queryFn: () => hmoService.getPlanLookup(providerId as number),
+    enabled: providerId !== null, // wait until a provider is picked
+  });

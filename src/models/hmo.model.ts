@@ -125,3 +125,51 @@ export type HmoNewPlanPayload = Omit<HmoPlanPayload, 'hmoProviderId'>;
 export interface HmoProviderCreatePayload extends HmoProviderPayload {
   plans: HmoNewPlanPayload[];
 }
+
+/** Row from GET /api/HmoProviders/lookup (active providers with at least one active plan). */
+export interface HmoProviderLookup {
+  id: number;
+  name: string;
+}
+
+/** Row from GET /api/HmoPlans/lookup?providerId= (that provider's active plans). */
+export interface HmoPlanLookup {
+  id: number;
+  name: string;
+  allowDependents: boolean;
+}
+
+/** API values for HmoDependentRelationship. */
+export const HMO_DEPENDENT_RELATIONSHIPS = [
+  'Spouse',
+  'Child',
+  'Parent',
+  'Sibling',
+] as const;
+export type HmoDependentRelationship =
+  (typeof HMO_DEPENDENT_RELATIONSHIPS)[number];
+
+/** One dependent: inside an enrollment request, and the body of the dependent POST/PUT. */
+export interface EmployeeHmoDependentPayload {
+  firstName: string;
+  middleName: string | null;
+  lastName: string;
+  suffix: string | null;
+  /** Calendar date: 'YYYY-MM-DD'. */
+  birthdate: string;
+  relationship: HmoDependentRelationship;
+  /** null = same plan as the employee (the API fills it in). */
+  hmoPlanId: number | null;
+  memberNumber: string | null;
+}
+
+/** The `hmo` object in POST /api/Employees, and the body of POST /api/Employees/{id}/hmo. */
+export interface EmployeeHmoPayload {
+  hmoPlanId: number;
+  memberNumber: string;
+  /** Calendar date: 'YYYY-MM-DD'. */
+  effectiveDate: string;
+  /** Calendar date: 'YYYY-MM-DD', or null for "until further notice". */
+  endDate: string | null;
+  dependents: EmployeeHmoDependentPayload[];
+}
