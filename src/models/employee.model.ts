@@ -63,16 +63,12 @@ export type EmployeeSummaryModel = {
   positionTitle: string | null;
 };
 
-// What the list page asks for. pageIndex is 0-based, like MUI and TanStack Table;
-// the service converts it to the API's 1-based page.
 export type EmployeePageParams = {
   pageIndex: number;
   pageSize: number;
   search: string;
 };
 
-// DiceBear style for an employee's generated default avatar.
-// The values match the API's JSON exactly ("avataaars", "bottts", "constellation").
 export type AvatarStyle = 'avataaars' | 'bottts' | 'constellation';
 
 export type EmployeeDetailModel = {
@@ -106,3 +102,13 @@ export type EmergencyContactRelationship =
   | 'Relative'
   | 'Friend'
   | 'Other';
+
+export interface UsernameSuggestion {
+  username: string | null;
+}
+
+export type UsernameSuggestionParams = {
+  firstName: string;
+  lastName: string;
+  birthdate?: string;
+};

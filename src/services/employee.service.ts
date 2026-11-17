@@ -6,6 +6,8 @@ import type {
   EmployeePageParams,
   EmployeeSummaryModel,
   UsernameAvailability,
+  UsernameSuggestion,
+  UsernameSuggestionParams,
 } from '~/models/employee.model';
 import type { PagedResult } from '~/models/paged-result.model';
 import { apiClient, mockClient } from '~/api/client';
@@ -44,11 +46,6 @@ export const employeeService = {
     return employees.map(toEmployeeOption);
   },
 
-  // NOT YET MIGRATED. MyMIS.Api has no partial-update endpoint - PUT
-  // /api/Employees/{id} requires the full EmployeeUpdateDto on every call.
-  // Left pointed at mockClient (old shape, string IDs) until a
-  // fetch-then-full-PUT is deliberately implemented, or a dedicated
-  // backend endpoint exists.
   updateEmployeeDepartment: async (
     employeeIds: string[],
     departmentId: string
@@ -95,5 +92,18 @@ export const employeeService = {
     );
 
     return employees.map(toEmployeeOption);
+  },
+
+  suggestUsername: async ({
+    firstName,
+    lastName,
+    birthdate,
+  }: UsernameSuggestionParams): Promise<string | null> => {
+    const { data } = await apiClient.get<UsernameSuggestion>(
+      `${BASE_URL}/username-suggestion`,
+      { params: { firstName, lastName, birthdate: birthdate || undefined } }
+    );
+
+    return data.username;
   },
 };

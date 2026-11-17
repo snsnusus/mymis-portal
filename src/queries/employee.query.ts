@@ -4,6 +4,7 @@ import type {
   EmployeeOption,
   EmployeePageParams,
   EmployeeSummaryModel,
+  UsernameSuggestionParams,
 } from '~/models/employee.model';
 import type { PagedResult } from '~/models/paged-result.model';
 
@@ -15,6 +16,7 @@ import {
   type UseMutationResult,
   type UseQueryResult,
 } from '@tanstack/react-query';
+import { useCallback } from 'react';
 
 interface UpdateEmployeeDepartmentParams {
   employeeIds: string[];
@@ -31,6 +33,8 @@ const employeeKeys = {
     [...employeeKeys.all, 'detail', id] as const,
   availability: (username: string) =>
     [...employeeKeys.all, 'availability', username] as const,
+  usernameSuggestion: (params: UsernameSuggestionParams) =>
+    [...employeeKeys.all, 'username-suggestion', params] as const,
 };
 
 export const useGetEmployeesPaged = (
@@ -132,3 +136,18 @@ export const useGetEmployeesByIds = (
     // While a new set of ids loads, keep showing the previous result instead of nothing.
     keepPreviousData: true,
   });
+
+export const useSuggestUsername = (): ((
+  params: UsernameSuggestionParams
+) => Promise<string | null>) => {
+  const queryClient = useQueryClient();
+
+  return useCallback(
+    (params: UsernameSuggestionParams) =>
+      queryClient.fetchQuery({
+        queryKey: employeeKeys.usernameSuggestion(params),
+        queryFn: () => employeeService.suggestUsername(params),
+      }),
+    [queryClient]
+  );
+};
