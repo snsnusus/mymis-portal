@@ -1,6 +1,10 @@
 import type { EmployeeCreateFormValues } from '../../types';
-import { useState, type MouseEvent, type ReactElement } from 'react';
+import { useEffect, useState, type MouseEvent, type ReactElement } from 'react';
 import { useFormContext } from 'react-hook-form';
+import {
+  useCheckUsernameAvailability,
+  useSuggestUsername,
+} from '~/queries/employee.query';
 import {
   Card,
   CardContent,
@@ -20,15 +24,14 @@ import {
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
 import { ControlledTextField } from '~/components/form/inputs/controlled/textfield';
-import { useCheckUsernameAvailability } from '~/queries/employee.query';
 import {
   generateDefaultPassword,
   generateRandomPassword,
 } from '~/utils/password.util';
+import { dateToDateOnly } from '~/utils/date.util';
 
 type PasswordMode = 'manual' | 'default' | 'random';
 
-// Must match UsernameRules in MyMIS.Api.
 const USERNAME_PATTERN = /^[a-z][a-z0-9._-]{2,29}$/;
 const USERNAME_RULE_MESSAGE =
   'Username must be 3–30 characters long, start with a letter, and contain only letters, numbers, dots (.), underscores (_) or hyphens (-).';
@@ -37,6 +40,7 @@ export const AuthCredentials = (): ReactElement => {
   const { getValues, setValue, trigger, clearErrors } =
     useFormContext<EmployeeCreateFormValues>();
   const checkUsernameAvailability = useCheckUsernameAvailability();
+  const suggestUsername = useSuggestUsername();
 
   const [passwordMode, setPasswordMode] = useState<PasswordMode>('manual');
   const [showPassword, setShowPassword] = useState(false);
@@ -55,7 +59,6 @@ export const AuthCredentials = (): ReactElement => {
     _event: MouseEvent<HTMLElement>,
     mode: PasswordMode | null
   ): void => {
-    // ToggleButtonGroup passes null when the selected button is clicked again.
     if (mode === null) return;
 
     setPasswordMode(mode);
@@ -70,6 +73,35 @@ export const AuthCredentials = (): ReactElement => {
   };
 
   const isGenerated = passwordMode !== 'manual';
+
+  useEffect(() => {
+    if (getValues('username')) return;
+
+    let isCancelled = false;
+
+    const fillSuggestion = async (): Promise<void> => {
+      try {
+        const suggestion = await suggestUsername({
+          firstName: getValues('firstName'),
+          lastName: getValues('lastName'),
+          birthdate: dateToDateOnly(getValues('birthdate')),
+        });
+
+        if (isCancelled || !suggestion || getValues('username')) return;
+
+        setValue('username', suggestion, { shouldDirty: true });
+        void trigger('username');
+      } catch {
+        // Fail open: HR can still type a username.
+      }
+    };
+
+    void fillSuggestion();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [getValues, setValue, trigger, suggestUsername]);
 
   return (
     <Card variant="outlined">
@@ -101,8 +133,6 @@ export const AuthCredentials = (): ReactElement => {
                       const available = await checkUsernameAvailability(value);
                       return available || 'That username is already taken.';
                     } catch {
-                      // If the check itself fails, don't block HR here;
-                      // the API's 409 on submit is still the final guard.
                       return true;
                     }
                   },
