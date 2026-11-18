@@ -1,24 +1,160 @@
-import type { Address, EmployeeCreateFormValues } from '../types';
-import { type ReactElement } from 'react';
+import type { Address, EmployeeCreateFormValues } from '../../types';
+import { useState, type ReactElement } from 'react';
 
 import { useFieldArray, useFormContext } from 'react-hook-form';
 
-import { Grid, Stack } from '@mui/material';
-import EmailIcon from '@mui/icons-material/Email';
-import PlaceIcon from '@mui/icons-material/Place';
-import SmartphoneIcon from '@mui/icons-material/Smartphone';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  List,
+  ListItemButton,
+  ListItemText,
+  MenuItem,
+  Stack,
+} from '@mui/material';
+import {
+  ContentCopy as ContentCopyIcon,
+  Email as EmailIcon,
+  Place as PlaceIcon,
+  Smartphone as SmartphoneIcon,
+} from '@mui/icons-material';
 
 import { Card } from '~/components/ui/card';
 import { SectionHeader } from '~/components/section-header';
 import { SectionLabel } from '~/components/section-label';
+import { ControlledTextField } from '~/components/form/inputs/controlled/textfield';
+import { ControlledPhoneNumberInput } from '~/components/form/inputs/controlled/phone-number-input';
 
-import { RemovableItemList } from '../components/display/removable-item-list';
-import { AddressAddForm } from '../components/form/employee/address-add-form';
-import { EmailAddForm } from '../components/form/employee/email-add-form';
-import { PhoneAddForm } from '../components/form/employee/phone-add-form';
-import { EmergencyContactIdentityFields } from '../components/form/emergency-contact/identity-fields';
-import { CopyAddressDialog } from '../components/dialog/copy-address-dialog';
-import { EmergencyContactAddressFields } from '../components/form/emergency-contact/address-fields';
+import { RemovableItemList } from '../../shared/removable-item-list';
+import { RELATIONSHIP_OPTIONS } from '../../const/options';
+
+import { matchIsValidTel } from 'mui-tel-input';
+
+import { AddAddressForm } from './add-address-form';
+import { AddEmailForm } from './add-email-form';
+import { AddPhoneNumberForm } from './add-phone-number-form';
+import { EmergencyContactAddressFields } from './emergency-contact-address-fields';
+
+interface CopyAddressDialogProps {
+  addresses: Address[];
+  onSelect: (address: Address) => void;
+}
+
+const CopyAddressDialog = ({
+  addresses,
+  onSelect,
+}: CopyAddressDialogProps): ReactElement => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Stack
+        direction="row"
+        sx={{
+          justifyContent: 'flex-end',
+        }}
+      >
+        <Button
+          size="small"
+          startIcon={<ContentCopyIcon />}
+          disabled={addresses.length === 0}
+          onClick={() => setOpen(true)}
+        >
+          Copy from employee&apos;s address
+        </Button>
+      </Stack>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Copy one of the employee&apos;s addresses</DialogTitle>
+        <DialogContent dividers>
+          <List disablePadding>
+            {addresses.map((eca) => (
+              <ListItemButton
+                key={eca.formattedAddress}
+                onClick={() => {
+                  onSelect(eca);
+                  setOpen(false);
+                }}
+              >
+                <ListItemText primary={eca.formattedAddress} />
+              </ListItemButton>
+            ))}
+          </List>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+};
+
+const EmergencyContactIdentityFields = (): ReactElement => (
+  <Grid container spacing={2}>
+    <Grid size={12}>
+      <ControlledTextField
+        label="First Name *"
+        name="emergencyContact.firstName"
+        rules={{ required: 'First name is required.' }}
+      />
+    </Grid>
+    <Grid size={12}>
+      <ControlledTextField
+        label="Middle Name"
+        name="emergencyContact.middleName"
+      />
+    </Grid>
+    <Grid size={12}>
+      <ControlledTextField
+        label="Last Name *"
+        name="emergencyContact.lastName"
+        rules={{ required: 'Last name is required.' }}
+      />
+    </Grid>
+    <Grid size={6}>
+      <ControlledTextField label="Suffix" name="emergencyContact.suffix" />
+    </Grid>
+    <Grid size={12}>
+      <ControlledTextField
+        label="Relationship *"
+        name="emergencyContact.relationship"
+        select
+        rules={{ required: 'Relationship is required.' }}
+      >
+        {RELATIONSHIP_OPTIONS.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
+          </MenuItem>
+        ))}
+      </ControlledTextField>
+    </Grid>
+    <Grid size={12}>
+      <ControlledPhoneNumberInput
+        label="Contact Number *"
+        name="emergencyContact.contactNumber"
+        rules={{
+          validate: (value: { international?: string } | null) => {
+            if (!value?.international) {
+              return 'Contact number is required.';
+            }
+            return (
+              matchIsValidTel(value.international) ||
+              'Enter a valid phone number for the selected country.'
+            );
+          },
+        }}
+      />
+    </Grid>
+  </Grid>
+);
 
 export const ContactDetails = (): ReactElement => {
   const { control, setValue } = useFormContext<EmployeeCreateFormValues>();
@@ -83,7 +219,7 @@ export const ContactDetails = (): ReactElement => {
                 />
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
-                <AddressAddForm onSave={(values) => addAddress(values)} />
+                <AddAddressForm onSave={(values) => addAddress(values)} />
               </Grid>
             </Grid>
           </Stack>
@@ -104,7 +240,7 @@ export const ContactDetails = (): ReactElement => {
                 />
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
-                <PhoneAddForm
+                <AddPhoneNumberForm
                   phones={phones}
                   onSave={(values) => addPhone(values)}
                 />
@@ -128,7 +264,7 @@ export const ContactDetails = (): ReactElement => {
                 />
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
-                <EmailAddForm
+                <AddEmailForm
                   emails={emails}
                   onSave={(values) => addEmail(values)}
                 />

@@ -3,7 +3,7 @@ import { useEffect, useState, type MouseEvent, type ReactElement } from 'react';
 import { useFormContext } from 'react-hook-form';
 import {
   useCheckUsernameAvailability,
-  useSuggestUsername,
+  useSuggestUsernames,
 } from '~/queries/employee.query';
 import {
   Card,
@@ -40,7 +40,7 @@ export const AuthCredentials = (): ReactElement => {
   const { getValues, setValue, trigger, clearErrors } =
     useFormContext<EmployeeCreateFormValues>();
   const checkUsernameAvailability = useCheckUsernameAvailability();
-  const suggestUsername = useSuggestUsername();
+  const suggestUsernames = useSuggestUsernames();
 
   const [passwordMode, setPasswordMode] = useState<PasswordMode>('manual');
   const [showPassword, setShowPassword] = useState(false);
@@ -81,7 +81,7 @@ export const AuthCredentials = (): ReactElement => {
 
     const fillSuggestion = async (): Promise<void> => {
       try {
-        const suggestion = await suggestUsername({
+        const [suggestion] = await suggestUsernames({
           firstName: getValues('firstName'),
           lastName: getValues('lastName'),
           birthdate: dateToDateOnly(getValues('birthdate')),
@@ -90,6 +90,7 @@ export const AuthCredentials = (): ReactElement => {
         if (isCancelled || !suggestion || getValues('username')) return;
 
         setValue('username', suggestion, { shouldDirty: true });
+        console.log(suggestion, 'suggestion');
         void trigger('username');
       } catch {
         // Fail open: HR can still type a username.
@@ -101,7 +102,7 @@ export const AuthCredentials = (): ReactElement => {
     return () => {
       isCancelled = true;
     };
-  }, [getValues, setValue, trigger, suggestUsername]);
+  }, [getValues, setValue, trigger, suggestUsernames]);
 
   return (
     <Card variant="outlined">

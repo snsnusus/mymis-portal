@@ -9,25 +9,21 @@ import {
 } from '@mui/icons-material';
 import { FormProvider } from '~/components/form/form-provider';
 import { SectionHeader } from '~/components/section-header';
-import { Stepper, StepConnector, StepLabel } from './components/styled';
+import { Stepper, StepConnector, StepLabel } from './styled-components';
 
-import { DEFAULT_VALUES } from './config/default-values';
-import { STEPS } from './config/steps';
+import { DEFAULT_VALUES } from './const/default-values';
+import { STEPS } from './const/steps';
 
-// Stays pinned to the bottom of the viewport while the step content scrolls.
 const ActionBar = styled(Stack)(({ theme }) => ({
   position: 'sticky',
   bottom: 0,
   zIndex: theme.zIndex.appBar - 1,
   flexDirection: 'row',
   justifyContent: 'space-between',
-  padding: theme.spacing(1.5, 2),
-  backgroundColor: theme.palette.background.paper,
-  borderTop: `1px solid ${theme.palette.divider}`,
 }));
 
 const CreateEmployee = (): ReactElement => {
-  const [activeStep, setActiveStep] = useState(2);
+  const [activeStep, setActiveStep] = useState(3);
   const [errorScrollRequest, setErrorScrollRequest] = useState(0);
 
   const topRef = useRef<HTMLDivElement>(null);
@@ -100,7 +96,7 @@ const CreateEmployee = (): ReactElement => {
         </Box>
         <ActionBar>
           <Button
-            variant="contained"
+            variant="outlined"
             disabled={activeStep === 0}
             startIcon={<KeyboardDoubleArrowLeftIcon fontSize="small" />}
             onClick={handleBack}

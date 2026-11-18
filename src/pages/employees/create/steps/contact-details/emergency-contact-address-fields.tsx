@@ -1,4 +1,4 @@
-import type { EmployeeCreateFormValues } from '../../../types';
+import type { EmployeeCreateFormValues } from '../../types';
 import { type ReactElement } from 'react';
 
 import { useFormContext } from 'react-hook-form';

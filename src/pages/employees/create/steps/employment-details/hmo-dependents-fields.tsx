@@ -1,4 +1,4 @@
-import type { EmployeeCreateFormValues } from '../../../types';
+import type { EmployeeCreateFormValues } from '../../types';
 import { type ReactElement } from 'react';
 
 import { useFieldArray, useFormContext } from 'react-hook-form';
@@ -17,7 +17,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 
 import { ControlledAutocomplete } from '~/components/form/inputs/controlled/autocomplete';
-import ControlledDateOnlyPicker from '~/components/form/inputs/controlled/date-only-picker';
+import { ControlledDateOnlyPicker } from '~/components/form/inputs/controlled/date-only-picker';
 import { ControlledTextField } from '~/components/form/inputs/controlled/textfield';
 import { SectionLabel } from '~/components/section-label';
 
@@ -25,13 +25,12 @@ import {
   HMO_DEPENDENT_RELATIONSHIPS,
   type HmoPlanLookup,
 } from '~/models/hmo.model';
-import { EMPTY_HMO_DEPENDENT } from '../../../config/default-values';
+import { EMPTY_HMO_DEPENDENT } from '../../const/default-values';
 
 import { isDuplicate } from '~/utils/array.util';
 import { dateToDateOnly } from '~/utils/date.util';
 
 interface HmoDependentsFieldProps {
-  /** The selected provider's active plans; only those allowing dependents are offered. */
   plans: HmoPlanLookup[];
 }
 

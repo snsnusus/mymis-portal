@@ -3,18 +3,24 @@ import type { City } from '~/models/city.model';
 import type { Barangay } from '~/models/barangay.model';
 
 import { type ChangeEvent, useState, type ReactElement } from 'react';
+
 import { useGetAll as useGetBarangaysByCity } from '~/queries/barangay.query';
 import { useGetAll as useGetCitiesByRegion } from '~/queries/city.query';
 import { useGetAll as useGetRegions } from '~/queries/region.query';
 
-import { Button, Grid, Stack, TextField } from '@mui/material';
-import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
+import { type z } from 'zod';
+
+import { AddLocationAlt as AddLocationAltIcon } from '@mui/icons-material';
 
 import { LocationAutocomplete } from '~/components/form/inputs/base/location-autocomplete';
 
 import { formatAddress } from '~/utils/address.utils';
 
-export type Address = {
+import { ADDRESS_SCHEMA } from '../../schemas';
+import { EMPTY_ADDRESS } from '../../const/default-values';
+import { Button, Grid, Stack, TextField } from '@mui/material';
+
+interface AddressFormValues {
   addressLine1: string;
   addressLine2?: string;
   region: Region | null;
@@ -22,24 +28,20 @@ export type Address = {
   barangay: Barangay | null;
   postalCode: string;
   formattedAddress: string;
-};
+}
 
-const defaultValues: Address = {
-  addressLine1: '',
-  addressLine2: '',
-  region: null,
-  city: null,
-  barangay: null,
-  postalCode: '',
-  formattedAddress: '',
-};
+type AddressFieldErrors = Partial<
+  Record<keyof z.infer<typeof ADDRESS_SCHEMA>, string>
+>;
 
-export const AddressAddForm = ({
+export const AddAddressForm = ({
   onSave,
 }: {
-  onSave: (values: Address) => void;
+  onSave: (values: AddressFormValues) => void;
 }): ReactElement => {
-  const [formValues, setFormValues] = useState<Address>(defaultValues);
+  const [formValues, setFormValues] =
+    useState<AddressFormValues>(EMPTY_ADDRESS);
+  const [errors, setErrors] = useState<AddressFieldErrors>({});
 
   const { data: regions = [] } = useGetRegions();
   const { data: cities = [] } = useGetCitiesByRegion(
@@ -48,6 +50,14 @@ export const AddressAddForm = ({
   const { data: barangays = [] } = useGetBarangaysByCity(
     formValues.city?.id ?? 0
   );
+
+  const clearErrors = (...fields: (keyof AddressFieldErrors)[]): void => {
+    setErrors((prev) => {
+      const next = { ...prev };
+      fields.forEach((field) => delete next[field]);
+      return next;
+    });
+  };
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -59,14 +69,33 @@ export const AddressAddForm = ({
       [name]:
         type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
     }));
+    clearErrors(name as keyof AddressFieldErrors);
   };
 
   const handleSave = (): void => {
+    const result = ADDRESS_SCHEMA.safeParse(formValues);
+
+    if (!result.success) {
+      const nextErrors: AddressFieldErrors = {};
+      result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as keyof AddressFieldErrors;
+        nextErrors[field] ??= issue.message;
+      });
+      setErrors(nextErrors);
+      return;
+    }
+
     onSave({
       ...formValues,
       formattedAddress: formatAddress(formValues),
     });
-    setFormValues(defaultValues);
+    setFormValues(EMPTY_ADDRESS);
+    setErrors({});
+  };
+
+  const handleClear = (): void => {
+    setFormValues(EMPTY_ADDRESS);
+    setErrors({});
   };
 
   return (
@@ -80,6 +109,8 @@ export const AddressAddForm = ({
             onChange={handleChange}
             fullWidth
             size="small"
+            error={!!errors.addressLine1}
+            helperText={errors.addressLine1}
           />
         </Grid>
         <Grid size={12}>
@@ -96,47 +127,56 @@ export const AddressAddForm = ({
           <LocationAutocomplete
             label="Region *"
             value={formValues.region}
-            onChange={(value) =>
+            onChange={(value) => {
               setFormValues((prev) => ({
                 ...prev,
                 region: value,
                 city: null,
                 barangay: null,
                 postalCode: '',
-              }))
-            }
+              }));
+              clearErrors('region');
+            }}
             options={regions}
+            error={!!errors.region}
+            helperText={errors.region}
           />
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <LocationAutocomplete
             label="City *"
             value={formValues.city}
-            onChange={(value) =>
+            onChange={(value) => {
               setFormValues((prev) => ({
                 ...prev,
                 city: value,
                 barangay: null,
                 postalCode: '',
-              }))
-            }
+              }));
+              clearErrors('city');
+            }}
             options={cities}
             disabled={!formValues.region}
+            error={!!errors.city}
+            helperText={errors.city}
           />
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <LocationAutocomplete
             label="Barangay *"
             value={formValues.barangay}
-            onChange={(value) =>
+            onChange={(value) => {
               setFormValues((prev) => ({
                 ...prev,
                 barangay: value,
                 postalCode: value?.zipCode ?? '',
-              }))
-            }
+              }));
+              clearErrors('barangay', 'postalCode');
+            }}
             options={barangays}
             disabled={!formValues.city}
+            error={!!errors.barangay}
+            helperText={errors.barangay}
           />
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
@@ -162,11 +202,7 @@ export const AddressAddForm = ({
           gap: 1,
         }}
       >
-        <Button
-          variant="outlined"
-          size="small"
-          onClick={() => setFormValues(defaultValues)}
-        >
+        <Button variant="outlined" size="small" onClick={handleClear}>
           Clear
         </Button>
         <Button

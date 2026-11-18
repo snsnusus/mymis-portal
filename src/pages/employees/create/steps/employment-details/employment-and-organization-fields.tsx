@@ -1,4 +1,5 @@
-import type { EmployeeCreateFormValues } from '../../../types';
+import type { EmployeeCreateFormValues } from '../../types';
+
 import { type ReactElement } from 'react';
 
 import { useFormContext } from 'react-hook-form';
@@ -11,9 +12,9 @@ import { ControlledTextField } from '~/components/form/inputs/controlled/textfie
 import { ControlledAutocomplete } from '~/components/form/inputs/controlled/autocomplete';
 import { ControlledDatePicker } from '~/components/form/inputs/controlled/datepicker';
 
-import { EMPLOYEE_TYPE_OPTIONS } from '../../../config/options';
+import { EMPLOYEE_TYPE_OPTIONS } from '../../const/options';
 
-export const RoleAndOrgFields = (): ReactElement => {
+export const EmploymentAndOrganizationFields = (): ReactElement => {
   const { watch, setValue } = useFormContext<EmployeeCreateFormValues>();
 
   const departmentId = watch('departmentId');

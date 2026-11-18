@@ -6,7 +6,7 @@ import type {
   EmployeePageParams,
   EmployeeSummaryModel,
   UsernameAvailability,
-  UsernameSuggestion,
+  UsernameSuggestions,
   UsernameSuggestionParams,
 } from '~/models/employee.model';
 import type { PagedResult } from '~/models/paged-result.model';
@@ -94,16 +94,16 @@ export const employeeService = {
     return employees.map(toEmployeeOption);
   },
 
-  suggestUsername: async ({
+  suggestUsernames: async ({
     firstName,
     lastName,
     birthdate,
-  }: UsernameSuggestionParams): Promise<string | null> => {
-    const { data } = await apiClient.get<UsernameSuggestion>(
-      `${BASE_URL}/username-suggestion`,
+  }: UsernameSuggestionParams): Promise<string[]> => {
+    const { data } = await apiClient.get<UsernameSuggestions>(
+      `${BASE_URL}/username-suggestions`,
       { params: { firstName, lastName, birthdate: birthdate || undefined } }
     );
 
-    return data.username;
+    return data.usernames;
   },
 };

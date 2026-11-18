@@ -33,8 +33,8 @@ const employeeKeys = {
     [...employeeKeys.all, 'detail', id] as const,
   availability: (username: string) =>
     [...employeeKeys.all, 'availability', username] as const,
-  usernameSuggestion: (params: UsernameSuggestionParams) =>
-    [...employeeKeys.all, 'username-suggestion', params] as const,
+  usernameSuggestions: (params: UsernameSuggestionParams) =>
+    [...employeeKeys.all, 'username-suggestions', params] as const,
 };
 
 export const useGetEmployeesPaged = (
@@ -137,16 +137,16 @@ export const useGetEmployeesByIds = (
     keepPreviousData: true,
   });
 
-export const useSuggestUsername = (): ((
+export const useSuggestUsernames = (): ((
   params: UsernameSuggestionParams
-) => Promise<string | null>) => {
+) => Promise<string[]>) => {
   const queryClient = useQueryClient();
 
   return useCallback(
     (params: UsernameSuggestionParams) =>
       queryClient.fetchQuery({
-        queryKey: employeeKeys.usernameSuggestion(params),
-        queryFn: () => employeeService.suggestUsername(params),
+        queryKey: employeeKeys.usernameSuggestions(params),
+        queryFn: () => employeeService.suggestUsernames(params),
       }),
     [queryClient]
   );

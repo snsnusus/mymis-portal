@@ -1,40 +1,28 @@
-import { type MuiTelInputInfo } from 'mui-tel-input';
-import { type Phone } from '../../../types';
+import type { MuiTelInputInfo } from 'mui-tel-input';
+import type { Phone } from '../../types';
+
 import { useState, type ReactElement } from 'react';
 
 import { Button, Stack, Typography } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+import { Add as AddIcon } from '@mui/icons-material';
 
 import { PhoneNumberInput } from '~/components/form/inputs/base/phone-number-input';
+
 import { formatPhoneNumber } from '~/utils/phone-number.utils';
 
-import { z } from 'zod';
-import { isValidPhoneNumber } from 'libphonenumber-js';
+import { EMPTY_PHONE } from '../../const/default-values';
+import { PHONE_NUMBER_SCHEMA } from '../../schemas';
 
 interface AddPhoneFormProps {
   phones: Phone[];
   onSave: (values: Phone) => void;
 }
 
-const defaultValues = {
-  countryCode: '',
-  dialCode: '',
-  international: '',
-  local: '',
-  formatted: '',
-};
-
-const phoneNumberSchema = z
-  .string()
-  .refine((value) => isValidPhoneNumber(value, 'PH'), {
-    message: 'Please enter a valid Philippine phone number.',
-  });
-
-export const PhoneAddForm = ({
+export const AddPhoneNumberForm = ({
   phones,
   onSave,
 }: AddPhoneFormProps): ReactElement => {
-  const [formValues, setFormValues] = useState<Phone>(defaultValues);
+  const [formValues, setFormValues] = useState<Phone>(EMPTY_PHONE);
   const [errorMessage, setErrorMessage] = useState('');
 
   const isDuplicate = (value: string): boolean =>
@@ -57,14 +45,14 @@ export const PhoneAddForm = ({
   };
 
   const handleClear = (): void => {
-    setFormValues(defaultValues);
+    setFormValues(EMPTY_PHONE);
     setErrorMessage('');
   };
 
   const validatePhone = (value: string): string => {
     if (!value) return 'Phone number is required.';
 
-    const result = phoneNumberSchema.safeParse(value);
+    const result = PHONE_NUMBER_SCHEMA.safeParse(value);
     if (!result.success) return result.error.issues[0].message;
 
     if (isDuplicate(value)) return 'This phone number has already been added.';
@@ -86,7 +74,7 @@ export const PhoneAddForm = ({
 
     onSave(formValues);
 
-    setFormValues(defaultValues);
+    setFormValues(EMPTY_PHONE);
     setErrorMessage('');
   };
 

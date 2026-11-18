@@ -1,4 +1,3 @@
-// File: src/components/ui/removable-item-list.tsx
 import { type ReactElement, type ReactNode } from 'react';
 import {
   Box,
@@ -12,15 +11,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 export interface RemovableItemListProps<T> {
   items: T[];
-  /** Stable key per item, e.g. useFieldArray's generated `id`. */
   getKey: (item: T) => string;
-  /** Small caption above the value, e.g. "Address 1". */
   getLabel: (item: T, index: number) => string;
-  /** The main text, e.g. the formatted address. */
   getValue: (item: T) => ReactNode;
   icon: ReactNode;
   onRemove: (index: number) => void;
-  /** Used for the tooltip and aria-label, e.g. "Remove address". */
   removeLabel: string;
   emptyText: string;
   maxHeight?: number;

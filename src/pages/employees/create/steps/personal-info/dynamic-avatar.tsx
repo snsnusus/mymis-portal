@@ -1,11 +1,13 @@
-import { type AvatarStyle } from '~/models/employee.model';
+import type { AvatarStyle } from '~/models/employee.model';
 import { type ReactElement } from 'react';
-import { SpeechCardContainer, SpeechCardArrow } from '../styled';
-import { alpha, Avatar, Stack, Typography } from '@mui/material';
+
+import { Stack, Typography, Avatar, alpha } from '@mui/material';
+import { blue, pink } from '@mui/material/colors';
+
 import { AvatarStylePicker } from '~/components/modules/avatar-style-picker';
+import { SpeechCardContainer, SpeechCardArrow } from '../../styled-components';
 
 import { getDefaultAvatarUri } from '~/utils/default-avatar';
-import { blue, pink } from '@mui/material/colors';
 
 interface DynamicAvatarProps {
   avatarStyle: AvatarStyle | null;
@@ -13,13 +15,6 @@ interface DynamicAvatarProps {
   onStyleChange: (avatarStyle: AvatarStyle) => void;
   seed: string;
 }
-
-export const SpeechCard = ({ children }: PropsWithChildren): ReactElement => (
-  <SpeechCardContainer elevation={0}>
-    <SpeechCardArrow />
-    {children}
-  </SpeechCardContainer>
-);
 
 export const DynamicAvatar = (props: DynamicAvatarProps): ReactElement => {
   const { avatarStyle, gender, onStyleChange, seed } = props;
@@ -55,7 +50,8 @@ export const DynamicAvatar = (props: DynamicAvatarProps): ReactElement => {
             variant="circular"
           />
         </Avatar>
-        <SpeechCard>
+        <SpeechCardContainer elevation={0}>
+          <SpeechCardArrow />
           <Stack sx={{ gap: 1 }}>
             <Typography
               sx={{
@@ -68,7 +64,7 @@ export const DynamicAvatar = (props: DynamicAvatarProps): ReactElement => {
               Pick a style below, and fill out the name to personalize my look.
             </Typography>
           </Stack>
-        </SpeechCard>
+        </SpeechCardContainer>
       </Stack>
 
       <AvatarStylePicker

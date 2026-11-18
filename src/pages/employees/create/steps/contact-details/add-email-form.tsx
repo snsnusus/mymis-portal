@@ -1,18 +1,16 @@
-import { useState, type ReactElement } from 'react';
+import { type ReactElement, useState } from 'react';
 
 import { Button, Stack, TextField } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+import { Add as AddIcon } from '@mui/icons-material';
 
-import { z } from 'zod';
+import { EMAIL_SCHEMA } from '../../schemas';
 
 interface AddEmailFormProps {
   emails: Array<{ value: string }>;
   onSave: (value: { value: string }) => void;
 }
 
-const emailSchema = z.email('Please enter a valid email address.');
-
-export const EmailAddForm = ({
+export const AddEmailForm = ({
   emails,
   onSave,
 }: AddEmailFormProps): ReactElement => {
@@ -21,7 +19,7 @@ export const EmailAddForm = ({
 
   const validateEmail = (value: string): string => {
     if (!value.trim()) return 'Email is required.';
-    const result = emailSchema.safeParse(value);
+    const result = EMAIL_SCHEMA.safeParse(value);
     return result.success ? '' : result.error.issues[0].message;
   };
 

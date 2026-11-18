@@ -1,5 +1,5 @@
 import type { HmoPlanLookup, HmoProviderLookup } from '~/models/hmo.model';
-import type { EmployeeCreateFormValues } from '../../../types';
+import type { EmployeeCreateFormValues } from '../../types';
 
 import { type ReactElement } from 'react';
 
@@ -12,14 +12,14 @@ import { useFormContext, useWatch } from 'react-hook-form';
 import { Grid, Stack, Typography } from '@mui/material';
 
 import { ControlledAutocomplete } from '~/components/form/inputs/controlled/autocomplete';
-import ControlledDateOnlyPicker from '~/components/form/inputs/controlled/date-only-picker';
+import { ControlledDateOnlyPicker } from '~/components/form/inputs/controlled/date-only-picker';
 import { ControlledSwitch } from '~/components/form/inputs/controlled/switch';
 import { ControlledTextField } from '~/components/form/inputs/controlled/textfield';
 import { SectionLabel } from '~/components/section-label';
 
 import { HmoDependentsField } from './hmo-dependents-fields';
 
-export const HmoEnrollmentForm = (): ReactElement => {
+export const HmoCoverageFields = (): ReactElement => {
   const { control, getValues, setValue } =
     useFormContext<EmployeeCreateFormValues>();
 

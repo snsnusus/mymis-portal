@@ -103,8 +103,8 @@ export type EmergencyContactRelationship =
   | 'Friend'
   | 'Other';
 
-export interface UsernameSuggestion {
-  username: string | null;
+export interface UsernameSuggestions {
+  usernames: string[];
 }
 
 export type UsernameSuggestionParams = {
