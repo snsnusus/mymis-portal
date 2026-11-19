@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ReactElement } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import {
+  alpha,
   styled,
   Box,
   Button,
@@ -23,21 +24,29 @@ import { SectionHeader } from '~/components/section-header';
 import { AlertDialog } from '~/components/ui/alert-dialog';
 import { Stepper, StepConnector, StepLabel } from './styled-components';
 
-import { PAGE_PADDING } from '~/layout';
+import { FOOTER_HEIGHT, PAGE_PADDING } from '~/layout/constants';
 import { DEFAULT_VALUES } from './const/default-values';
 import { STEPS } from './const/steps';
 
-const ActionBar = styled(Stack)(({ theme }) => ({
+const ActionBar = styled(Stack, {
+  shouldForwardProp: (prop) => prop !== 'isStuck',
+})<{ isStuck: boolean }>(({ theme, isStuck }) => ({
   position: 'sticky',
-  bottom: 56,
+  bottom: FOOTER_HEIGHT,
   zIndex: theme.zIndex.appBar - 1,
   margin: theme.spacing(0, -PAGE_PADDING.x, -PAGE_PADDING.y),
   flexDirection: 'row',
   alignItems: 'center',
   gap: theme.spacing(1),
   padding: theme.spacing(1.5, PAGE_PADDING.x),
-  backgroundColor: theme.palette.background.paper,
+  backgroundColor: theme.palette.background.default,
   borderTop: `1px solid ${theme.palette.divider}`,
+  boxShadow: isStuck
+    ? `0 -4px 12px ${alpha(theme.palette.common.black, 0.08)}`
+    : 'none',
+  transition: theme.transitions.create('box-shadow', {
+    duration: theme.transitions.duration.short,
+  }),
 }));
 
 const CreateEmployee = (): ReactElement => {
@@ -48,6 +57,9 @@ const CreateEmployee = (): ReactElement => {
   const [activeStep, setActiveStep] = useState(0);
   const [errorScrollRequest, setErrorScrollRequest] = useState(0);
   const [isDiscardOpen, setIsDiscardOpen] = useState(false);
+
+  const [isBarStuck, setIsBarStuck] = useState(false);
+  const barSentinelRef = useRef<HTMLDivElement>(null);
 
   const topRef = useRef<HTMLDivElement>(null);
   const stepRef = useRef<HTMLDivElement>(null);
@@ -107,9 +119,22 @@ const CreateEmployee = (): ReactElement => {
       ?.focus({ preventScroll: true });
   }, [errorScrollRequest]);
 
+  useEffect(() => {
+    const sentinel = barSentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsBarStuck(!entry.isIntersecting),
+      { rootMargin: `0px 0px -${FOOTER_HEIGHT}px 0px` }
+    );
+    observer.observe(sentinel);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <FormProvider {...methods} onSubmit={handleSubmit}>
-      <Stack sx={{ gap: 2 }} ref={topRef}>
+      <Stack sx={{ gap: 2, position: 'relative' }} ref={topRef}>
         <SectionHeader
           header="Create Employee"
           subheader="Set up a new employee profile, access permission, and organization
@@ -129,7 +154,7 @@ const CreateEmployee = (): ReactElement => {
         <Box ref={stepRef}>
           <StepComponent />
         </Box>
-        <ActionBar>
+        <ActionBar isStuck={isBarStuck}>
           <Button variant="text" color="inherit" onClick={handleCancel}>
             Cancel
           </Button>
@@ -177,6 +202,18 @@ const CreateEmployee = (): ReactElement => {
             </Button>
           )}
         </ActionBar>
+        <Box
+          ref={barSentinelRef}
+          aria-hidden
+          sx={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: (sxTheme) => sxTheme.spacing(-PAGE_PADDING.y),
+            height: '1px',
+            pointerEvents: 'none',
+          }}
+        />
       </Stack>
 
       <AlertDialog
