@@ -12,6 +12,8 @@ import Navbar from './navbar';
 import Sidebar from './sidebar';
 import Footer from './footer';
 
+export const PAGE_PADDING = { x: 4, y: 2 } as const;
+
 const AppWrapper = styled('div')({
   display: 'flex',
   flexDirection: 'column',
@@ -86,7 +88,7 @@ const Layout = (props: PropsWithChildren): ReactElement => {
               flexDirection: 'column',
               width: '100%',
               minWidth: 0,
-              overflow: 'hidden',
+              overflowX: 'clip',
             }}
           >
             <TopOffset />
@@ -95,7 +97,7 @@ const Layout = (props: PropsWithChildren): ReactElement => {
                 display: 'flex',
                 width: '100%',
                 minWidth: 0,
-                overflow: 'hidden',
+                overflowX: 'clip',
               }}
             >
               <Content
@@ -118,8 +120,8 @@ const Layout = (props: PropsWithChildren): ReactElement => {
                 >
                   <Stack
                     sx={{
-                      py: 2,
-                      px: 4,
+                      py: PAGE_PADDING.y,
+                      px: PAGE_PADDING.x,
                     }}
                   >
                     <AppBreadcrumbs />
