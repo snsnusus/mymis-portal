@@ -13,7 +13,7 @@ type ControlledDateOnlyPickerProps = Omit<
   rules?: UseControllerProps['rules'];
 };
 
-const ControlledDateOnlyPicker = (
+export const ControlledDateOnlyPicker = (
   props: ControlledDateOnlyPickerProps
 ): ReactElement => {
   const { name, rules, helperText, ...rest } = props;
@@ -35,5 +35,3 @@ const ControlledDateOnlyPicker = (
     />
   );
 };
-
-export default ControlledDateOnlyPicker;

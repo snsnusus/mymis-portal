@@ -7,7 +7,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import ControlledDateOnlyPicker from '~/components/form/inputs/controlled/date-only-picker';
+import { ControlledDateOnlyPicker } from '~/components/form/inputs/controlled/date-only-picker';
 import { ControlledTextField } from '~/components/form/inputs/controlled/textfield';
 import { SectionLabel } from '~/components/section-label';
 
@@ -29,15 +29,10 @@ export const ProviderInfo = (): ReactElement => (
               label="Code *"
               name="code"
               placeholder="MAXI"
-              fullWidth
             />
           </Grid>
           <Grid size={{ xs: 12, md: 8 }}>
-            <ControlledTextField
-              label="Provider name *"
-              name="name"
-              fullWidth
-            />
+            <ControlledTextField label="Provider name *" name="name" />
           </Grid>
         </Grid>
       </Stack>

@@ -1,4 +1,3 @@
-/** Response from GET /api/HmoProviders and GET /api/HmoProviders/{id}. */
 export interface HmoProvider {
   id: number;
   code: string;
@@ -7,18 +6,13 @@ export interface HmoProvider {
   hotline: string | null;
   supportEmail: string | null;
   websiteUrl: string | null;
-  /** Calendar date as sent by the API: 'YYYY-MM-DD'. */
   contractStartDate: string;
-  /** Calendar date as sent by the API: 'YYYY-MM-DD'. */
   contractEndDate: string;
   isActive: boolean;
-  /** UTC timestamp, ISO 8601 (ends in 'Z'). */
   createdAt: string;
-  /** UTC timestamp, ISO 8601 (ends in 'Z'). */
   updatedAt: string;
 }
 
-/** Body for POST /api/HmoProviders and PUT /api/HmoProviders/{id}. */
 export interface HmoProviderPayload {
   code: string;
   name: string;
@@ -31,7 +25,6 @@ export interface HmoProviderPayload {
   isActive: boolean;
 }
 
-/** API values for HmoPlanTier. Display labels live in the HMO constants file. */
 export const HMO_PLAN_TIERS = [
   'Executive',
   'Managerial',
@@ -39,7 +32,6 @@ export const HMO_PLAN_TIERS = [
 ] as const;
 export type HmoPlanTier = (typeof HMO_PLAN_TIERS)[number];
 
-/** API values for HmoRoomType, best to worst (same order as the C# enum). */
 export const HMO_ROOM_TYPES = [
   'OpenSuite',
   'SmallSuite',
@@ -51,25 +43,20 @@ export const HMO_ROOM_TYPES = [
 ] as const;
 export type HmoRoomType = (typeof HMO_ROOM_TYPES)[number];
 
-/** API values for HmoPremiumFrequency. */
 export const HMO_PREMIUM_FREQUENCIES = ['Monthly', 'Annual'] as const;
 export type HmoPremiumFrequency = (typeof HMO_PREMIUM_FREQUENCIES)[number];
 
-/** One coverage line. Same shape in requests and responses. */
 export interface HmoPlanCoverageItem {
   name: string;
-  /** Peso cap, if the item has one. */
   limitAmount: number | null;
   notes: string | null;
 }
 
-/** One category heading with its items. Same shape in requests and responses. */
 export interface HmoPlanCoverageGroup {
   category: string;
   items: HmoPlanCoverageItem[];
 }
 
-/** Row from GET /api/HmoPlans?providerId= (no coverage). */
 export interface HmoPlanSummary {
   id: number;
   hmoProviderId: number;
@@ -87,15 +74,10 @@ export interface HmoPlan extends HmoPlanSummary {
   hmoProviderName: string;
   employerSubsidyPercentage: number;
   pecCovered: boolean;
-  /** null when pecCovered is false. */
   pecLimit: number | null;
-  /** null when allowDependents is false. */
   dependentPremiumCost: number | null;
-  /** null when allowDependents is false. */
   dependentSubsidyPercentage: number | null;
-  /** UTC timestamp, ISO 8601. */
   createdAt: string;
-  /** UTC timestamp, ISO 8601. */
   updatedAt: string;
   coverageGroups: HmoPlanCoverageGroup[];
 }
@@ -118,28 +100,23 @@ export interface HmoPlanPayload {
   coverageGroups: HmoPlanCoverageGroup[];
 }
 
-/** A plan inside a provider-create request: the provider doesn't exist yet, so no hmoProviderId. */
 export type HmoNewPlanPayload = Omit<HmoPlanPayload, 'hmoProviderId'>;
 
-/** Body for POST /api/HmoProviders: the provider plus its initial plans. */
 export interface HmoProviderCreatePayload extends HmoProviderPayload {
   plans: HmoNewPlanPayload[];
 }
 
-/** Row from GET /api/HmoProviders/lookup (active providers with at least one active plan). */
 export interface HmoProviderLookup {
   id: number;
   name: string;
 }
 
-/** Row from GET /api/HmoPlans/lookup?providerId= (that provider's active plans). */
 export interface HmoPlanLookup {
   id: number;
   name: string;
   allowDependents: boolean;
 }
 
-/** API values for HmoDependentRelationship. */
 export const HMO_DEPENDENT_RELATIONSHIPS = [
   'Spouse',
   'Child',
@@ -149,27 +126,21 @@ export const HMO_DEPENDENT_RELATIONSHIPS = [
 export type HmoDependentRelationship =
   (typeof HMO_DEPENDENT_RELATIONSHIPS)[number];
 
-/** One dependent: inside an enrollment request, and the body of the dependent POST/PUT. */
 export interface EmployeeHmoDependentPayload {
   firstName: string;
   middleName: string | null;
   lastName: string;
   suffix: string | null;
-  /** Calendar date: 'YYYY-MM-DD'. */
   birthdate: string;
   relationship: HmoDependentRelationship;
-  /** null = same plan as the employee (the API fills it in). */
   hmoPlanId: number | null;
   memberNumber: string | null;
 }
 
-/** The `hmo` object in POST /api/Employees, and the body of POST /api/Employees/{id}/hmo. */
 export interface EmployeeHmoPayload {
   hmoPlanId: number;
   memberNumber: string;
-  /** Calendar date: 'YYYY-MM-DD'. */
   effectiveDate: string;
-  /** Calendar date: 'YYYY-MM-DD', or null for "until further notice". */
   endDate: string | null;
   dependents: EmployeeHmoDependentPayload[];
 }
