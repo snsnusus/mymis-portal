@@ -1,11 +1,9 @@
-import type { AvatarStyle } from '~/models/employee.model';
 import type { EmployeeCreateFormValues } from '../../types';
 
 import { useState, type ReactElement } from 'react';
-import { useController, useFormContext } from 'react-hook-form';
-import { useDebouncedValue } from '~/hooks/use-debounced-value';
+import { useFormContext } from 'react-hook-form';
 
-import { Divider, Grid, Stack, Typography, MenuItem } from '@mui/material';
+import { Grid, Stack, MenuItem } from '@mui/material';
 
 import { ControlledAutocomplete } from '~/components/form/inputs/controlled/autocomplete';
 import { ControlledDateOnlyPicker } from '~/components/form/inputs/controlled/date-only-picker';
@@ -16,7 +14,6 @@ import { SectionLabel } from '~/components/section-label';
 import { SectionHeader } from '~/components/section-header';
 import { Card } from '~/components/ui/card';
 
-import { DynamicAvatar } from './dynamic-avatar';
 import { UploadedImagePreview } from './uploaded-image-preview';
 
 import { validateFile } from '~/utils';
@@ -107,22 +104,11 @@ const DemographicFields = (): ReactElement => (
 );
 
 export const PersonalInfo = (): ReactElement => {
-  const { field: avatarStyleField } = useController({ name: 'avatarStyle' });
   const { watch, setValue } = useFormContext<EmployeeCreateFormValues>();
   const [uploadeImage, setUploadedImage] = useState<File | null>(null);
   const [isOpenCropperDialog, setIsOpenCropperDialog] = useState(false);
 
   const avatar = watch('avatar');
-  const firstName = watch('firstName');
-  const lastName = watch('lastName');
-  const gender = watch('gender');
-
-  const debouncedName = useDebouncedValue(
-    `${firstName} ${lastName}`.trim(),
-    300
-  );
-  const seed = `default:${debouncedName}`;
-  const avatarStyle = avatarStyleField.value as AvatarStyle | null;
 
   const handleImageUpload = (files: File[]): void => {
     if (files && files.length > 0) {
@@ -153,19 +139,8 @@ export const PersonalInfo = (): ReactElement => {
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 6 }}>
           <Stack spacing={2}>
-            {avatar ? (
-              <UploadedImagePreview image={avatar} />
-            ) : (
-              <DynamicAvatar
-                avatarStyle={avatarStyle}
-                gender={gender}
-                onStyleChange={avatarStyleField.onChange}
-                seed={seed}
-              />
-            )}
-            <Divider>
-              <Typography variant="body1">OR</Typography>
-            </Divider>
+            <SectionLabel title="Display Picture" />
+            {avatar && <UploadedImagePreview image={avatar} />}
             <FileUploadZone
               onFilesSelected={handleImageUpload}
               multiple={false}

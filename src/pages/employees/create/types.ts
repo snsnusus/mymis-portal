@@ -50,6 +50,8 @@ export interface Phone {
   formatted: string;
 }
 
+export type PasswordMode = 'free-text' | 'default' | 'random';
+
 export interface EmployeeCreateFormValues {
   firstName: string;
   middleName: string;
@@ -57,7 +59,7 @@ export interface EmployeeCreateFormValues {
   suffix?: string;
   gender: string;
   maritalStatus: string;
-  birthdate: Date | null;
+  birthdate: string;
   birthplace?: string;
   nationality?: string;
   avatar: File | null;
@@ -82,6 +84,7 @@ export interface EmployeeCreateFormValues {
   hmo: HmoValues;
   username: string;
   password: string;
+  passwordMode: PasswordMode;
 }
 
 export type WizardStep = {

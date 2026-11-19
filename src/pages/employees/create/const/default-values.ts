@@ -52,7 +52,7 @@ export const DEFAULT_VALUES: EmployeeCreateFormValues = {
   suffix: '',
   gender: '',
   maritalStatus: '',
-  birthdate: null,
+  birthdate: '',
   birthplace: '',
   nationality: '',
   avatar: null,
@@ -77,4 +77,5 @@ export const DEFAULT_VALUES: EmployeeCreateFormValues = {
   hmo: EMPTY_HMO,
   username: '',
   password: '',
+  passwordMode: 'default',
 };

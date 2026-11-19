@@ -23,7 +23,7 @@ const ActionBar = styled(Stack)(({ theme }) => ({
 }));
 
 const CreateEmployee = (): ReactElement => {
-  const [activeStep, setActiveStep] = useState(3);
+  const [activeStep, setActiveStep] = useState(0);
   const [errorScrollRequest, setErrorScrollRequest] = useState(0);
 
   const topRef = useRef<HTMLDivElement>(null);
