@@ -205,7 +205,7 @@ export const ContactDetails = (): ReactElement => {
         <Stack sx={{ gap: 1 }}>
           <Stack sx={{ gap: 1 }}>
             <SectionLabel title="Addresses" />
-            <Grid container spacing={2}>
+            <Grid container columnSpacing={6}>
               <Grid size={{ xs: 12, md: 6 }}>
                 <RemovableItemList
                   items={addresses}
@@ -226,7 +226,7 @@ export const ContactDetails = (): ReactElement => {
 
           <Stack sx={{ gap: 1 }}>
             <SectionLabel title="Phone Numbers" />
-            <Grid container spacing={2}>
+            <Grid container columnSpacing={6}>
               <Grid size={{ xs: 12, md: 6 }}>
                 <RemovableItemList
                   items={phones}
@@ -250,7 +250,7 @@ export const ContactDetails = (): ReactElement => {
 
           <Stack sx={{ gap: 1 }}>
             <SectionLabel title="Emails" />
-            <Grid container spacing={2}>
+            <Grid container columnSpacing={6}>
               <Grid size={{ xs: 12, md: 6 }}>
                 <RemovableItemList
                   items={emails}
