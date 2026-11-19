@@ -12,7 +12,7 @@ import Navbar from './navbar';
 import Sidebar from './sidebar';
 import Footer from './footer';
 
-export const PAGE_PADDING = { x: 4, y: 2 } as const;
+import { FOOTER_HEIGHT, PAGE_PADDING } from './constants';
 
 const AppWrapper = styled('div')({
   display: 'flex',
@@ -30,7 +30,7 @@ const MainSection = styled('div')({
 const Content = styled(Box)<BoxProps>(({ theme }) => ({
   flexGrow: 1,
   minHeight: `calc(100% - ${theme.mixins.toolbar.minHeight}px)`,
-  marginBottom: theme.mixins.toolbar.minHeight,
+  marginBottom: FOOTER_HEIGHT,
 }));
 
 const TopOffset = styled('div')(({ theme }) => ({

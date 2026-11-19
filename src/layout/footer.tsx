@@ -8,6 +8,7 @@ import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { Typography } from '@mui/material';
+import { FOOTER_HEIGHT } from './constants';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   top: 'auto',
@@ -22,7 +23,7 @@ const StyledDivider = styled(Divider)(({ theme }) => ({
 
 const Footer = (): ReactElement => (
   <StyledAppBar position="fixed">
-    <Toolbar>
+    <Toolbar sx={{ minHeight: FOOTER_HEIGHT, height: FOOTER_HEIGHT }}>
       <Box
         sx={{
           flexGrow: 1,
