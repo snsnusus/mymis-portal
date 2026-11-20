@@ -4,6 +4,8 @@ import type { Barangay } from '~/models/barangay.model';
 import type { City } from '~/models/city.model';
 import type { Region } from '~/models/region.model';
 import type {
+  AddressType,
+  ContactOwnership,
   EmployeeType,
   EmergencyContactRelationship,
   EmploymentStatus,
@@ -49,6 +51,18 @@ export interface Phone {
   formatted: string;
 }
 
+/** An employee address entry: the shared address fields plus its type. */
+export type EmployeeAddressValues = Address & { type: AddressType };
+
+/** An employee phone entry: the shared phone fields plus who owns it. */
+export type EmployeePhoneValues = Phone & { ownership: ContactOwnership };
+
+/** An employee email entry. */
+export type EmployeeEmailValues = {
+  value: string;
+  ownership: ContactOwnership;
+};
+
 export type PasswordMode = 'free-text' | 'default' | 'random';
 
 export interface EmployeeCreateFormValues {
@@ -62,9 +76,9 @@ export interface EmployeeCreateFormValues {
   birthplace?: string;
   nationality?: string;
   avatar: File | null;
-  addresses: Address[];
-  phones: Phone[];
-  emails: Array<{ value: string }>;
+  addresses: EmployeeAddressValues[];
+  phones: EmployeePhoneValues[];
+  emails: EmployeeEmailValues[];
   emergencyContact: {
     firstName: string;
     middleName?: string;
@@ -80,6 +94,10 @@ export interface EmployeeCreateFormValues {
   positionId: number | null;
   joiningDate: Date | null;
   hmo: HmoValues;
+  ssNumber: string;
+  philHealthNumber: string;
+  pagIbigNumber: string;
+  tinNumber: string;
   username: string;
   password: string;
   passwordMode: PasswordMode;

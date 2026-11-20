@@ -112,3 +112,7 @@ export type UsernameSuggestionParams = {
   lastName: string;
   birthdate?: string;
 };
+
+export type AddressType = 'Present' | 'Permanent' | 'Other';
+
+export type ContactOwnership = 'Corporate' | 'Personal' | 'Other';

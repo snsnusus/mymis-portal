@@ -1,6 +1,5 @@
-import type { Region } from '~/models/region.model';
-import type { City } from '~/models/city.model';
-import type { Barangay } from '~/models/barangay.model';
+import type { AddressType } from '~/models/employee.model';
+import type { EmployeeAddressValues } from '../../types';
 
 import { type ChangeEvent, useState, type ReactElement } from 'react';
 
@@ -10,6 +9,7 @@ import { useGetAll as useGetRegions } from '~/queries/region.query';
 
 import { type z } from 'zod';
 
+import { Button, Grid, MenuItem, Stack, TextField } from '@mui/material';
 import { AddLocationAlt as AddLocationAltIcon } from '@mui/icons-material';
 
 import { LocationAutocomplete } from '~/components/form/inputs/base/location-autocomplete';
@@ -17,30 +17,25 @@ import { LocationAutocomplete } from '~/components/form/inputs/base/location-aut
 import { formatAddress } from '~/utils/address.utils';
 
 import { ADDRESS_SCHEMA } from '../../schemas';
+import { ADDRESS_TYPE_OPTIONS } from '../../constants/options';
 import { EMPTY_ADDRESS } from '../../constants/default-values';
-import { Button, Grid, Stack, TextField } from '@mui/material';
-
-interface AddressFormValues {
-  addressLine1: string;
-  addressLine2?: string;
-  region: Region | null;
-  city: City | null;
-  barangay: Barangay | null;
-  postalCode: string;
-  formattedAddress: string;
-}
 
 type AddressFieldErrors = Partial<
   Record<keyof z.infer<typeof ADDRESS_SCHEMA>, string>
 >;
 
-export const AddAddressForm = ({
+const defaultValues: EmployeeAddressValues = {
+  ...EMPTY_ADDRESS,
+  type: 'Present',
+};
+
+export const AddressAddForm = ({
   onSave,
 }: {
-  onSave: (values: AddressFormValues) => void;
+  onSave: (values: EmployeeAddressValues) => void;
 }): ReactElement => {
   const [formValues, setFormValues] =
-    useState<AddressFormValues>(EMPTY_ADDRESS);
+    useState<EmployeeAddressValues>(defaultValues);
   const [errors, setErrors] = useState<AddressFieldErrors>({});
 
   const { data: regions = [] } = useGetRegions();
@@ -89,18 +84,39 @@ export const AddAddressForm = ({
       ...formValues,
       formattedAddress: formatAddress(formValues),
     });
-    setFormValues(EMPTY_ADDRESS);
+    setFormValues(defaultValues);
     setErrors({});
   };
 
   const handleClear = (): void => {
-    setFormValues(EMPTY_ADDRESS);
+    setFormValues(defaultValues);
     setErrors({});
   };
 
   return (
-    <Stack sx={{ gap: 2 }}>
+    <Stack spacing={2}>
       <Grid container spacing={2}>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            select
+            label="Address Type"
+            value={formValues.type}
+            onChange={(event) =>
+              setFormValues((prev) => ({
+                ...prev,
+                type: event.target.value as AddressType,
+              }))
+            }
+            fullWidth
+            size="small"
+          >
+            {ADDRESS_TYPE_OPTIONS.map(({ label, value }) => (
+              <MenuItem key={value} value={value}>
+                {label}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
         <Grid size={12}>
           <TextField
             name="addressLine1"

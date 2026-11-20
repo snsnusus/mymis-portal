@@ -1,9 +1,10 @@
 import type { MuiTelInputInfo } from 'mui-tel-input';
-import type { Phone } from '../../types';
+import type { ContactOwnership } from '~/models/employee.model';
+import type { EmployeePhoneValues, Phone } from '../../types';
 
 import { useState, type ReactElement } from 'react';
 
-import { Button, Stack, Typography } from '@mui/material';
+import { Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import AddIcCallIcon from '@mui/icons-material/AddIcCall';
 
 import { PhoneNumberInput } from '~/components/form/inputs/base/phone-number-input';
@@ -11,11 +12,12 @@ import { PhoneNumberInput } from '~/components/form/inputs/base/phone-number-inp
 import { formatPhoneNumber } from '~/utils/phone-number.utils';
 
 import { EMPTY_PHONE } from '../../constants/default-values';
+import { CONTACT_OWNERSHIP_OPTIONS } from '../../constants/options';
 import { PHONE_NUMBER_SCHEMA } from '../../schemas';
 
 interface AddPhoneFormProps {
   phones: Phone[];
-  onSave: (values: Phone) => void;
+  onSave: (values: EmployeePhoneValues) => void;
 }
 
 export const AddPhoneNumberForm = ({
@@ -23,6 +25,7 @@ export const AddPhoneNumberForm = ({
   onSave,
 }: AddPhoneFormProps): ReactElement => {
   const [formValues, setFormValues] = useState<Phone>(EMPTY_PHONE);
+  const [ownership, setOwnership] = useState<ContactOwnership>('Personal');
   const [errorMessage, setErrorMessage] = useState('');
 
   const isDuplicate = (value: string): boolean =>
@@ -46,6 +49,7 @@ export const AddPhoneNumberForm = ({
 
   const handleClear = (): void => {
     setFormValues(EMPTY_PHONE);
+    setOwnership('Personal');
     setErrorMessage('');
   };
 
@@ -72,20 +76,41 @@ export const AddPhoneNumberForm = ({
       return;
     }
 
-    onSave(formValues);
+    onSave({ ...formValues, ownership });
 
     setFormValues(EMPTY_PHONE);
+    setOwnership('Personal');
     setErrorMessage('');
   };
 
   return (
     <Stack spacing={2}>
       <Stack spacing={1}>
-        <PhoneNumberInput
-          label="Phone Number *"
-          value={formValues.international}
-          onChange={handleChange}
-        />
+        <Stack direction="row" sx={{ gap: 1 }}>
+          <Stack sx={{ flex: 1 }}>
+            <PhoneNumberInput
+              label="Phone Number *"
+              value={formValues.international}
+              onChange={handleChange}
+            />
+          </Stack>
+          <TextField
+            select
+            label="Ownership"
+            value={ownership}
+            onChange={(event) =>
+              setOwnership(event.target.value as ContactOwnership)
+            }
+            size="small"
+            sx={{ width: 150 }}
+          >
+            {CONTACT_OWNERSHIP_OPTIONS.map(({ label, value }) => (
+              <MenuItem key={value} value={value}>
+                {label}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Stack>
         {errorMessage && (
           <Typography variant="caption" color="error">
             {errorMessage}

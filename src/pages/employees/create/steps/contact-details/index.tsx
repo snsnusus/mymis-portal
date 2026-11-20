@@ -35,7 +35,7 @@ import { RELATIONSHIP_OPTIONS } from '../../constants/options';
 
 import { matchIsValidTel } from 'mui-tel-input';
 
-import { AddAddressForm } from './add-address-form';
+import { AddressAddForm } from './address-add-form';
 import { AddEmailForm } from './add-email-form';
 import { AddPhoneNumberForm } from './add-phone-number-form';
 import { EmergencyContactAddressFields } from './emergency-contact-address-fields';
@@ -230,7 +230,9 @@ export const ContactDetails = (): ReactElement => {
                 <RemovableItemList
                   items={addresses}
                   getKey={(address) => address.id}
-                  getLabel={(_, index) => `Address ${index + 1}`}
+                  getLabel={(address, index) =>
+                    `Address ${index + 1} · ${address.type}`
+                  }
                   getValue={(address) => address.formattedAddress}
                   icon={<PlaceIcon color="error" fontSize="large" />}
                   onRemove={removeAddress}
@@ -244,7 +246,7 @@ export const ContactDetails = (): ReactElement => {
                 )}
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
-                <AddAddressForm onSave={(values) => addAddress(values)} />
+                <AddressAddForm onSave={(values) => addAddress(values)} />
               </Grid>
             </Grid>
           </Stack>
@@ -256,7 +258,9 @@ export const ContactDetails = (): ReactElement => {
                 <RemovableItemList
                   items={phones}
                   getKey={(phone) => phone.id}
-                  getLabel={(_, index) => `Phone Number ${index + 1}`}
+                  getLabel={(phone, index) =>
+                    `Phone Number ${index + 1} · ${phone.ownership}`
+                  }
                   getValue={(phone) => phone.international}
                   icon={<SmartphoneIcon color="error" fontSize="large" />}
                   onRemove={removePhone}
@@ -280,7 +284,9 @@ export const ContactDetails = (): ReactElement => {
                 <RemovableItemList
                   items={emails}
                   getKey={(email) => email.id}
-                  getLabel={(_, index) => `Email ${index + 1}`}
+                  getLabel={(email, index) =>
+                    `Email ${index + 1} · ${email.ownership}`
+                  }
                   getValue={(email) => email.value}
                   icon={<EmailIcon color="error" fontSize="large" />}
                   onRemove={removeEmail}

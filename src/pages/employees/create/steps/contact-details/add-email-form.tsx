@@ -1,13 +1,16 @@
+import type { EmployeeEmailValues } from '../../types';
+import type { ContactOwnership } from '~/models/employee.model';
 import { type ReactElement, useState } from 'react';
 
-import { Button, Stack, TextField } from '@mui/material';
+import { Button, MenuItem, Stack, TextField } from '@mui/material';
 import EmailIcon from '@mui/icons-material/Email';
 
+import { CONTACT_OWNERSHIP_OPTIONS } from '../../constants/options';
 import { EMAIL_SCHEMA } from '../../schemas';
 
 interface AddEmailFormProps {
   emails: Array<{ value: string }>;
-  onSave: (value: { value: string }) => void;
+  onSave: (value: EmployeeEmailValues) => void;
 }
 
 export const AddEmailForm = ({
@@ -15,6 +18,7 @@ export const AddEmailForm = ({
   onSave,
 }: AddEmailFormProps): ReactElement => {
   const [input, setInput] = useState('');
+  const [ownership, setOwnership] = useState<ContactOwnership>('Personal');
   const [errorMessage, setErrorMessage] = useState('');
 
   const validateEmail = (value: string): string => {
@@ -25,6 +29,7 @@ export const AddEmailForm = ({
 
   const clear = (): void => {
     setInput('');
+    setOwnership('Personal');
     setErrorMessage('');
   };
 
@@ -50,32 +55,51 @@ export const AddEmailForm = ({
       return;
     }
 
-    onSave({ value: input });
+    onSave({ value: input, ownership });
     clear();
   };
 
   return (
     <Stack spacing={2}>
-      <TextField
-        label="Email Address *"
-        type="email"
-        variant="outlined"
-        size="small"
-        value={input}
-        onChange={(e) => {
-          setInput(e.target.value);
-          if (errorMessage) setErrorMessage('');
-        }}
-        onBlur={handleBlur}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            handleSave();
+      <Stack direction="row" sx={{ gap: 1, alignItems: 'flex-start' }}>
+        <TextField
+          label="Email Address *"
+          type="email"
+          variant="outlined"
+          size="small"
+          value={input}
+          onChange={(e) => {
+            setInput(e.target.value);
+            if (errorMessage) setErrorMessage('');
+          }}
+          onBlur={handleBlur}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleSave();
+            }
+          }}
+          error={!!errorMessage}
+          helperText={errorMessage}
+          sx={{ flex: 1 }}
+        />
+        <TextField
+          select
+          label="Ownership"
+          value={ownership}
+          onChange={(event) =>
+            setOwnership(event.target.value as ContactOwnership)
           }
-        }}
-        error={!!errorMessage}
-        helperText={errorMessage}
-      />
+          size="small"
+          sx={{ width: 150 }}
+        >
+          {CONTACT_OWNERSHIP_OPTIONS.map(({ label, value }) => (
+            <MenuItem key={value} value={value}>
+              {label}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Stack>
       <Stack
         direction="row"
         sx={{

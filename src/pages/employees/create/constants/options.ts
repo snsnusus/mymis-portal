@@ -1,4 +1,8 @@
-import type { EmergencyContactRelationship } from '~/models/employee.model';
+import type {
+  AddressType,
+  ContactOwnership,
+  EmergencyContactRelationship,
+} from '~/models/employee.model';
 
 export const GENDER_OPTIONS = [
   {
@@ -53,4 +57,22 @@ export const EMPLOYEE_TYPE_OPTIONS = [
     label: 'MANAGEMENT',
     value: 'Management',
   },
+];
+
+export const ADDRESS_TYPE_OPTIONS: Array<{
+  label: string;
+  value: AddressType;
+}> = [
+  { label: 'Present', value: 'Present' },
+  { label: 'Permanent', value: 'Permanent' },
+  { label: 'Other', value: 'Other' },
+];
+
+export const CONTACT_OWNERSHIP_OPTIONS: Array<{
+  label: string;
+  value: ContactOwnership;
+}> = [
+  { label: 'Personal', value: 'Personal' },
+  { label: 'Corporate', value: 'Corporate' },
+  { label: 'Other', value: 'Other' },
 ];
