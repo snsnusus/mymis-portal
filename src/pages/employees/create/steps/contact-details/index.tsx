@@ -9,6 +9,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormHelperText,
   Grid,
   List,
   ListItemButton,
@@ -30,7 +31,7 @@ import { ControlledTextField } from '~/components/form/inputs/controlled/textfie
 import { ControlledPhoneNumberInput } from '~/components/form/inputs/controlled/phone-number-input';
 
 import { RemovableItemList } from '../../shared/removable-item-list';
-import { RELATIONSHIP_OPTIONS } from '../../const/options';
+import { RELATIONSHIP_OPTIONS } from '../../constants/options';
 
 import { matchIsValidTel } from 'mui-tel-input';
 
@@ -157,7 +158,11 @@ const EmergencyContactIdentityFields = (): ReactElement => (
 );
 
 export const ContactDetails = (): ReactElement => {
-  const { control, setValue } = useFormContext<EmployeeCreateFormValues>();
+  const {
+    control,
+    setValue,
+    formState: { errors },
+  } = useFormContext<EmployeeCreateFormValues>();
   const {
     fields: addresses,
     append: addAddress,
@@ -165,6 +170,11 @@ export const ContactDetails = (): ReactElement => {
   } = useFieldArray<EmployeeCreateFormValues, 'addresses'>({
     control,
     name: 'addresses',
+    rules: {
+      validate: (items) =>
+        items.length > 0 ||
+        'Add at least one address. Fill in the form, then click Add address.',
+    },
   });
   const {
     fields: phones,
@@ -173,6 +183,11 @@ export const ContactDetails = (): ReactElement => {
   } = useFieldArray<EmployeeCreateFormValues, 'phones'>({
     control,
     name: 'phones',
+    rules: {
+      validate: (items) =>
+        items.length > 0 ||
+        'Add at least one phone number. Fill in the form, then click Add phone number.',
+    },
   });
   const {
     fields: emails,
@@ -181,6 +196,11 @@ export const ContactDetails = (): ReactElement => {
   } = useFieldArray({
     control,
     name: 'emails',
+    rules: {
+      validate: (items) =>
+        items.length > 0 ||
+        'Add at least one email. Fill in the form, then click Add email.',
+    },
   });
 
   const handleSelectExistingAddress = (afv: Address): void => {
@@ -217,6 +237,11 @@ export const ContactDetails = (): ReactElement => {
                   removeLabel="Remove address"
                   emptyText="No address added yet."
                 />
+                {errors.addresses?.root?.message && (
+                  <FormHelperText error>
+                    {errors.addresses.root.message}
+                  </FormHelperText>
+                )}
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
                 <AddAddressForm onSave={(values) => addAddress(values)} />

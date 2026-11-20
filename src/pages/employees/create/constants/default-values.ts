@@ -56,7 +56,6 @@ export const DEFAULT_VALUES: EmployeeCreateFormValues = {
   birthplace: '',
   nationality: '',
   avatar: null,
-  avatarStyle: null,
   addresses: [],
   phones: [],
   emails: [],

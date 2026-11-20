@@ -1,7 +1,7 @@
 import { type ReactElement, useState } from 'react';
 
 import { Button, Stack, TextField } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
+import EmailIcon from '@mui/icons-material/Email';
 
 import { EMAIL_SCHEMA } from '../../schemas';
 
@@ -88,7 +88,7 @@ export const AddEmailForm = ({
         </Button>
         <Button
           variant="contained"
-          startIcon={<AddIcon />}
+          startIcon={<EmailIcon />}
           size="small"
           onClick={handleSave}
           disabled={Boolean(errorMessage)}

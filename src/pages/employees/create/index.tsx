@@ -25,8 +25,8 @@ import { AlertDialog } from '~/components/ui/alert-dialog';
 import { Stepper, StepConnector, StepLabel } from './styled-components';
 
 import { FOOTER_HEIGHT, PAGE_PADDING } from '~/layout/constants';
-import { DEFAULT_VALUES } from './const/default-values';
-import { STEPS } from './const/steps';
+import { DEFAULT_VALUES } from './constants/default-values';
+import { STEPS } from './constants/steps';
 
 const ActionBar = styled(Stack, {
   shouldForwardProp: (prop) => prop !== 'isStuck',

@@ -25,7 +25,7 @@ import {
   HMO_DEPENDENT_RELATIONSHIPS,
   type HmoPlanLookup,
 } from '~/models/hmo.model';
-import { EMPTY_HMO_DEPENDENT } from '../../const/default-values';
+import { EMPTY_HMO_DEPENDENT } from '../../constants/default-values';
 
 import { isDuplicate } from '~/utils/array.util';
 import { dateToDateOnly } from '~/utils/date.util';

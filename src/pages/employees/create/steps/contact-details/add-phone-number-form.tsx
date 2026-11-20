@@ -4,13 +4,13 @@ import type { Phone } from '../../types';
 import { useState, type ReactElement } from 'react';
 
 import { Button, Stack, Typography } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
+import AddIcCallIcon from '@mui/icons-material/AddIcCall';
 
 import { PhoneNumberInput } from '~/components/form/inputs/base/phone-number-input';
 
 import { formatPhoneNumber } from '~/utils/phone-number.utils';
 
-import { EMPTY_PHONE } from '../../const/default-values';
+import { EMPTY_PHONE } from '../../constants/default-values';
 import { PHONE_NUMBER_SCHEMA } from '../../schemas';
 
 interface AddPhoneFormProps {
@@ -105,7 +105,7 @@ export const AddPhoneNumberForm = ({
         <Button
           variant="contained"
           size="small"
-          startIcon={<AddIcon />}
+          startIcon={<AddIcCallIcon />}
           onClick={handleSave}
         >
           Add Phone Number

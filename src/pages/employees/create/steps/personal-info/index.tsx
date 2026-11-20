@@ -21,7 +21,7 @@ import {
   GENDER_OPTIONS,
   MARITAL_STATUS_OPTIONS,
   NATIONALITY_OPTIONS,
-} from '../../const/options';
+} from '../../constants/options';
 
 const FILE_CONFIG = {
   maxFileSize: { bytes: 5 * 1024 * 1024, formattedLabel: '5MB' },

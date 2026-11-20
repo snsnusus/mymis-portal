@@ -20,7 +20,6 @@ export const STEPS: WizardStep[] = [
       'birthplace',
       'nationality',
       'avatar',
-      'avatarStyle',
     ],
   },
   {

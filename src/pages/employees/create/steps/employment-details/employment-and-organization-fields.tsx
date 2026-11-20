@@ -12,7 +12,7 @@ import { ControlledTextField } from '~/components/form/inputs/controlled/textfie
 import { ControlledAutocomplete } from '~/components/form/inputs/controlled/autocomplete';
 import { ControlledDatePicker } from '~/components/form/inputs/controlled/datepicker';
 
-import { EMPLOYEE_TYPE_OPTIONS } from '../../const/options';
+import { EMPLOYEE_TYPE_OPTIONS } from '../../constants/options';
 
 export const EmploymentAndOrganizationFields = (): ReactElement => {
   const { watch, setValue } = useFormContext<EmployeeCreateFormValues>();

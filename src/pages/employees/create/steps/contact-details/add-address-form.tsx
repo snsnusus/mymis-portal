@@ -17,7 +17,7 @@ import { LocationAutocomplete } from '~/components/form/inputs/base/location-aut
 import { formatAddress } from '~/utils/address.utils';
 
 import { ADDRESS_SCHEMA } from '../../schemas';
-import { EMPTY_ADDRESS } from '../../const/default-values';
+import { EMPTY_ADDRESS } from '../../constants/default-values';
 import { Button, Grid, Stack, TextField } from '@mui/material';
 
 interface AddressFormValues {

@@ -4,7 +4,6 @@ import type { Barangay } from '~/models/barangay.model';
 import type { City } from '~/models/city.model';
 import type { Region } from '~/models/region.model';
 import type {
-  AvatarStyle,
   EmployeeType,
   EmergencyContactRelationship,
   EmploymentStatus,
@@ -63,7 +62,6 @@ export interface EmployeeCreateFormValues {
   birthplace?: string;
   nationality?: string;
   avatar: File | null;
-  avatarStyle: AvatarStyle | null;
   addresses: Address[];
   phones: Phone[];
   emails: Array<{ value: string }>;
